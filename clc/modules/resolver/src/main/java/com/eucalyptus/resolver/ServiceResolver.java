@@ -19,7 +19,10 @@
  ************************************************************************/
 package com.eucalyptus.resolver;
 
+import static com.eucalyptus.ws.util.HmacUtils.SignatureVariant;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.codec.DecoderException;
@@ -27,10 +30,14 @@ import org.apache.commons.codec.net.URLCodec;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
+import com.eucalyptus.auth.login.AuthenticationException;
 import com.eucalyptus.auth.policy.PolicySpec;
 import com.eucalyptus.http.MappingHttpRequest;
+import com.eucalyptus.util.CollectionUtils;
 import com.eucalyptus.ws.protocol.OperationParameter;
 import com.eucalyptus.ws.protocol.RequiredQueryParams;
+import com.eucalyptus.ws.util.HmacUtils;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -48,7 +55,8 @@ enum ServiceResolver {
       PolicySpec.AUTOSCALING_ACTIONS,
       ImmutableSet.of(
           OperationParameter.Action.toString( ),
-          OperationParameter.Operation.toString( ) )
+          OperationParameter.Operation.toString( ) ),
+      EnumSet.allOf( SignatureVariant.class )
   ),
 
   /**
@@ -57,7 +65,8 @@ enum ServiceResolver {
   CloudWatch(
       ImmutableSet.of( "2010-08-01" ),
       PolicySpec.CLOUDWATCH_ACTIONS,
-      ImmutableSet.of( OperationParameter.Action.toString( ) )
+      ImmutableSet.of( OperationParameter.Action.toString( ) ),
+      EnumSet.allOf( SignatureVariant.class )
   ),
 
   /**
@@ -78,7 +87,8 @@ enum ServiceResolver {
               "getldapsyncstatus" ) ) ),
       ImmutableSet.of(
           OperationParameter.Action.toString(),
-          OperationParameter.Operation.toString() )
+          OperationParameter.Operation.toString() ),
+      EnumSet.allOf( SignatureVariant.class )
   ),
 
   /**
@@ -129,7 +139,8 @@ enum ServiceResolver {
               "modifyinstancetypeattribute" ) ) ),
       ImmutableSet.of(
           OperationParameter.Action.toString(),
-          OperationParameter.Operation.toString() )
+          OperationParameter.Operation.toString() ),
+      EnumSet.allOf( SignatureVariant.class )
   ),
 
   /**
@@ -138,7 +149,8 @@ enum ServiceResolver {
   LoadBalancing(
       ImmutableSet.of( "2012-06-01" ),
       PolicySpec.LOADBALANCING_ACTIONS,
-      ImmutableSet.of( OperationParameter.Action.toString( ) )
+      ImmutableSet.of( OperationParameter.Action.toString( ) ),
+      EnumSet.allOf( SignatureVariant.class )
   ),
 
   /**
@@ -147,7 +159,8 @@ enum ServiceResolver {
   Tokens(
       ImmutableSet.of( "2011-06-15" ),
       PolicySpec.STS_ACTIONS,
-      ImmutableSet.of( OperationParameter.Action.toString( ) )
+      ImmutableSet.of( OperationParameter.Action.toString( ) ),
+      EnumSet.allOf( SignatureVariant.class )
   );
 
   public Set<String> getActions( ) {
@@ -161,13 +174,16 @@ enum ServiceResolver {
   private final Set<String> versions;
   private final Set<String> actions;
   private final Set<String> actionParameters;
+  private final Set<SignatureVariant> variants;
 
   private ServiceResolver( final Set<String> versions,
                            final Set<String> actions,
-                           final Set<String> actionParameters ) {
+                           final Set<String> actionParameters,
+                           final Set<SignatureVariant> variants ) {
     this.versions = versions;
     this.actions = actions;
     this.actionParameters = actionParameters;
+    this.variants = variants;
   }
 
   boolean accepts( final HttpRequest message ) {
@@ -175,7 +191,7 @@ enum ServiceResolver {
         ( message.getUri().isEmpty() || message.getUri().equals( "/" ) ) ) {
       final MappingHttpRequest httpRequest = ( MappingHttpRequest ) message;
       if ( httpRequest.getMethod( ).equals( HttpMethod.POST ) ) {
-        final Map<String,String> parameters = new HashMap<String,String>( httpRequest.getParameters( ) );
+        final Map<String,String> parameters = new HashMap<>( httpRequest.getParameters( ) );
         final Set<String> nonQueryParameters = Sets.newHashSet();
         final ChannelBuffer buffer = httpRequest.getContent( );
         buffer.markReaderIndex( );
@@ -208,11 +224,39 @@ enum ServiceResolver {
         if ( action != null ) break;
       }
 
-      return version != null && action != null &&
-          versions.contains( version ) &&
-          actions.contains( action.toLowerCase() );
+      try {
+        final SignatureVariant variant = HmacUtils.detectSignatureVariant(
+          headerLookup( httpRequest ),
+          parameterLookup( httpRequest ) );
+
+        return version != null && action != null &&
+            versions.contains( version ) &&
+            actions.contains( action.toLowerCase() ) &&
+            variants.contains( variant );
+      } catch ( AuthenticationException e ) {
+        // No signature in request
+      }
     }
 
     return false;
+  }
+
+  static Function<String,List<String>> headerLookup( final MappingHttpRequest request ) {
+    return new Function<String,List<String>>(){
+      @Override
+      public List<String> apply( final String header ) {
+        return request.getHeaders( header );
+      }
+    };
+  }
+
+  static Function<String,List<String>> parameterLookup( final MappingHttpRequest request ) {
+    final Map<String,String> parameters = request.getParameters();
+    return new Function<String,List<String>>(){
+      @Override
+      public List<String> apply( final String header ) {
+        return CollectionUtils.<String>listUnit().apply( parameters.get( header ) );
+      }
+    };
   }
 }
