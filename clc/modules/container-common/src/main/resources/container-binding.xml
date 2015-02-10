@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2009-2015 Eucalyptus Systems, Inc.
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see http://www.gnu.org/licenses/.
+
+  Please contact Eucalyptus Systems, Inc., 6755 Hollister Ave., Goleta
+  CA 93117, USA or visit http://www.eucalyptus.com/licenses/ if you need
+  additional information or have any questions.
+  -->
+<binding name="ecs_amazonaws_com_doc_2014_11_13" xmlns:tns="http://ecs.amazonaws.com/doc/2014-11-13/" force-classes="true" add-constructors="true">
+  <namespace uri="http://ecs.amazonaws.com/doc/2014-11-13/" default="elements"/>
+  <format
+      type="java.util.Date"
+      deserializer="org.jibx.runtime.Utility.deserializeDateTime"
+      serializer="com.eucalyptus.ws.util.SerializationUtils.serializeDateTime"/>
+  <mapping class="com.eucalyptus.container.common.model.ResponseMetadata" abstract="true">
+    <value name="RequestId" field="requestId" usage="required"/>
+  </mapping>
+  <mapping name="CreateCluster" class="com.eucalyptus.container.common.model.CreateClusterRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="ClusterName" field="clusterName" usage="required"/>
+  </mapping>
+  <mapping name="CreateClusterResponse" class="com.eucalyptus.container.common.model.CreateClusterResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="CreateClusterResult" field="result" usage="required" type="com.eucalyptus.container.common.model.CreateClusterResult"/>
+    <structure name="ResponseMetadata" field="responseMetadata" usage="required" type="com.eucalyptus.container.common.model.ResponseMetadata"/>
+  </mapping>
+  <mapping name="CreateClusterResult" class="com.eucalyptus.container.common.model.CreateClusterResult" abstract="true">
+    <structure name="Cluster" field="cluster" usage="required" type="com.eucalyptus.container.common.model.Cluster"/>
+  </mapping>
+  <mapping name="cluster" class="com.eucalyptus.container.common.model.Cluster" abstract="true">
+    <value name="clusterName" field="clusterName" usage="required"/>
+    <value name="clusterArn" field="clusterArn" usage="required"/>
+    <value name="status" field="status" usage="required"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.EcsMessage" abstract="true"/>
+</binding>

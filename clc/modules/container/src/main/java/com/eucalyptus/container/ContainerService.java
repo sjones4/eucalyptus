@@ -64,6 +64,7 @@ public class ContainerService {
   }
 
   public EcsMessage createCluster( final CreateClusterRequest request ) throws EcsException {
+    final CreateClusterResponse response = new CreateClusterResponse( );
     final Context ctx = Contexts.lookup( );
     final UserFullName userFullName = ctx.getUserFullName( );
     final Cluster cluster = allocate( new Supplier<Cluster>( ) {
@@ -79,8 +80,9 @@ public class ContainerService {
         }
       }
     }, Cluster.class, request.getClusterName( ) );
-    return request.reply( new CreateClusterResult( )
+    response.setResult( new CreateClusterResult( )
         .withCluster( TypeMappers.transform( cluster, com.eucalyptus.container.common.model.Cluster.class ) ) );
+    return request.reply( response );
   }
 
   public EcsMessage deleteCluster( final DeleteClusterRequest request ) throws EcsException {

@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class CreateClusterResult extends EcsMessage implements Serializable {
+public class CreateClusterResult implements Serializable {
 
     /**
      * The full description of your new cluster.

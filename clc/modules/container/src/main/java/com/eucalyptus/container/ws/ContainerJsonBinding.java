@@ -57,7 +57,7 @@ import edu.ucsb.eucalyptus.msgs.ExceptionResponseType;
 /**
  *
  */
-public class ContainerBinding extends MessageStackHandler implements ExceptionMarshallerHandler {
+public class ContainerJsonBinding extends MessageStackHandler implements ExceptionMarshallerHandler {
 
   @Override
   public void incomingMessage( final ChannelHandlerContext ctx, final MessageEvent event ) throws Exception {

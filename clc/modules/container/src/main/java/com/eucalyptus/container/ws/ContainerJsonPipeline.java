@@ -36,26 +36,26 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
- * //TODO:STEVE: should also have a Query API?
+ *
  */
 @ComponentPart( Container.class )
-public class ContainerPipeline extends FilteredPipeline {
+public class ContainerJsonPipeline extends FilteredPipeline {
   private final HmacUserAuthenticationStage auth;
   private final Set<String> servicePathPrefixes = ImmutableSet.of( ContainerConfiguration.SERVICE_PATH );
 
-  public ContainerPipeline() {
+  public ContainerJsonPipeline() {
     auth = new HmacUserAuthenticationStage( EnumSet.allOf( TemporaryAccessKey.TemporaryKeyType.class ) );
   }
 
   @Override
   public String getName() {
-    return "ecs-query-pipeline";
+    return "ecs-json-pipeline";
   }
 
   @Override
   public ChannelPipeline addHandlers( final ChannelPipeline pipeline ) {
     auth.unrollStage( pipeline );
-    pipeline.addLast( "ecs-binding", new ContainerBinding( ) );
+    pipeline.addLast( "ecs-json-binding", new ContainerJsonBinding( ) );
     return pipeline;
   }
 
