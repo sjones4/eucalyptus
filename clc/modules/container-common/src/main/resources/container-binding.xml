@@ -31,15 +31,20 @@
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
     <value name="ClusterName" field="clusterName" usage="required"/>
   </mapping>
+  <mapping type-name="EcsResponseMessage" class="com.eucalyptus.container.common.model.EcsMessage" abstract="true">
+    <structure name="ResponseMetadata">
+      <value name="RequestId" get-method="getCorrelationId" set-method="setCorrelationId" usage="required"/>
+    </structure>
+  </mapping>
   <mapping name="CreateClusterResponse" class="com.eucalyptus.container.common.model.CreateClusterResponse">
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
     <structure name="CreateClusterResult" field="result" usage="required" type="com.eucalyptus.container.common.model.CreateClusterResult"/>
-    <structure name="ResponseMetadata" field="responseMetadata" usage="required" type="com.eucalyptus.container.common.model.ResponseMetadata"/>
+    <structure map-as="EcsResponseMessage"/>
   </mapping>
-  <mapping name="CreateClusterResult" class="com.eucalyptus.container.common.model.CreateClusterResult" abstract="true">
-    <structure name="Cluster" field="cluster" usage="required" type="com.eucalyptus.container.common.model.Cluster"/>
+  <mapping class="com.eucalyptus.container.common.model.CreateClusterResult" abstract="true">
+    <structure name="cluster" field="cluster" usage="required" type="com.eucalyptus.container.common.model.Cluster"/>
   </mapping>
-  <mapping name="cluster" class="com.eucalyptus.container.common.model.Cluster" abstract="true">
+  <mapping class="com.eucalyptus.container.common.model.Cluster" abstract="true">
     <value name="clusterName" field="clusterName" usage="required"/>
     <value name="clusterArn" field="clusterArn" usage="required"/>
     <value name="status" field="status" usage="required"/>

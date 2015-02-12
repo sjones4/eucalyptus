@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#createCluster(CreateClusterRequest) CreateCluster operation}.
@@ -62,6 +63,7 @@ public class CreateClusterRequest extends EcsMessage implements Serializable {
      * The name of your cluster. If you do not specify a name for your
      * cluster, you will create a cluster named <code>default</code>.
      */
+    @HttpParameterMapping( parameter = "clusterName" )
     private String clusterName;
 
     /**

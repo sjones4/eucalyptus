@@ -29,39 +29,39 @@
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.4/mule-vm.xsd
         http://www.eucalyptus.com/schema/cloud/3.4 http://www.eucalyptus.com/schema/cloud/3.4/euca.xsd">
 
-  <euca:endpoint name="EcsControllerWS"
+  <euca:endpoint name="ContainerControllerWS"
                  connector-ref="eucaws"
-                 address="http://127.0.0.1:8773/services/Ecs"/>
-  <euca:endpoint name="EcsInternalWS"
+                 address="http://127.0.0.1:8773/services/Container"/>
+  <euca:endpoint name="ContainerInternalWS"
                  connector-ref="eucaws"
-                 address="http://127.0.0.1:8773/internal/EcsInternal"
+                 address="http://127.0.0.1:8773/internal/ContainerInternal"
                  exchange-pattern="request-response"/>
 
-  <endpoint name="EcsWS" address="vm://Ecs" exchange-pattern="one-way"/>
-  <endpoint name="EcsInternalVM" address="vm://EcsInternal" exchange-pattern="request-response"/>
-  <endpoint name="EcsErrorQueueWS" address="vm://EcsErrorQueue" exchange-pattern="one-way"/>
-  <model name="ecs">
+  <endpoint name="ContainerWS" address="vm://Container" exchange-pattern="one-way"/>
+  <endpoint name="ContainerInternalVM" address="vm://ContainerInternal" exchange-pattern="request-response"/>
+  <endpoint name="ContainerErrorQueueWS" address="vm://ContainerErrorQueue" exchange-pattern="one-way"/>
+  <model name="container">
 
     <default-service-exception-strategy>
-      <outbound-endpoint ref="EcsErrorQueueWS" />
+      <outbound-endpoint ref="ContainerErrorQueueWS" />
     </default-service-exception-strategy>
 
-    <service name="EcsRequestQueue">
+    <service name="ContainerRequestQueue">
       <inbound>
-        <vm:inbound-endpoint ref="EcsRequestQueueEndpoint" />
+        <vm:inbound-endpoint ref="ContainerRequestQueueEndpoint" />
       </inbound>
       <component class="com.eucalyptus.container.EcsMessageValidator"/>
       <outbound>
         <filtering-router>
-          <outbound-endpoint ref="EcsWS" />
+          <outbound-endpoint ref="ContainerWS" />
           <payload-type-filter expectedType="com.eucalyptus.container.common.model.EcsMessage" />
         </filtering-router>
       </outbound>
     </service>
 
-    <service name="Ecs">
+    <service name="Container">
       <inbound>
-        <inbound-endpoint ref="EcsWS" />
+        <inbound-endpoint ref="ContainerWS" />
       </inbound>
       <component>
         <spring-object bean="containerService"/>
@@ -74,19 +74,19 @@
       </outbound>
     </service>
 
-    <service name="EcsErrorQueue">
+    <service name="ContainerErrorQueue">
       <inbound>
-        <inbound-endpoint ref="EcsErrorQueueWS" />
+        <inbound-endpoint ref="ContainerErrorQueueWS" />
       </inbound>
       <component class="com.eucalyptus.container.ws.ContainerErrorHandler" />
     </service>
 
   </model>
-  <model name="ecs-internal">
-    <service name="EcsInternal">
+  <model name="container-internal">
+    <service name="ContainerInternal">
       <inbound>
-        <inbound-endpoint ref="EcsInternalWS" />
-        <inbound-endpoint ref="EcsInternalVM" />
+        <inbound-endpoint ref="ContainerInternalWS" />
+        <inbound-endpoint ref="ContainerInternalVM" />
       </inbound>
       <component>
         <spring-object bean="containerService"/>
