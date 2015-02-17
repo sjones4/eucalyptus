@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DescribeClustersResult extends EcsMessage implements Serializable {
+public class DescribeClustersResult implements Serializable {
 
     /**
      * The list of clusters.

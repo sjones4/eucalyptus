@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DescribeContainerInstancesResult extends EcsMessage implements Serializable {
+public class DescribeContainerInstancesResult implements Serializable {
 
     /**
      * The list of container instances.

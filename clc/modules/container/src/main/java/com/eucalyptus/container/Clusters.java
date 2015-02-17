@@ -36,6 +36,7 @@ public interface Clusters {
 
   <T> T lookupByName( @Nullable final OwnerFullName ownerFullName,
                       String name,
+                      Predicate<? super Cluster> filter,
                       Function<? super Cluster,T> transform ) throws EcsMetadataException;
 
   <T> List<T> list( OwnerFullName ownerFullName,

@@ -17,30 +17,31 @@
  * CA 93117, USA or visit http://www.eucalyptus.com/licenses/ if you need
  * additional information or have any questions.
  ************************************************************************/
-package com.eucalyptus.container.common;
+package com.eucalyptus.container.persist;
 
-import com.eucalyptus.auth.policy.PolicyResourceType;
-import com.eucalyptus.component.annotation.PolicyVendor;
-import com.eucalyptus.util.RestrictedType;
+import static com.eucalyptus.container.common.ContainerMetadata.ContainerInstanceMetadata;
+import com.eucalyptus.component.annotation.ComponentNamed;
+import com.eucalyptus.container.ContainerInstance;
+import com.eucalyptus.container.ContainerInstances;
+import com.eucalyptus.util.OwnerFullName;
 
 /**
  *
  */
-@PolicyVendor( ContainerMetadata.VENDOR )
-public interface ContainerMetadata extends RestrictedType {
+@ComponentNamed
+public class PersistenceContainerInstances  extends EcsPersistenceSupport<ContainerInstanceMetadata,ContainerInstance> implements ContainerInstances {
 
-  String VENDOR = "ecs";
-
-  public interface ContainerMetadataWithResourceName extends ContainerMetadata {
-    String getArn();
+  public PersistenceContainerInstances( ) {
+    super( "container-instance" );
   }
 
-  @PolicyResourceType( "cluster" )
-  interface ClusterMetadata extends ContainerMetadataWithResourceName {}
+  @Override
+  protected ContainerInstance exampleWithOwner( final OwnerFullName ownerFullName ) {
+    return ContainerInstance.exampleWithOwner( ownerFullName );
+  }
 
-  @PolicyResourceType( "container-instance" )
-  interface ContainerInstanceMetadata extends ContainerMetadataWithResourceName {}
-
-  @PolicyResourceType( "task-definition" )
-  interface TaskDefinitionMetadata extends ContainerMetadataWithResourceName {}
+  @Override
+  protected ContainerInstance exampleWithName( final OwnerFullName ownerFullName, final String name ) {
+    return ContainerInstance.exampleWithName( ownerFullName, name );
+  }
 }

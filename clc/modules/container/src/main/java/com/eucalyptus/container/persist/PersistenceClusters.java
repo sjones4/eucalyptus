@@ -32,7 +32,7 @@ import com.eucalyptus.util.OwnerFullName;
 public class PersistenceClusters extends EcsPersistenceSupport<ContainerMetadata.ClusterMetadata,Cluster> implements Clusters {
 
   public PersistenceClusters( ) {
-    super( "activity-task" );
+    super( "cluster" );
   }
 
   @Override

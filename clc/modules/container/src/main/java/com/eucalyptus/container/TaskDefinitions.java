@@ -37,6 +37,7 @@ public interface TaskDefinitions {
 
   <T> T lookupByName( @Nullable final OwnerFullName ownerFullName,
                       String name,
+                      Predicate<? super TaskDefinition> filter,
                       Function<? super TaskDefinition,T> transform ) throws EcsMetadataException;
 
   <T> List<T> list( OwnerFullName ownerFullName,
@@ -105,6 +106,18 @@ public interface TaskDefinitions {
               containerDefinition.getMemory( ),
               containerDefinition.getName( )
           );
+    }
+  }
+
+  public enum TaskDefinitionStringFunctions implements Function<TaskDefinition,String> {
+    FAMILY {
+      @Nullable
+      @Override
+      public String apply( @Nullable final TaskDefinition taskDefinition ) {
+        return taskDefinition == null ?
+            null :
+            taskDefinition.getFamily( );
+      }
     }
   }
 }

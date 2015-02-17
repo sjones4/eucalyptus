@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class RegisterTaskDefinitionResult extends EcsMessage implements Serializable {
+public class RegisterTaskDefinitionResult implements Serializable {
 
     /**
      * 

@@ -19,7 +19,11 @@
  ************************************************************************/
 package com.eucalyptus.container.ws
 
+import com.eucalyptus.container.EcsJsonUtils
+import com.eucalyptus.container.common.model.ContainerInstance
 import com.eucalyptus.container.common.model.CreateClusterRequest
+import com.eucalyptus.container.common.model.RegisterContainerInstanceResponse
+import com.eucalyptus.container.common.model.RegisterContainerInstanceResult
 import com.eucalyptus.ws.protocol.QueryBindingTestSupport
 import edu.ucsb.eucalyptus.msgs.BaseMessage
 import org.junit.Test
@@ -71,5 +75,14 @@ class ContainerQueryBindingTest extends QueryBindingTestSupport {
       assertNotNull( 'Expected clustername', clusterName )
       assertEquals( 'clustername', 'cluster-1', clusterName )
     }
+  }
+
+  @Test
+  void testJsonMessages( ) {
+    EcsJsonUtils.writeObjectAsString( new RegisterContainerInstanceResponse(
+        result: new RegisterContainerInstanceResult(
+          containerInstance: new ContainerInstance( )
+        )
+    ) )
   }
 }

@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DeleteClusterResult extends EcsMessage implements Serializable {
+public class DeleteClusterResult implements Serializable {
 
     /**
      * The full description of the deleted cluster.

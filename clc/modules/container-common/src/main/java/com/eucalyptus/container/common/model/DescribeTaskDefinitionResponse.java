@@ -17,30 +17,19 @@
  * CA 93117, USA or visit http://www.eucalyptus.com/licenses/ if you need
  * additional information or have any questions.
  ************************************************************************/
-package com.eucalyptus.container.common;
-
-import com.eucalyptus.auth.policy.PolicyResourceType;
-import com.eucalyptus.component.annotation.PolicyVendor;
-import com.eucalyptus.util.RestrictedType;
+package com.eucalyptus.container.common.model;
 
 /**
  *
  */
-@PolicyVendor( ContainerMetadata.VENDOR )
-public interface ContainerMetadata extends RestrictedType {
+public class DescribeTaskDefinitionResponse extends EcsMessage implements EcsResult {
+  private DescribeTaskDefinitionResult result;
 
-  String VENDOR = "ecs";
-
-  public interface ContainerMetadataWithResourceName extends ContainerMetadata {
-    String getArn();
+  public DescribeTaskDefinitionResult getResult( ) {
+    return result;
   }
 
-  @PolicyResourceType( "cluster" )
-  interface ClusterMetadata extends ContainerMetadataWithResourceName {}
-
-  @PolicyResourceType( "container-instance" )
-  interface ContainerInstanceMetadata extends ContainerMetadataWithResourceName {}
-
-  @PolicyResourceType( "task-definition" )
-  interface TaskDefinitionMetadata extends ContainerMetadataWithResourceName {}
+  public void setResult( final DescribeTaskDefinitionResult result ) {
+    this.result = result;
+  }
 }

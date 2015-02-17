@@ -19,15 +19,12 @@
  ************************************************************************/
 package com.eucalyptus.container.common.model;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
 /**
  *
  */
-public class CreateClusterResponse extends EcsMessage {
-  @JsonUnwrapped
+public class CreateClusterResponse extends EcsMessage implements EcsResult {
+
   private CreateClusterResult result;
-  private ResponseMetadata responseMetadata;
 
   public CreateClusterResult getResult( ) {
     return result;
@@ -35,13 +32,5 @@ public class CreateClusterResponse extends EcsMessage {
 
   public void setResult( final CreateClusterResult result ) {
     this.result = result;
-  }
-
-  public ResponseMetadata getResponseMetadata() {
-    return responseMetadata;
-  }
-
-  public void setResponseMetadata( final ResponseMetadata responseMetadata ) {
-    this.responseMetadata = responseMetadata;
   }
 }

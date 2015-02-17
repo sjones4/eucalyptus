@@ -60,7 +60,7 @@ public class Cluster extends AbstractOwnedPersistent implements ClusterMetadata 
   @Override
   public String getArn( ) {
     return String.format(
-        "arn:aws:ecs::%1s:cluster/%2s",
+        "arn:aws:ecs::%s:cluster/%s",
         getOwnerAccountNumber(),
         getDisplayName() );
   }

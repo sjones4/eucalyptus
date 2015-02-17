@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class ListClustersResult extends EcsMessage implements Serializable {
+public class ListClustersResult implements Serializable {
 
     /**
      * The list of full Amazon Resource Name (ARN) entries for each cluster

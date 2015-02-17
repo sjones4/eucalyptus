@@ -36,6 +36,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import com.eucalyptus.auth.InvalidAccessKeyAuthException;
 import com.eucalyptus.auth.InvalidSignatureAuthException;
 import com.eucalyptus.binding.BindingException;
+import com.eucalyptus.container.common.model.EcsResult;
 import com.eucalyptus.context.Context;
 import com.eucalyptus.context.Contexts;
 import com.eucalyptus.context.NoSuchContextException;
@@ -100,7 +101,11 @@ public class ContainerJsonBinding extends MessageStackHandler implements Excepti
         if ( message instanceof EcsMessage ) {
           httpResponse.addHeader( "x-amzn-RequestId", ( (EcsMessage) message ).getCorrelationId() );
           if ( !EcsMessage.class.equals( message.getClass() ) ) {
-            EcsJsonUtils.writeObject( byteOut, message );
+            if ( message instanceof EcsResult ) {
+              EcsJsonUtils.writeObject( byteOut, ( (EcsResult) message ).getResult( ) );
+            } else {
+              EcsJsonUtils.writeObject( byteOut, message );
+            }
           }
         }
       }

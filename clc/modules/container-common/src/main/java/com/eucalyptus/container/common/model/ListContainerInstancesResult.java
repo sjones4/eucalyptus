@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class ListContainerInstancesResult extends EcsMessage implements Serializable {
+public class ListContainerInstancesResult implements Serializable {
 
     /**
      * The list of container instance full Amazon Resource Name (ARN) entries

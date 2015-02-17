@@ -64,6 +64,7 @@ public class EcsJsonUtils {
     mapper.setDateFormat( new EpochSecondsDateFormat() );
     mapper.getSerializationConfig().addMixInAnnotations( EcsMessage.class, BindingMixIn.class );
     mapper.getSerializationConfig().addMixInAnnotations( com.eucalyptus.container.common.model.ContainerDefinition.class, BindingMixIn.class );
+    mapper.getSerializationConfig().addMixInAnnotations( com.eucalyptus.container.common.model.ContainerInstance.class, BindingMixIn.class );
     mapper.getSerializationConfig().set( SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false );
     mapper.getSerializationConfig().setSerializationInclusion( JsonSerialize.Inclusion.NON_NULL );
   }
@@ -93,6 +94,7 @@ public class EcsJsonUtils {
       "_disabledServices", "_notreadyServices", "_stoppedServices", "_epoch", "_services", "_return",
       "callerContext" } )
   private interface BindingMixIn {
+    @JsonIgnore Boolean isAgentConnected( );
     @JsonIgnore Boolean isEssential( );
   }
 

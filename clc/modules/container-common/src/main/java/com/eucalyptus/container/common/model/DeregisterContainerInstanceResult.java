@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DeregisterContainerInstanceResult extends EcsMessage implements Serializable {
+public class DeregisterContainerInstanceResult implements Serializable {
 
     /**
      * An Amazon EC2 instance that is running the Amazon ECS agent and has

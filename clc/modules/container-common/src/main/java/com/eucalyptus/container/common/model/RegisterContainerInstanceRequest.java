@@ -38,6 +38,7 @@ package com.eucalyptus.container.common.model;
 
 import java.io.Serializable;
 
+import javax.annotation.Nonnull;
 import com.eucalyptus.auth.policy.PolicyAction;
 
 /**
@@ -61,6 +62,7 @@ public class RegisterContainerInstanceRequest extends EcsMessage implements Seri
      * you want to register your container instance with. If you do not
      * specify a cluster, the default cluster is assumed..
      */
+    @Nonnull
     private String cluster;
 
     /**
