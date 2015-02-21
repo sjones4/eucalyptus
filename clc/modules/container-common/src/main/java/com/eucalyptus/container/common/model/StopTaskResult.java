@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class StopTaskResult extends EcsMessage implements Serializable {
+public class StopTaskResult implements Serializable {
 
     /**
      * 

@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class SubmitContainerStateChangeResult extends EcsMessage implements Serializable {
+public class SubmitContainerStateChangeResult implements Serializable {
 
     /**
      * Acknowledgement of the state change.

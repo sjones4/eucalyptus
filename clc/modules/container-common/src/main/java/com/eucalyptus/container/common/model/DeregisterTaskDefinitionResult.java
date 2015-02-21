@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DeregisterTaskDefinitionResult extends EcsMessage implements Serializable {
+public class DeregisterTaskDefinitionResult implements Serializable {
 
     /**
      * The full description of the deregistered task.

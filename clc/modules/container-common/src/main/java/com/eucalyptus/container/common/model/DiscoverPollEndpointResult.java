@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DiscoverPollEndpointResult extends EcsMessage implements Serializable {
+public class DiscoverPollEndpointResult implements Serializable {
 
     /**
      * The endpoint for the Amazon ECS agent to poll.

@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class ListTasksResult extends EcsMessage implements Serializable {
+public class ListTasksResult implements Serializable {
 
     /**
      * The list of task Amazon Resource Name (ARN) entries for the

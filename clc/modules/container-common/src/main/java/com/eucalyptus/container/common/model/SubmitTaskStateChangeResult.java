@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class SubmitTaskStateChangeResult extends EcsMessage implements Serializable {
+public class SubmitTaskStateChangeResult implements Serializable {
 
     /**
      * Acknowledgement of the state change.

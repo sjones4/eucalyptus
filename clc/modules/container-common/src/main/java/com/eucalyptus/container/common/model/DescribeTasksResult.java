@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class DescribeTasksResult extends EcsMessage implements Serializable {
+public class DescribeTasksResult implements Serializable {
 
     /**
      * The list of tasks.

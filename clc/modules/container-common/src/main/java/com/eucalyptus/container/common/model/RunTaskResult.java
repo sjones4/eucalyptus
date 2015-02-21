@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * 
  */
-public class RunTaskResult extends EcsMessage implements Serializable {
+public class RunTaskResult implements Serializable {
 
     /**
      * A full description of the tasks that were run. Each task that was

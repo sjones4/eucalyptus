@@ -159,8 +159,8 @@ public class ContainerService {
     return request.reply( response );
   }
 
-  public EcsMessage deregisterTaskDefinition( final DeregisterTaskDefinitionRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public DeregisterTaskDefinitionResponse deregisterTaskDefinition( final DeregisterTaskDefinitionRequest request ) throws EcsException {
+    return request.reply( new DeregisterTaskDefinitionResponse( ) );
   }
 
   public DescribeClustersResponse describeClusters( final DescribeClustersRequest request ) throws EcsException {
@@ -226,8 +226,8 @@ public class ContainerService {
     return request.reply( response );
   }
 
-  public EcsMessage describeTasks( final DescribeTasksRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public DescribeTasksResponse describeTasks( final DescribeTasksRequest request ) throws EcsException {
+    return request.reply( new DescribeTasksResponse( ) );
   }
 
   public DiscoverPollEndpointResponse discoverPollEndpoint( final DiscoverPollEndpointRequest request ) throws EcsException {
@@ -281,7 +281,9 @@ public class ContainerService {
     return request.reply( response );
   }
 
-  //TODO:STEVE: add ListTaskDefinitionFamilies
+  public ListTaskDefinitionFamiliesResponse listTaskDefinitionFamilies( final ListTaskDefinitionFamiliesRequest request ) throws EcsException {
+    return request.reply( new ListTaskDefinitionFamiliesResponse( ) );
+  }
 
   public ListTaskDefinitionsResponse listTaskDefinitions( final ListTaskDefinitionsRequest request ) throws EcsException {
     final ListTaskDefinitionsResponse response = new ListTaskDefinitionsResponse( );
@@ -306,8 +308,8 @@ public class ContainerService {
     return request.reply( response );
   }
 
-  public EcsMessage listTasks( final ListTasksRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public ListTasksResponse listTasks( final ListTasksRequest request ) throws EcsException {
+    return request.reply( new ListTasksResponse( ) );
   }
 
   public RegisterContainerInstanceResponse registerContainerInstance( final RegisterContainerInstanceRequest request ) throws EcsException {
@@ -400,24 +402,24 @@ public class ContainerService {
     return request.reply( response );
   }
 
-  public EcsMessage runTask( final RunTaskRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public RunTaskResponse runTask( final RunTaskRequest request ) throws EcsException {
+    return request.reply( new RunTaskResponse( ) );
   }
 
-  public EcsMessage startTask( final StartTaskRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public StartTaskResponse startTask( final StartTaskRequest request ) throws EcsException {
+    return request.reply( new StartTaskResponse( ) );
   }
 
-  public EcsMessage stopTask( final StopTaskRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public StopTaskResponse stopTask( final StopTaskRequest request ) throws EcsException {
+    return request.reply( new StopTaskResponse( ) );
   }
 
-  public EcsMessage submitContainerStateChange( final SubmitContainerStateChangeRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public SubmitContainerStateChangeResponse submitContainerStateChange( final SubmitContainerStateChangeRequest request ) throws EcsException {
+    return request.reply( new SubmitContainerStateChangeResponse( ) );
   }
 
-  public EcsMessage submitTaskStateChange ( final SubmitTaskStateChangeRequest request ) throws EcsException {
-    return request.reply( new EcsMessage( ) );
+  public SubmitTaskStateChangeResponse submitTaskStateChange ( final SubmitTaskStateChangeRequest request ) throws EcsException {
+    return request.reply( new SubmitTaskStateChangeResponse( ) );
   }
 
   private <T extends AbstractPersistent & RestrictedType> T allocate(
