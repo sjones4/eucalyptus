@@ -27,14 +27,16 @@
   <mapping class="com.eucalyptus.container.common.model.ResponseMetadata" abstract="true">
     <value name="RequestId" field="requestId" usage="required"/>
   </mapping>
-  <mapping name="CreateCluster" class="com.eucalyptus.container.common.model.CreateClusterRequest">
-    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
-    <value name="ClusterName" field="clusterName" usage="required"/>
-  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.EcsMessage" abstract="true"/>
   <mapping type-name="EcsResponseMessage" class="com.eucalyptus.container.common.model.EcsMessage" abstract="true">
     <structure name="ResponseMetadata">
       <value name="RequestId" get-method="getCorrelationId" set-method="setCorrelationId" usage="required"/>
     </structure>
+  </mapping>
+  <!-- TODO:STEVE: verify field ordering -->
+  <mapping name="CreateCluster" class="com.eucalyptus.container.common.model.CreateClusterRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="clusterName" field="clusterName" usage="optional"/>
   </mapping>
   <mapping name="CreateClusterResponse" class="com.eucalyptus.container.common.model.CreateClusterResponse">
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
@@ -42,12 +44,444 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.CreateClusterResult" abstract="true">
-    <structure name="cluster" field="cluster" usage="required" type="com.eucalyptus.container.common.model.Cluster"/>
+    <structure name="cluster" field="cluster" usage="optional" type="com.eucalyptus.container.common.model.Cluster"/>
+  </mapping>
+  <mapping name="DeleteCluster" class="com.eucalyptus.container.common.model.DeleteClusterRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+  </mapping>
+  <mapping name="DeleteClusterResponse" class="com.eucalyptus.container.common.model.DeleteClusterResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DeleteClusterResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DeleteClusterResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DeleteClusterResult" abstract="true">
+    <structure name="cluster" field="cluster" usage="optional" type="com.eucalyptus.container.common.model.Cluster"/>
+  </mapping>
+  <mapping name="DeregisterContainerInstance" class="com.eucalyptus.container.common.model.DeregisterContainerInstanceRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="containerInstance" field="containerInstance" usage="optional"/>
+    <value name="force" field="force" usage="optional"/>
+  </mapping>
+  <mapping name="DeregisterContainerInstanceResponse" class="com.eucalyptus.container.common.model.DeregisterContainerInstanceResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DeregisterContainerInstanceResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DeregisterContainerInstanceResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DeregisterContainerInstanceResult" abstract="true">
+    <structure name="containerInstance" field="containerInstance" usage="optional" type="com.eucalyptus.container.common.model.ContainerInstance"/>
+  </mapping>
+  <mapping name="DeregisterTaskDefinition" class="com.eucalyptus.container.common.model.DeregisterTaskDefinitionRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="taskDefinition" field="taskDefinition" usage="optional"/>
+  </mapping>
+  <mapping name="DeregisterTaskDefinitionResponse" class="com.eucalyptus.container.common.model.DeregisterTaskDefinitionResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DeregisterTaskDefinitionResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DeregisterTaskDefinitionResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DeregisterTaskDefinitionResult" abstract="true">
+    <structure name="taskDefinition" field="taskDefinition" usage="optional" type="com.eucalyptus.container.common.model.TaskDefinition"/>
+  </mapping>
+  <mapping name="DescribeClusters" class="com.eucalyptus.container.common.model.DescribeClustersRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <collection name="clusters" field="clusters">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping name="DescribeClustersResponse" class="com.eucalyptus.container.common.model.DescribeClustersResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DescribeClustersResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DescribeClustersResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DescribeClustersResult" abstract="true">
+    <collection field="clusters">
+      <structure name="member" type="com.eucalyptus.container.common.model.Cluster"/>
+    </collection>
+    <collection field="failures">
+      <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
+    </collection>
+  </mapping>
+  <mapping name="DescribeContainerInstances" class="com.eucalyptus.container.common.model.DescribeContainerInstancesRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <collection name="containerInstances" field="containerInstances">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping name="DescribeContainerInstancesResponse" class="com.eucalyptus.container.common.model.DescribeContainerInstancesResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DescribeContainerInstancesResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DescribeContainerInstancesResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DescribeContainerInstancesResult" abstract="true">
+    <collection field="containerInstances">
+      <structure name="member" type="com.eucalyptus.container.common.model.ContainerInstance"/>
+    </collection>
+    <collection field="failures">
+      <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
+    </collection>
+  </mapping>
+  <mapping name="DescribeTaskDefinition" class="com.eucalyptus.container.common.model.DescribeTaskDefinitionRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="taskDefinition" field="taskDefinition" usage="optional"/>
+  </mapping>
+  <mapping name="DescribeTaskDefinitionResponse" class="com.eucalyptus.container.common.model.DescribeTaskDefinitionResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DescribeTaskDefinitionResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DescribeTaskDefinitionResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DescribeTaskDefinitionResult" abstract="true">
+    <structure name="taskDefinition" field="taskDefinition" usage="optional" type="com.eucalyptus.container.common.model.TaskDefinition"/>
+  </mapping>
+  <mapping name="DescribeTasks" class="com.eucalyptus.container.common.model.DescribeTasksRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <collection name="tasks" field="tasks">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping name="DescribeTasksResponse" class="com.eucalyptus.container.common.model.DescribeTasksResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DescribeTasksResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DescribeTasksResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DescribeTasksResult" abstract="true">
+    <collection field="tasks">
+      <structure name="member" type="com.eucalyptus.container.common.model.Task"/>
+    </collection>
+    <collection field="failures">
+      <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
+    </collection>
+  </mapping>
+  <mapping name="DiscoverPollEndpoint" class="com.eucalyptus.container.common.model.DiscoverPollEndpointRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="containerInstance" field="containerInstance" usage="optional"/>
+  </mapping>
+  <mapping name="DiscoverPollEndpointResponse" class="com.eucalyptus.container.common.model.DiscoverPollEndpointResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="DiscoverPollEndpointResult" field="result" usage="required" type="com.eucalyptus.container.common.model.DiscoverPollEndpointResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.DiscoverPollEndpointResult" abstract="true">
+    <value name="endpoint" field="endpoint" usage="optional"/>
+  </mapping>
+  <mapping name="ListClusters" class="com.eucalyptus.container.common.model.ListClustersRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+    <value name="maxResults" field="maxResults" usage="optional"/>
+  </mapping>
+  <mapping name="ListClustersResponse" class="com.eucalyptus.container.common.model.ListClustersResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="ListClustersResult" field="result" usage="required" type="com.eucalyptus.container.common.model.ListClustersResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ListClustersResult" abstract="true">
+    <collection name="clusterArns" field="clusterArns">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+  </mapping>
+  <mapping name="ListContainerInstances" class="com.eucalyptus.container.common.model.ListContainerInstancesRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+    <value name="maxResults" field="maxResults" usage="optional"/>
+  </mapping>
+  <mapping name="ListContainerInstancesResponse" class="com.eucalyptus.container.common.model.ListContainerInstancesResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="ListContainerInstancesResult" field="result" usage="required" type="com.eucalyptus.container.common.model.ListContainerInstancesResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ListContainerInstancesResult" abstract="true">
+    <collection name="containerInstanceArns" field="containerInstanceArns">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+  </mapping>
+  <mapping name="ListTaskDefinitionFamilies" class="com.eucalyptus.container.common.model.ListTaskDefinitionFamiliesRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="familyPrefix" field="familyPrefix" usage="optional"/>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+    <value name="maxResults" field="maxResults" usage="optional"/>
+  </mapping>
+  <mapping name="ListTaskDefinitionFamiliesResponse" class="com.eucalyptus.container.common.model.ListTaskDefinitionFamiliesResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="ListTaskDefinitionFamiliesResult" field="result" usage="required" type="com.eucalyptus.container.common.model.ListTaskDefinitionFamiliesResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ListTaskDefinitionFamiliesResult" abstract="true">
+    <collection name="families" field="families">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+  </mapping>
+  <mapping name="ListTaskDefinitions" class="com.eucalyptus.container.common.model.ListTaskDefinitionsRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="familyPrefix" field="familyPrefix" usage="optional"/>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+    <value name="maxResults" field="maxResults" usage="optional"/>
+  </mapping>
+  <mapping name="ListTaskDefinitionsResponse" class="com.eucalyptus.container.common.model.ListTaskDefinitionsResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="ListTaskDefinitionsResult" field="result" usage="required" type="com.eucalyptus.container.common.model.ListTaskDefinitionsResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ListTaskDefinitionsResult" abstract="true">
+    <collection name="taskDefinitionArns" field="taskDefinitionArns">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+  </mapping>
+  <mapping name="ListTasks" class="com.eucalyptus.container.common.model.ListTasksRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="containerInstance" field="containerInstance" usage="optional"/>
+    <value name="family" field="family" usage="optional"/>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+    <value name="maxResults" field="maxResults" usage="optional"/>
+  </mapping>
+  <mapping name="ListTasksResponse" class="com.eucalyptus.container.common.model.ListTasksResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="ListTasksResult" field="result" usage="required" type="com.eucalyptus.container.common.model.ListTasksResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ListTasksResult" abstract="true">
+    <collection name="taskArns" field="taskArns">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <value name="nextToken" field="nextToken" usage="optional"/>
+  </mapping>
+  <mapping name="RegisterContainerInstance" class="com.eucalyptus.container.common.model.RegisterContainerInstanceRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="instanceIdentityDocument" field="instanceIdentityDocument" usage="optional"/>
+    <value name="instanceIdentityDocumentSignature" field="instanceIdentityDocumentSignature" usage="optional"/>
+    <collection field="totalResources">
+      <structure name="member" type="com.eucalyptus.container.common.model.Resource"/>
+    </collection>
+  </mapping>
+  <mapping name="RegisterContainerInstanceResponse" class="com.eucalyptus.container.common.model.RegisterContainerInstanceResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="RegisterContainerInstanceResult" field="result" usage="required" type="com.eucalyptus.container.common.model.RegisterContainerInstanceResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.RegisterContainerInstanceResult" abstract="true">
+    <structure name="containerInstance" field="containerInstance" usage="optional" type="com.eucalyptus.container.common.model.ContainerInstance"/>
+  </mapping>
+  <mapping name="RegisterTaskDefinition" class="com.eucalyptus.container.common.model.RegisterTaskDefinitionRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="family" field="family" usage="optional"/>
+    <collection field="containerDefinitions">
+      <structure name="member" type="com.eucalyptus.container.common.model.ContainerDefinition"/>
+    </collection>
+  </mapping>
+  <mapping name="RegisterTaskDefinitionResponse" class="com.eucalyptus.container.common.model.RegisterTaskDefinitionResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="RegisterTaskDefinitionResult" field="result" usage="required" type="com.eucalyptus.container.common.model.RegisterTaskDefinitionResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.RegisterTaskDefinitionResult" abstract="true">
+    <structure name="taskDefinition" field="taskDefinition" usage="optional" type="com.eucalyptus.container.common.model.TaskDefinition"/>
+  </mapping>
+  <mapping name="RunTask" class="com.eucalyptus.container.common.model.RunTaskRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="taskDefinition" field="taskDefinition" usage="optional"/>
+    <structure name="overrides" field="overrides" usage="optional" type="com.eucalyptus.container.common.model.TaskOverride"/>
+    <value name="count" field="count" usage="optional"/>
+  </mapping>
+  <mapping name="RunTaskResponse" class="com.eucalyptus.container.common.model.RunTaskResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="RunTaskResult" field="result" usage="required" type="com.eucalyptus.container.common.model.RunTaskResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.RunTaskResult" abstract="true">
+    <collection field="tasks">
+      <structure name="member" type="com.eucalyptus.container.common.model.Task"/>
+    </collection>
+    <collection field="failures">
+      <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
+    </collection>
+  </mapping>
+  <mapping name="StartTask" class="com.eucalyptus.container.common.model.StartTaskRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="taskDefinition" field="taskDefinition" usage="optional"/>
+    <structure name="overrides" field="overrides" usage="optional" type="com.eucalyptus.container.common.model.TaskOverride"/>
+    <collection name="containerInstances" field="containerInstances">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping name="StartTaskResponse" class="com.eucalyptus.container.common.model.StartTaskResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="StartTaskResult" field="result" usage="required" type="com.eucalyptus.container.common.model.StartTaskResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.StartTaskResult" abstract="true">
+    <collection field="tasks">
+      <structure name="member" type="com.eucalyptus.container.common.model.Task"/>
+    </collection>
+    <collection field="failures">
+      <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
+    </collection>
+  </mapping>
+  <mapping name="StopTask" class="com.eucalyptus.container.common.model.StopTaskRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="task" field="task" usage="optional"/>
+  </mapping>
+  <mapping name="StopTaskResponse" class="com.eucalyptus.container.common.model.StopTaskResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="StopTaskResult" field="result" usage="required" type="com.eucalyptus.container.common.model.StopTaskResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.StopTaskResult" abstract="true">
+    <structure name="task" field="task" usage="optional" type="com.eucalyptus.container.common.model.Task"/>
+  </mapping>
+  <mapping name="SubmitContainerStateChange" class="com.eucalyptus.container.common.model.SubmitContainerStateChangeRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="task" field="task" usage="optional"/>
+    <value name="containerName" field="containerName" usage="optional"/>
+    <value name="status" field="status" usage="optional"/>
+    <value name="exitCode" field="exitCode" usage="optional"/>
+    <value name="reason" field="reason" usage="optional"/>
+    <collection field="networkBindings">
+      <structure name="member" type="com.eucalyptus.container.common.model.NetworkBinding"/>
+    </collection>
+  </mapping>
+  <mapping name="SubmitContainerStateChangeResponse" class="com.eucalyptus.container.common.model.SubmitContainerStateChangeResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="SubmitContainerStateChangeResult" field="result" usage="required" type="com.eucalyptus.container.common.model.SubmitContainerStateChangeResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.SubmitContainerStateChangeResult" abstract="true">
+    <value name="acknowledgment" field="acknowledgment" usage="optional"/>
+  </mapping>
+  <mapping name="SubmitTaskStateChange" class="com.eucalyptus.container.common.model.SubmitTaskStateChangeRequest">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <value name="cluster" field="cluster" usage="optional"/>
+    <value name="task" field="task" usage="optional"/>
+    <value name="status" field="status" usage="optional"/>
+    <value name="reason" field="reason" usage="optional"/>
+  </mapping>
+  <mapping name="SubmitTaskStateChangeResponse" class="com.eucalyptus.container.common.model.SubmitTaskStateChangeResponse">
+    <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
+    <structure name="SubmitTaskStateChangeResult" field="result" usage="required" type="com.eucalyptus.container.common.model.SubmitTaskStateChangeResult"/>
+    <structure map-as="EcsResponseMessage"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.SubmitTaskStateChangeResult" abstract="true">
+    <value name="acknowledgment" field="acknowledgment" usage="optional"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.Cluster" abstract="true">
-    <value name="clusterName" field="clusterName" usage="required"/>
-    <value name="clusterArn" field="clusterArn" usage="required"/>
-    <value name="status" field="status" usage="required"/>
+    <value name="clusterArn" field="clusterArn" usage="optional"/>
+    <value name="clusterName" field="clusterName" usage="optional"/>
+    <value name="status" field="status" usage="optional"/>
   </mapping>
-  <mapping class="com.eucalyptus.container.common.model.EcsMessage" abstract="true"/>
+  <mapping class="com.eucalyptus.container.common.model.ContainerDefinition" abstract="true">
+    <value name="name" field="name" usage="optional"/>
+    <value name="image" field="image" usage="optional"/>
+    <value name="cpu" field="cpu" usage="optional"/>
+    <value name="memory" field="memory" usage="optional"/>
+    <collection name="links" field="links">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <collection field="portMappings">
+      <structure name="member" type="com.eucalyptus.container.common.model.PortMapping"/>
+    </collection>
+    <value name="essential" field="essential" usage="optional"/>
+    <collection name="entryPoint" field="entryPoint">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <collection name="command" field="command">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+    <collection field="environment">
+      <structure name="member" type="com.eucalyptus.container.common.model.KeyValuePair"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ContainerInstance" abstract="true">
+    <value name="containerInstanceArn" field="containerInstanceArn" usage="optional"/>
+    <value name="ec2InstanceId" field="ec2InstanceId" usage="optional"/>
+    <collection field="remainingResources">
+      <structure name="member" type="com.eucalyptus.container.common.model.Resource"/>
+    </collection>
+    <collection field="registeredResources">
+      <structure name="member" type="com.eucalyptus.container.common.model.Resource"/>
+    </collection>
+    <value name="status" field="status" usage="optional"/>
+    <value name="agentConnected" field="agentConnected" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.Failure" abstract="true">
+    <value name="arn" field="arn" usage="optional"/>
+    <value name="reason" field="reason" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.NetworkBinding" abstract="true">
+    <value name="bindIP" field="bindIP" usage="optional"/>
+    <value name="containerPort" field="containerPort" usage="optional"/>
+    <value name="hostPort" field="hostPort" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.Resource" abstract="true">
+    <value name="name" field="name" usage="optional"/>
+    <value name="type" field="type" usage="optional"/>
+    <value name="doubleValue" field="doubleValue" usage="optional"/>
+    <value name="longValue" field="longValue" usage="optional"/>
+    <value name="integerValue" field="integerValue" usage="optional"/>
+    <collection name="stringSetValue" field="stringSetValue">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.Task" abstract="true">
+    <value name="taskArn" field="taskArn" usage="optional"/>
+    <value name="clusterArn" field="clusterArn" usage="optional"/>
+    <value name="taskDefinitionArn" field="taskDefinitionArn" usage="optional"/>
+    <value name="containerInstanceArn" field="containerInstanceArn" usage="optional"/>
+    <structure name="overrides" field="overrides" usage="optional" type="com.eucalyptus.container.common.model.TaskOverride"/>
+    <value name="lastStatus" field="lastStatus" usage="optional"/>
+    <value name="desiredStatus" field="desiredStatus" usage="optional"/>
+    <collection field="containers">
+      <structure name="member" type="com.eucalyptus.container.common.model.Container"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.TaskDefinition" abstract="true">
+    <value name="taskDefinitionArn" field="taskDefinitionArn" usage="optional"/>
+    <collection field="containerDefinitions">
+      <structure name="member" type="com.eucalyptus.container.common.model.ContainerDefinition"/>
+    </collection>
+    <value name="family" field="family" usage="optional"/>
+    <value name="revision" field="revision" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.TaskOverride" abstract="true">
+    <collection field="containerOverrides">
+      <structure name="member" type="com.eucalyptus.container.common.model.ContainerOverride"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.Container" abstract="true">
+    <value name="containerArn" field="containerArn" usage="optional"/>
+    <value name="taskArn" field="taskArn" usage="optional"/>
+    <value name="name" field="name" usage="optional"/>
+    <value name="lastStatus" field="lastStatus" usage="optional"/>
+    <value name="exitCode" field="exitCode" usage="optional"/>
+    <value name="reason" field="reason" usage="optional"/>
+    <collection field="networkBindings">
+      <structure name="member" type="com.eucalyptus.container.common.model.NetworkBinding"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.ContainerOverride" abstract="true">
+    <value name="name" field="name" usage="optional"/>
+    <collection name="command" field="command">
+      <value name="member" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.KeyValuePair" abstract="true">
+    <value name="name" field="name" usage="optional"/>
+    <value name="value" field="value" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.container.common.model.PortMapping" abstract="true">
+    <value name="containerPort" field="containerPort" usage="optional"/>
+    <value name="hostPort" field="hostPort" usage="optional"/>
+  </mapping>
 </binding>
