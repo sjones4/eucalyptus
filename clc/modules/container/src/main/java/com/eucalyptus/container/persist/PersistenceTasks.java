@@ -17,22 +17,31 @@
  * CA 93117, USA or visit http://www.eucalyptus.com/licenses/ if you need
  * additional information or have any questions.
  ************************************************************************/
-package com.eucalyptus.container.common;
+package com.eucalyptus.container.persist;
 
-import com.eucalyptus.util.RestrictedTypes;
-import com.google.common.base.Function;
+import static com.eucalyptus.container.common.EcsMetadata.TaskMetadata;
+import com.eucalyptus.component.annotation.ComponentNamed;
+import com.eucalyptus.container.Task;
+import com.eucalyptus.container.Tasks;
+import com.eucalyptus.util.OwnerFullName;
 
 /**
  *
  */
-public class ContainerMetadatas extends RestrictedTypes {
+@ComponentNamed
+public class PersistenceTasks extends EcsPersistenceSupport<TaskMetadata,Task> implements Tasks {
 
-  public static <T extends EcsMetadata.EcsMetadataWithResourceName> Function<T, String> toArn( ) {
-    return new Function<T, String>( ) {
-      @Override
-      public String apply( T metadata ) {
-        return metadata == null ? null : metadata.getArn( );
-      }
-    };
+  public PersistenceTasks( ) {
+    super( "task" );
+  }
+
+  @Override
+  protected Task exampleWithOwner( final OwnerFullName ownerFullName ) {
+    return Task.exampleWithOwner( ownerFullName );
+  }
+
+  @Override
+  protected Task exampleWithName( final OwnerFullName ownerFullName, final String name ) {
+    return Task.exampleWithName( ownerFullName, name );
   }
 }

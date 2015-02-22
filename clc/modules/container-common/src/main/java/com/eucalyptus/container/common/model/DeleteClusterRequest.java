@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#deleteCluster(DeleteClusterRequest) DeleteCluster operation}.
@@ -57,6 +58,7 @@ public class DeleteClusterRequest extends EcsMessage implements Serializable {
     /**
      * The cluster you want to delete.
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**

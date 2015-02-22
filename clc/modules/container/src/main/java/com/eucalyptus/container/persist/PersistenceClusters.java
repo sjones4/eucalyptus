@@ -22,14 +22,14 @@ package com.eucalyptus.container.persist;
 import com.eucalyptus.component.annotation.ComponentNamed;
 import com.eucalyptus.container.Cluster;
 import com.eucalyptus.container.Clusters;
-import com.eucalyptus.container.common.ContainerMetadata;
+import com.eucalyptus.container.common.EcsMetadata;
 import com.eucalyptus.util.OwnerFullName;
 
 /**
  *
  */
 @ComponentNamed
-public class PersistenceClusters extends EcsPersistenceSupport<ContainerMetadata.ClusterMetadata,Cluster> implements Clusters {
+public class PersistenceClusters extends EcsPersistenceSupport<EcsMetadata.ClusterMetadata,Cluster> implements Clusters {
 
   public PersistenceClusters( ) {
     super( "cluster" );

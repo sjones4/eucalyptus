@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#listTaskDefinitions(ListTaskDefinitionsRequest) ListTaskDefinitions operation}.
@@ -59,6 +60,7 @@ public class ListTaskDefinitionsRequest extends EcsMessage implements Serializab
      * <code>familyPrefix</code> will limit the listed task definitions to
      * definitions that belong to that family.
      */
+    @HttpParameterMapping( parameter = "familyPrefix" )
     private String familyPrefix;
 
     /**
@@ -69,6 +71,7 @@ public class ListTaskDefinitionsRequest extends EcsMessage implements Serializab
      * returned the <code>nextToken</code> value. This value is
      * <code>null</code> when there are no more results to return.
      */
+    @HttpParameterMapping( parameter = "nextToken" )
     private String nextToken;
 
     /**
@@ -84,6 +87,7 @@ public class ListTaskDefinitionsRequest extends EcsMessage implements Serializab
      * returns up to 100 results and a <code>nextToken</code> value if
      * applicable.
      */
+    @HttpParameterMapping( parameter = "maxResults" )
     private Integer maxResults;
 
     /**

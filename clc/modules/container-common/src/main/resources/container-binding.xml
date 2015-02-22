@@ -86,7 +86,7 @@
   </mapping>
   <mapping name="DescribeClusters" class="com.eucalyptus.container.common.model.DescribeClustersRequest">
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
-    <collection name="clusters" field="clusters">
+    <collection name="clusters" field="clusters" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
   </mapping>
@@ -96,17 +96,17 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.DescribeClustersResult" abstract="true">
-    <collection field="clusters">
+    <collection name="clusters" field="clusters" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Cluster"/>
     </collection>
-    <collection field="failures">
+    <collection name="failures" field="failures" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
     </collection>
   </mapping>
   <mapping name="DescribeContainerInstances" class="com.eucalyptus.container.common.model.DescribeContainerInstancesRequest">
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
     <value name="cluster" field="cluster" usage="optional"/>
-    <collection name="containerInstances" field="containerInstances">
+    <collection name="containerInstances" field="containerInstances" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
   </mapping>
@@ -116,10 +116,10 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.DescribeContainerInstancesResult" abstract="true">
-    <collection field="containerInstances">
+    <collection name="containerInstances" field="containerInstances" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.ContainerInstance"/>
     </collection>
-    <collection field="failures">
+    <collection name="failures" field="failures" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
     </collection>
   </mapping>
@@ -138,7 +138,7 @@
   <mapping name="DescribeTasks" class="com.eucalyptus.container.common.model.DescribeTasksRequest">
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
     <value name="cluster" field="cluster" usage="optional"/>
-    <collection name="tasks" field="tasks">
+    <collection name="tasks" field="tasks" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
   </mapping>
@@ -148,10 +148,10 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.DescribeTasksResult" abstract="true">
-    <collection field="tasks">
+    <collection name="tasks" field="tasks" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Task"/>
     </collection>
-    <collection field="failures">
+    <collection name="failures" field="failures" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
     </collection>
   </mapping>
@@ -179,7 +179,7 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ListClustersResult" abstract="true">
-    <collection name="clusterArns" field="clusterArns">
+    <collection name="clusterArns" field="clusterArns" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
     <value name="nextToken" field="nextToken" usage="optional"/>
@@ -196,7 +196,7 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ListContainerInstancesResult" abstract="true">
-    <collection name="containerInstanceArns" field="containerInstanceArns">
+    <collection name="containerInstanceArns" field="containerInstanceArns" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
     <value name="nextToken" field="nextToken" usage="optional"/>
@@ -213,7 +213,7 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ListTaskDefinitionFamiliesResult" abstract="true">
-    <collection name="families" field="families">
+    <collection name="families" field="families" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
     <value name="nextToken" field="nextToken" usage="optional"/>
@@ -230,7 +230,7 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ListTaskDefinitionsResult" abstract="true">
-    <collection name="taskDefinitionArns" field="taskDefinitionArns">
+    <collection name="taskDefinitionArns" field="taskDefinitionArns" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
     <value name="nextToken" field="nextToken" usage="optional"/>
@@ -249,7 +249,7 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ListTasksResult" abstract="true">
-    <collection name="taskArns" field="taskArns">
+    <collection name="taskArns" field="taskArns" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
     <value name="nextToken" field="nextToken" usage="optional"/>
@@ -259,7 +259,7 @@
     <value name="cluster" field="cluster" usage="optional"/>
     <value name="instanceIdentityDocument" field="instanceIdentityDocument" usage="optional"/>
     <value name="instanceIdentityDocumentSignature" field="instanceIdentityDocumentSignature" usage="optional"/>
-    <collection field="totalResources">
+    <collection name="totalResources" field="totalResources" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Resource"/>
     </collection>
   </mapping>
@@ -274,7 +274,7 @@
   <mapping name="RegisterTaskDefinition" class="com.eucalyptus.container.common.model.RegisterTaskDefinitionRequest">
     <structure map-as="com.eucalyptus.container.common.model.EcsMessage"/>
     <value name="family" field="family" usage="optional"/>
-    <collection field="containerDefinitions">
+    <collection name="containerDefinitions" field="containerDefinitions" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.ContainerDefinition"/>
     </collection>
   </mapping>
@@ -299,10 +299,10 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.RunTaskResult" abstract="true">
-    <collection field="tasks">
+    <collection name="tasks" field="tasks" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Task"/>
     </collection>
-    <collection field="failures">
+    <collection name="failures" field="failures" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
     </collection>
   </mapping>
@@ -311,7 +311,7 @@
     <value name="cluster" field="cluster" usage="optional"/>
     <value name="taskDefinition" field="taskDefinition" usage="optional"/>
     <structure name="overrides" field="overrides" usage="optional" type="com.eucalyptus.container.common.model.TaskOverride"/>
-    <collection name="containerInstances" field="containerInstances">
+    <collection name="containerInstances" field="containerInstances" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
   </mapping>
@@ -321,10 +321,10 @@
     <structure map-as="EcsResponseMessage"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.StartTaskResult" abstract="true">
-    <collection field="tasks">
+    <collection name="tasks" field="tasks" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Task"/>
     </collection>
-    <collection field="failures">
+    <collection name="failures" field="failures" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Failure"/>
     </collection>
   </mapping>
@@ -349,7 +349,7 @@
     <value name="status" field="status" usage="optional"/>
     <value name="exitCode" field="exitCode" usage="optional"/>
     <value name="reason" field="reason" usage="optional"/>
-    <collection field="networkBindings">
+    <collection name="networkBindings" field="networkBindings" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.NetworkBinding"/>
     </collection>
   </mapping>
@@ -386,30 +386,30 @@
     <value name="image" field="image" usage="optional"/>
     <value name="cpu" field="cpu" usage="optional"/>
     <value name="memory" field="memory" usage="optional"/>
-    <collection name="links" field="links">
+    <collection name="links" field="links" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
-    <collection field="portMappings">
+    <collection name="portMappings" field="portMappings" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.PortMapping"/>
     </collection>
     <value name="essential" field="essential" usage="optional"/>
-    <collection name="entryPoint" field="entryPoint">
+    <collection name="entryPoint" field="entryPoint" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
-    <collection name="command" field="command">
+    <collection name="command" field="command" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
-    <collection field="environment">
+    <collection name="environment" field="environment" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.KeyValuePair"/>
     </collection>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ContainerInstance" abstract="true">
     <value name="containerInstanceArn" field="containerInstanceArn" usage="optional"/>
     <value name="ec2InstanceId" field="ec2InstanceId" usage="optional"/>
-    <collection field="remainingResources">
+    <collection name="remainingResources" field="remainingResources" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Resource"/>
     </collection>
-    <collection field="registeredResources">
+    <collection name="registeredResources" field="registeredResources" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Resource"/>
     </collection>
     <value name="status" field="status" usage="optional"/>
@@ -430,7 +430,7 @@
     <value name="doubleValue" field="doubleValue" usage="optional"/>
     <value name="longValue" field="longValue" usage="optional"/>
     <value name="integerValue" field="integerValue" usage="optional"/>
-    <collection name="stringSetValue" field="stringSetValue">
+    <collection name="stringSetValue" field="stringSetValue" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
   </mapping>
@@ -442,20 +442,20 @@
     <structure name="overrides" field="overrides" usage="optional" type="com.eucalyptus.container.common.model.TaskOverride"/>
     <value name="lastStatus" field="lastStatus" usage="optional"/>
     <value name="desiredStatus" field="desiredStatus" usage="optional"/>
-    <collection field="containers">
+    <collection name="containers" field="containers" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.Container"/>
     </collection>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.TaskDefinition" abstract="true">
     <value name="taskDefinitionArn" field="taskDefinitionArn" usage="optional"/>
-    <collection field="containerDefinitions">
+    <collection name="containerDefinitions" field="containerDefinitions" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.ContainerDefinition"/>
     </collection>
     <value name="family" field="family" usage="optional"/>
     <value name="revision" field="revision" usage="optional"/>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.TaskOverride" abstract="true">
-    <collection field="containerOverrides">
+    <collection name="containerOverrides" field="containerOverrides" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.ContainerOverride"/>
     </collection>
   </mapping>
@@ -466,13 +466,13 @@
     <value name="lastStatus" field="lastStatus" usage="optional"/>
     <value name="exitCode" field="exitCode" usage="optional"/>
     <value name="reason" field="reason" usage="optional"/>
-    <collection field="networkBindings">
+    <collection name="networkBindings" field="networkBindings" usage="optional">>
       <structure name="member" type="com.eucalyptus.container.common.model.NetworkBinding"/>
     </collection>
   </mapping>
   <mapping class="com.eucalyptus.container.common.model.ContainerOverride" abstract="true">
     <value name="name" field="name" usage="optional"/>
-    <collection name="command" field="command">
+    <collection name="command" field="command" usage="optional">
       <value name="member" type="java.lang.String"/>
     </collection>
   </mapping>

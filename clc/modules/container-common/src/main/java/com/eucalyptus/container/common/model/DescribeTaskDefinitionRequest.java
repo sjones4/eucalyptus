@@ -40,6 +40,7 @@ import java.io.Serializable;
 
 import javax.annotation.Nonnull;
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#describeTaskDefinition(DescribeTaskDefinitionRequest) DescribeTaskDefinition operation}.
@@ -59,6 +60,7 @@ public class DescribeTaskDefinitionRequest extends EcsMessage implements Seriali
      */
     @Nonnull
     @FieldRegex( FieldRegexValue.TASK_DEFINITION_NAME )
+    @HttpParameterMapping( parameter = "taskDefinition" )
     private String taskDefinition;
 
     /**

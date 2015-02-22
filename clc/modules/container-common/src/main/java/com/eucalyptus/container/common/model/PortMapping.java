@@ -37,6 +37,7 @@
 package com.eucalyptus.container.common.model;
 
 import java.io.Serializable;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * <p>
@@ -51,11 +52,13 @@ public class PortMapping implements Serializable {
      * The port number on the container that should be used with the port
      * mapping.
      */
+    @HttpParameterMapping( parameter = "containerPort" )
     private Integer containerPort;
 
     /**
      * The port number on the host that should be used with the port mapping.
      */
+    @HttpParameterMapping( parameter = "hostPort" )
     private Integer hostPort;
 
     /**

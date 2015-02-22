@@ -19,7 +19,7 @@
  ************************************************************************/
 package com.eucalyptus.container;
 
-import static com.eucalyptus.container.common.ContainerMetadata.ContainerInstanceMetadata;
+import static com.eucalyptus.container.common.EcsMetadata.ContainerInstanceMetadata;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;

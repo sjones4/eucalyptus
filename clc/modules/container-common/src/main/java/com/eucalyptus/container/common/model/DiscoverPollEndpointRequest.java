@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#discoverPollEndpoint(DiscoverPollEndpointRequest) DiscoverPollEndpoint operation}.
@@ -59,6 +60,7 @@ public class DiscoverPollEndpointRequest extends EcsMessage implements Serializa
     /**
      * The cluster that the container instance belongs to.
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
@@ -70,6 +72,7 @@ public class DiscoverPollEndpointRequest extends EcsMessage implements Serializa
      * instance UUID. For example,
      * arn:aws:ecs:<i>region</i>:<i>aws_account_id</i>:container-instance/<i>container_instance_UUID</i>.
      */
+    @HttpParameterMapping( parameter = "containerInstance" )
     private String containerInstance;
 
     /**

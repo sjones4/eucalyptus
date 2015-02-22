@@ -19,7 +19,7 @@
  ************************************************************************/
 package com.eucalyptus.container.persist;
 
-import static com.eucalyptus.container.common.ContainerMetadata.ContainerInstanceMetadata;
+import static com.eucalyptus.container.common.EcsMetadata.ContainerInstanceMetadata;
 import com.eucalyptus.component.annotation.ComponentNamed;
 import com.eucalyptus.container.ContainerInstance;
 import com.eucalyptus.container.ContainerInstances;

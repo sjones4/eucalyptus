@@ -21,10 +21,13 @@ package com.eucalyptus.container;
 
 import static com.eucalyptus.container.ContainerInstances.ContainerInstanceStringFunctions.CLUSTER;
 import static com.eucalyptus.container.TaskDefinitions.TaskDefinitionStringFunctions.FAMILY;
-import static com.eucalyptus.container.common.ContainerMetadata.ContainerInstanceMetadata;
+import static com.eucalyptus.container.Tasks.TaskStringFunctions;
+import static com.eucalyptus.container.common.EcsMetadata.ContainerInstanceMetadata;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -47,6 +50,7 @@ import com.eucalyptus.context.Contexts;
 import com.eucalyptus.container.common.model.*;
 import com.eucalyptus.entities.AbstractPersistent;
 import com.eucalyptus.entities.Entities;
+import com.eucalyptus.util.CollectionUtils;
 import com.eucalyptus.util.Exceptions;
 import com.eucalyptus.util.Internets;
 import com.eucalyptus.util.Pair;
@@ -56,12 +60,15 @@ import com.eucalyptus.util.Strings;
 import com.eucalyptus.util.TypeMappers;
 import com.eucalyptus.util.async.AsyncRequests;
 import com.eucalyptus.ws.Role;
+import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import edu.ucsb.eucalyptus.msgs.BaseCallerContext;
 import edu.ucsb.eucalyptus.msgs.EvaluatedIamConditionKey;
 
@@ -77,14 +84,18 @@ public class ContainerService {
   private final Clusters clusters;
   private final ContainerInstances containerInstances;
   private final TaskDefinitions taskDefinitions;
+  private final Tasks tasks;
+  private final Random random = new Random( );
 
   @Inject
   public ContainerService( final Clusters clusters,
                            final ContainerInstances containerInstances,
-                           final TaskDefinitions taskDefinitions ) {
+                           final TaskDefinitions taskDefinitions,
+                           final Tasks tasks ) {
     this.clusters = clusters;
     this.containerInstances = containerInstances;
     this.taskDefinitions = taskDefinitions;
+    this.tasks = tasks;
   }
 
   public CreateClusterResponse createCluster( final CreateClusterRequest request ) throws EcsException {
@@ -227,7 +238,26 @@ public class ContainerService {
   }
 
   public DescribeTasksResponse describeTasks( final DescribeTasksRequest request ) throws EcsException {
-    return request.reply( new DescribeTasksResponse( ) );
+    final DescribeTasksResponse response = new DescribeTasksResponse( );
+    final Context ctx = Contexts.lookup( );
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    final Predicate<? super Task> requestedAndAccessible = ContainerMetadatas.filteringFor( Task.class )
+        .byId( request.getTasks( ) )
+        .byProperty( Optional.fromNullable( request.getCluster( ) ).asSet( ), TaskStringFunctions.CLUSTER ) //TODO:STEVE: allow for ARN
+        .byPrivileges( )
+        .buildPredicate( );
+    try {
+      response.setResult( new DescribeTasksResult( ).withTasks( tasks.list(
+          accountFullName,
+          Restrictions.conjunction( ),
+          Collections.<String, String>emptyMap( ),
+          requestedAndAccessible,
+          TypeMappers.lookup( Task.class, com.eucalyptus.container.common.model.Task.class ) ) ) );
+      // TODO:STEVE: failures
+    } catch ( Exception e ) {
+      throw handleException( e );
+    }
+    return request.reply( response );
   }
 
   public DiscoverPollEndpointResponse discoverPollEndpoint( final DiscoverPollEndpointRequest request ) throws EcsException {
@@ -282,7 +312,26 @@ public class ContainerService {
   }
 
   public ListTaskDefinitionFamiliesResponse listTaskDefinitionFamilies( final ListTaskDefinitionFamiliesRequest request ) throws EcsException {
-    return request.reply( new ListTaskDefinitionFamiliesResponse( ) );
+    final ListTaskDefinitionFamiliesResponse response = new ListTaskDefinitionFamiliesResponse( );
+    final Context ctx = Contexts.lookup( );
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    final Predicate<? super TaskDefinition> requestedAndAccessible = ContainerMetadatas.filteringFor( TaskDefinition.class )
+        .byPredicate( request.getFamilyPrefix( ) == null ?
+            Predicates.<TaskDefinition>alwaysTrue( ) :
+            Predicates.compose( Strings.startsWith( request.getFamilyPrefix( ) ), FAMILY ) )
+        .byPrivileges()
+        .buildPredicate();
+    try {
+      response.setResult( new ListTaskDefinitionFamiliesResult( ).withFamilies( Sets.newTreeSet( taskDefinitions.list(
+          accountFullName,
+          Restrictions.conjunction(),
+          Collections.<String, String>emptyMap(),
+          requestedAndAccessible,
+          FAMILY ) ) ) );
+    } catch ( Exception e ) {
+      throw handleException( e );
+    }
+    return request.reply( response );
   }
 
   public ListTaskDefinitionsResponse listTaskDefinitions( final ListTaskDefinitionsRequest request ) throws EcsException {
@@ -309,7 +358,26 @@ public class ContainerService {
   }
 
   public ListTasksResponse listTasks( final ListTasksRequest request ) throws EcsException {
-    return request.reply( new ListTasksResponse( ) );
+    final ListTasksResponse response = new ListTasksResponse( );
+    final Context ctx = Contexts.lookup( );
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    final Predicate<? super Task> requestedAndAccessible = ContainerMetadatas.filteringFor( Task.class )
+        .byProperty( Optional.fromNullable( request.getCluster() ).asSet(), TaskStringFunctions.CLUSTER )                       //TODO:STEVE: allow for ARN
+        .byProperty( Optional.fromNullable( request.getContainerInstance() ).asSet(), TaskStringFunctions.CONTAINER_INSTANCE )  //TODO:STEVE: allow for ARN
+        .byProperty( Optional.fromNullable( request.getFamily( ) ).asSet( ), TaskStringFunctions.FAMILY )
+        .byPrivileges( )
+        .buildPredicate( );
+    try {
+      response.setResult( new ListTasksResult( ).withTaskArns( tasks.list(
+          accountFullName,
+          Restrictions.conjunction( ),
+          Collections.<String, String>emptyMap( ),
+          requestedAndAccessible,
+          ContainerMetadatas.toArn( ) ) ) );
+    } catch ( Exception e ) {
+      throw handleException( e );
+    }
+    return request.reply( response );
   }
 
   public RegisterContainerInstanceResponse registerContainerInstance( final RegisterContainerInstanceRequest request ) throws EcsException {
@@ -403,7 +471,56 @@ public class ContainerService {
   }
 
   public RunTaskResponse runTask( final RunTaskRequest request ) throws EcsException {
-    return request.reply( new RunTaskResponse( ) );
+    final RunTaskResponse response = new RunTaskResponse( );
+    final Context ctx = Contexts.lookup( );
+    final UserFullName userFullName = ctx.getUserFullName( );
+    final AccountFullName accountFullName = userFullName.asAccountFullName( );
+    allocate( new Supplier<Task>( ) {
+      @Override
+      public Task get( ) {
+        try {
+          final RunTaskResult result = new RunTaskResult( );
+
+          //TODO:STEVE: request count
+          final Cluster cluster = clusters.lookupByName(
+              accountFullName,
+              request.getCluster( ),
+              RestrictedTypes.filterPrivileged( ),
+              Functions.<Cluster>identity( ) ); //TODO:STEVE: allow for ARN
+
+          final TaskDefinition taskDefinition = taskDefinitions.lookupByName(
+              accountFullName,
+              request.getTaskDefinition( ),
+              RestrictedTypes.filterPrivileged( ),
+              Functions.<TaskDefinition>identity( ) ); //TODO:STEVE: allow for ARN
+
+          final List<ContainerInstance> containerInstanceList = containerInstances.list(
+              accountFullName,
+              Restrictions.eqProperty( "clusterName", cluster.getDisplayName( ) ),
+              Collections.<String,String>emptyMap( ),
+              RestrictedTypes.filterPrivileged( ),
+              Functions.<ContainerInstance>identity( ) );
+
+          if ( !containerInstanceList.isEmpty( ) ) {
+            final int index = random.nextInt( ) % containerInstanceList.size( );
+            //TODO:STEVE: verify resources
+            final ContainerInstance instance = containerInstanceList.get( index );
+            final List<Container> containers = Lists.newArrayList( );
+            for ( final ContainerDefinition containerDefinition : taskDefinition.getContainerDefinitions( ) ) {
+              containers.add( Container.create( userFullName, containerDefinition ) );
+            }
+            final Task task = tasks.save( Task.create( userFullName, cluster, instance, taskDefinition, containers ) );
+            result.setTasks( Lists.newArrayList( TypeMappers.transform( task, com.eucalyptus.container.common.model.Task.class ) ) );
+          } // else //TODO:STEVE: failures?
+
+          response.setResult( result );
+          return null;
+        } catch ( Exception ex ) {
+          throw new RuntimeException( ex );
+        }
+      }
+    }, Task.class, request.getTaskDefinition( ) );
+    return request.reply( response );
   }
 
   public StartTaskResponse startTask( final StartTaskRequest request ) throws EcsException {
@@ -411,15 +528,101 @@ public class ContainerService {
   }
 
   public StopTaskResponse stopTask( final StopTaskRequest request ) throws EcsException {
-    return request.reply( new StopTaskResponse( ) );
+    final StopTaskResponse response = new StopTaskResponse( );
+    final Context ctx = Contexts.lookup();
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    try {
+      response.setResult( new StopTaskResult( )
+          .withTask( tasks.updateByExample(
+              Task.exampleWithNameAndCluster( accountFullName, request.getTask(), request.getCluster() ),
+              accountFullName,
+              request.getTask(),
+              new Function<Task, com.eucalyptus.container.common.model.Task>( ){
+                @Nullable
+                @Override
+                public com.eucalyptus.container.common.model.Task apply( final Task task ) {
+                  task.setLastStatus( "RUNNING" );
+                  task.setDesiredStatus( "STOPPED" );
+                  return TypeMappers.transform( task, com.eucalyptus.container.common.model.Task.class );
+                }
+              } ) ) );
+    } catch ( EcsMetadataNotFoundException e ) {
+      throw new EcsClientException( "UnknownResourceFault", "Task not found: " + request.getTask() );
+    } catch ( Exception e ) {
+      throw handleException( e );
+    }
+    return request.reply( response );
   }
 
   public SubmitContainerStateChangeResponse submitContainerStateChange( final SubmitContainerStateChangeRequest request ) throws EcsException {
-    return request.reply( new SubmitContainerStateChangeResponse( ) );
+    final SubmitContainerStateChangeResponse response = new SubmitContainerStateChangeResponse( );
+    logger.error( "SubmitContainerStateChange: " + request.getCluster() ); //TODO:STEVE: remove
+    logger.error( "SubmitContainerStateChange: " + request.getTask() );//TODO:STEVE: remove
+    logger.error( "SubmitContainerStateChange: " + request.getContainerName() ); //TODO:STEVE: remove
+    logger.error( "SubmitContainerStateChange: " + request.getReason() ); //TODO:STEVE: remove
+    logger.error( "SubmitContainerStateChange: " + request.getStatus() ); //TODO:STEVE: remove
+    logger.error( "SubmitContainerStateChange: " + request.getExitCode() ); //TODO:STEVE: remove
+    logger.error( "SubmitContainerStateChange: " + request.getNetworkBindings() ); //TODO:STEVE: remove
+    final Context ctx = Contexts.lookup( );
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    try {
+      tasks.updateByExample(
+          Task.exampleWithNameAndCluster( accountFullName, request.getTask( ), request.getCluster( ) ),
+          accountFullName,
+          request.getTask(),
+          new Function<Task, Void>( ){
+            @Nullable
+            @Override
+            public Void apply( final Task task ) {
+              task.updateTimeStamps( );
+              final Optional<Container> container = Iterables.tryFind(
+                  task.getContainers( ),
+                  CollectionUtils.propertyPredicate( request.getContainerName( ), RestrictedTypes.toDisplayName( ) ) );
+              if ( container.isPresent( ) ) {
+                container.get( ).setLastStatus( request.getStatus( ) );
+                container.get( ).setReason( request.getReason( ) );
+                container.get( ).setExitCode( request.getExitCode( ) );
+                //TODO:STEVE: network bindings
+              }
+              return null;
+            }
+          } );
+      response.setResult( new SubmitContainerStateChangeResult( ).withAcknowledgment( "" ) );
+    } catch ( EcsMetadataNotFoundException e ) {
+      throw new EcsClientException( "UnknownResourceFault", "Task not found: " + request.getTask() );
+    } catch ( Exception e ) {
+      throw handleException( e );
+    }    return request.reply( response );
   }
 
   public SubmitTaskStateChangeResponse submitTaskStateChange ( final SubmitTaskStateChangeRequest request ) throws EcsException {
-    return request.reply( new SubmitTaskStateChangeResponse( ) );
+    final SubmitTaskStateChangeResponse response = new SubmitTaskStateChangeResponse( );
+    logger.error( "SubmitTaskStateChange: " + request.getCluster() ); //TODO:STEVE: remove
+    logger.error( "SubmitTaskStateChange: " + request.getTask() );//TODO:STEVE: remove
+    logger.error( "SubmitTaskStateChange: " + request.getReason() ); //TODO:STEVE: remove
+    logger.error( "SubmitTaskStateChange: " + request.getStatus() ); //TODO:STEVE: remove
+    final Context ctx = Contexts.lookup( );
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    try {
+      tasks.updateByExample(
+          Task.exampleWithNameAndCluster( accountFullName, request.getTask( ), request.getCluster( ) ),
+          accountFullName,
+          request.getTask(),
+          new Function<Task, Void>( ){
+            @Nullable
+            @Override
+            public Void apply( final Task task ) {
+              task.setLastStatus( request.getStatus( ) );
+              return null;
+            }
+          } );
+      response.setResult( new SubmitTaskStateChangeResult().withAcknowledgment( "" ) );
+    } catch ( EcsMetadataNotFoundException e ) {
+      throw new EcsClientException( "UnknownResourceFault", "Task not found: " + request.getTask() );
+    } catch ( Exception e ) {
+      throw handleException( e );
+    }
+    return request.reply( response );
   }
 
   private <T extends AbstractPersistent & RestrictedType> T allocate(

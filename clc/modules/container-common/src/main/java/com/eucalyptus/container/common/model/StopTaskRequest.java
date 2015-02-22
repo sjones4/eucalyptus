@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#stopTask(StopTaskRequest) StopTask operation}.
@@ -56,12 +57,14 @@ public class StopTaskRequest extends EcsMessage implements Serializable {
      * hosts the task you want to stop. If you do not specify a cluster, the
      * default cluster is assumed..
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
      * The task UUIDs or full Amazon Resource Name (ARN) entry of the task
      * you would like to stop.
      */
+    @HttpParameterMapping( parameter = "task" )
     private String task;
 
     /**

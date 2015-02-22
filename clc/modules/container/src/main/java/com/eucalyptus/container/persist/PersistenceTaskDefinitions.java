@@ -22,14 +22,14 @@ package com.eucalyptus.container.persist;
 import com.eucalyptus.component.annotation.ComponentNamed;
 import com.eucalyptus.container.TaskDefinition;
 import com.eucalyptus.container.TaskDefinitions;
-import com.eucalyptus.container.common.ContainerMetadata;
+import com.eucalyptus.container.common.EcsMetadata;
 import com.eucalyptus.util.OwnerFullName;
 
 /**
  *
  */
 @ComponentNamed
-public class PersistenceTaskDefinitions extends EcsPersistenceSupport<ContainerMetadata.TaskDefinitionMetadata,TaskDefinition> implements TaskDefinitions {
+public class PersistenceTaskDefinitions extends EcsPersistenceSupport<EcsMetadata.TaskDefinitionMetadata,TaskDefinition> implements TaskDefinitions {
 
   public PersistenceTaskDefinitions( ) {
     super( "task-definition" );

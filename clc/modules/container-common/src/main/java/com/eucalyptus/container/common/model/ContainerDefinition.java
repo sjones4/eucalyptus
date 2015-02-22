@@ -37,6 +37,7 @@
 package com.eucalyptus.container.common.model;
 
 import java.io.Serializable;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * <p>
@@ -52,6 +53,7 @@ public class ContainerDefinition implements Serializable {
      * can be entered in the <code>links</code> of another container to
      * connect the containers.
      */
+    @HttpParameterMapping( parameter = "name" )
     private String name;
 
     /**
@@ -60,6 +62,7 @@ public class ContainerDefinition implements Serializable {
      * default. Other repositories are specified with
      * <code><i>repository-url</i>/<i>image</i>:<i>tag</i></code>.
      */
+    @HttpParameterMapping( parameter = "image" )
     private String image;
 
     /**
@@ -67,12 +70,14 @@ public class ContainerDefinition implements Serializable {
      * container instance has 1,024 <code>cpu</code> units for every CPU
      * core.
      */
+    @HttpParameterMapping( parameter = "cpu" )
     private Integer cpu;
 
     /**
      * The number of MiB of memory reserved for the container. Docker will
      * allocate a minimum of 4 MiB of memory to a container.
      */
+    @HttpParameterMapping( parameter = "memory" )
     private Integer memory;
 
     /**
@@ -82,11 +87,13 @@ public class ContainerDefinition implements Serializable {
      * containers, see <a
      * href="https://docs.docker.com/userguide/dockerlinks/">https://docs.docker.com/userguide/dockerlinks/</a>.
      */
+    @HttpParameterMapping( parameter = "links" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> links;
 
     /**
      * The list of port mappings for the container.
      */
+    @HttpParameterMapping( parameter = "portMappings" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<PortMapping> portMappings;
 
     /**
@@ -96,6 +103,7 @@ public class ContainerDefinition implements Serializable {
      * <code>false</code>, then its failure will not affect the rest of the
      * containers in a task.
      */
+    @HttpParameterMapping( parameter = "essential" )
     private Boolean essential;
 
     /**
@@ -103,6 +111,7 @@ public class ContainerDefinition implements Serializable {
      * information on the Docker <code>ENTRYPOINT</code> parameter, see <a
      * href="https://docs.docker.com/reference/builder/#entrypoint">https://docs.docker.com/reference/builder/#entrypoint</a>.
      */
+    @HttpParameterMapping( parameter = "entryPoint" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> entryPoint;
 
     /**
@@ -110,11 +119,13 @@ public class ContainerDefinition implements Serializable {
      * information on the Docker <code>CMD</code> parameter, see <a
      * href="https://docs.docker.com/reference/builder/#cmd">https://docs.docker.com/reference/builder/#cmd</a>.
      */
+    @HttpParameterMapping( parameter = "command" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> command;
 
     /**
      * The environment variables to pass to a container.
      */
+    @HttpParameterMapping( parameter = "environment" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<KeyValuePair> environment;
 
     /**

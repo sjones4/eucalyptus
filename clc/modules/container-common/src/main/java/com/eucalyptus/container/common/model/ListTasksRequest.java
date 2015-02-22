@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#listTasks(ListTasksRequest) ListTasks operation}.
@@ -58,6 +59,7 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
      * hosts the tasks you want to list. If you do not specify a cluster, the
      * default cluster is assumed..
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
@@ -66,6 +68,7 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
      * results with. Specifying a <code>containerInstance</code> will limit
      * the results to tasks that belong to that container instance.
      */
+    @HttpParameterMapping( parameter = "containerInstance" )
     private String containerInstance;
 
     /**
@@ -73,6 +76,7 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
      * <code>ListTasks</code> results with. Specifying a <code>family</code>
      * will limit the results to tasks that belong to that family.
      */
+    @HttpParameterMapping( parameter = "family" )
     private String family;
 
     /**
@@ -83,6 +87,7 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
      * <code>nextToken</code> value. This value is <code>null</code> when
      * there are no more results to return.
      */
+    @HttpParameterMapping( parameter = "nextToken" )
     private String nextToken;
 
     /**
@@ -96,6 +101,7 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
      * this parameter is not used, then <code>ListTasks</code> returns up to
      * 100 results and a <code>nextToken</code> value if applicable.
      */
+    @HttpParameterMapping( parameter = "maxResults" )
     private Integer maxResults;
 
     /**

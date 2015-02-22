@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#listClusters(ListClustersRequest) ListClusters operation}.
@@ -59,6 +60,7 @@ public class ListClustersRequest extends EcsMessage implements Serializable {
      * <code>nextToken</code> value. This value is <code>null</code> when
      * there are no more results to return.
      */
+    @HttpParameterMapping( parameter = "nextToken" )
     private String nextToken;
 
     /**
@@ -72,6 +74,7 @@ public class ListClustersRequest extends EcsMessage implements Serializable {
      * this parameter is not used, then <code>ListClusters</code> returns up
      * to 100 results and a <code>nextToken</code> value if applicable.
      */
+    @HttpParameterMapping( parameter = "maxResults" )
     private Integer maxResults;
 
     /**

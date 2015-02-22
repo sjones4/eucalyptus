@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#registerTaskDefinition(RegisterTaskDefinitionRequest) RegisterTaskDefinition operation}.
@@ -58,12 +59,14 @@ public class RegisterTaskDefinitionRequest extends EcsMessage implements Seriali
      * can think of the <code>family</code> as a name for your task
      * definition.
      */
+    @HttpParameterMapping( parameter = "family" )
     private String family;
 
     /**
      * A list of container definitions in JSON format that describe the
      * different containers that make up your task.
      */
+    @HttpParameterMapping( parameter = "containerDefinitions" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<ContainerDefinition> containerDefinitions;
 
     /**

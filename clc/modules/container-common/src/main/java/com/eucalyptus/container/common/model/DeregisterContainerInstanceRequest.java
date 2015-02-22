@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#deregisterContainerInstance(DeregisterContainerInstanceRequest) DeregisterContainerInstance operation}.
@@ -57,6 +58,7 @@ public class DeregisterContainerInstanceRequest extends EcsMessage implements Se
      * hosts the container instance you want to deregister. If you do not
      * specify a cluster, the default cluster is assumed.
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
@@ -68,6 +70,7 @@ public class DeregisterContainerInstanceRequest extends EcsMessage implements Se
      * container instance UUID. For example,
      * arn:aws:ecs:<i>region</i>:<i>aws_account_id</i>:container-instance/<i>container_instance_UUID</i>.
      */
+    @HttpParameterMapping( parameter = "containerInstance" )
     private String containerInstance;
 
     /**
@@ -76,6 +79,7 @@ public class DeregisterContainerInstanceRequest extends EcsMessage implements Se
      * container instance and you don't want to run <code>StopTask</code> for
      * each task before deregistering the container instance.
      */
+    @HttpParameterMapping( parameter = "force" )
     private Boolean force;
 
     /**

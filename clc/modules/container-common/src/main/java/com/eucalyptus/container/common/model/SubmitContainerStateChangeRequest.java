@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#submitContainerStateChange(SubmitContainerStateChangeRequest) SubmitContainerStateChange operation}.
@@ -59,37 +60,44 @@ public class SubmitContainerStateChangeRequest extends EcsMessage implements Ser
      * The short name or full Amazon Resource Name (ARN) of the cluster that
      * hosts the container.
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
      * The task UUID or full Amazon Resource Name (ARN) of the task that
      * hosts the container.
      */
+    @HttpParameterMapping( parameter = "task" )
     private String task;
 
     /**
      * The name of the container.
      */
+    @HttpParameterMapping( parameter = "containerName" )
     private String containerName;
 
     /**
      * The status of the state change request.
      */
+    @HttpParameterMapping( parameter = "status" )
     private String status;
 
     /**
      * The exit code returned for the state change request.
      */
+    @HttpParameterMapping( parameter = "exitCode" )
     private Integer exitCode;
 
     /**
      * The reason for the state change request.
      */
+    @HttpParameterMapping( parameter = "reason" )
     private String reason;
 
     /**
      * The network bindings of the container.
      */
+    @HttpParameterMapping( parameter = "networkBindings" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<NetworkBinding> networkBindings;
 
     /**

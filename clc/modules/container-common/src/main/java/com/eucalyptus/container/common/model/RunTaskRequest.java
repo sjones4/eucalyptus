@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#runTask(RunTaskRequest) RunTask operation}.
@@ -58,6 +59,7 @@ public class RunTaskRequest extends EcsMessage implements Serializable {
      * you want to run your task on. If you do not specify a cluster, the
      * default cluster is assumed..
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
@@ -65,17 +67,20 @@ public class RunTaskRequest extends EcsMessage implements Serializable {
      * (<code>family:revision</code>) or full Amazon Resource Name (ARN) of
      * the task definition that you want to run.
      */
+    @HttpParameterMapping( parameter = "taskDefinition" )
     private String taskDefinition;
 
     /**
      * 
      */
+    @HttpParameterMapping( parameter = "overrides" )
     private TaskOverride overrides;
 
     /**
      * The number of instances of the specified task that you would like to
      * place on your cluster.
      */
+    @HttpParameterMapping( parameter = "count" )
     private Integer count;
 
     /**

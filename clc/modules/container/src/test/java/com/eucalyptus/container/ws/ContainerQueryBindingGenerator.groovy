@@ -81,11 +81,11 @@ class ContainerQueryBindingGenerator {
       } else if ( Collection.class.isAssignableFrom( field.type ) ) {
         Class itemType = ( Class ) ( ( ParameterizedType ) field.genericType ).actualTypeArguments[0];
         if ( itemType.name.startsWith( 'java' ) ) {
-          println """    <collection name="${field.name}" field="${field.name}">"""
+          println """    <collection name="${field.name}" field="${field.name}" usage="optional">"""
           println """      <value name="member" type="${itemType.name}"/>"""
           println """    </collection>"""
         } else {
-          println """    <collection field="${field.name}">"""
+          println """    <collection name="${field.name}" field="${field.name}" usage="optional">>"""
           println """      <structure name="member" type="${itemType.name}"/>"""
           println """    </collection>"""
           beanClasses << itemType.name

@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#startTask(StartTaskRequest) StartTask operation}.
@@ -58,6 +59,7 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
      * you want to start your task on. If you do not specify a cluster, the
      * default cluster is assumed..
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
@@ -65,11 +67,13 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
      * (<code>family:revision</code>) or full Amazon Resource Name (ARN) of
      * the task definition that you want to start.
      */
+    @HttpParameterMapping( parameter = "taskDefinition" )
     private String taskDefinition;
 
     /**
      * 
      */
+    @HttpParameterMapping( parameter = "overrides" )
     private TaskOverride overrides;
 
     /**
@@ -77,6 +81,7 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
      * entries for the container instances on which you would like to place
      * your task.
      */
+    @HttpParameterMapping( parameter = "containerInstances" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> containerInstances;
 
     /**

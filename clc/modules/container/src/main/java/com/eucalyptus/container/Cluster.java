@@ -19,7 +19,7 @@
  ************************************************************************/
 package com.eucalyptus.container;
 
-import static com.eucalyptus.container.common.ContainerMetadata.ClusterMetadata;
+import static com.eucalyptus.container.common.EcsMetadata.ClusterMetadata;
 import javax.persistence.Entity;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;

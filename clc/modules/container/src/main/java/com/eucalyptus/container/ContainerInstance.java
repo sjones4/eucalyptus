@@ -33,7 +33,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import com.eucalyptus.component.ComponentIds;
 import com.eucalyptus.container.common.Container;
-import com.eucalyptus.container.common.ContainerMetadata;
+import com.eucalyptus.container.common.EcsMetadata;
 import com.eucalyptus.entities.AccountMetadata;
 import com.eucalyptus.util.FullName;
 import com.eucalyptus.util.OwnerFullName;
@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
 @PersistenceContext( name = "eucalyptus_ecs" )
 @Table( name = "ecs_container_instance" )
 @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
-public class ContainerInstance extends AccountMetadata<ContainerInstance.State> implements ContainerMetadata.ContainerInstanceMetadata {
+public class ContainerInstance extends AccountMetadata<ContainerInstance.State> implements EcsMetadata.ContainerInstanceMetadata {
   private static final long serialVersionUID = 1L;
 
   @Column( name = "cluster_name", nullable = false, updatable = false )

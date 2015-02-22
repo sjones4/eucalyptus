@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#listContainerInstances(ListContainerInstancesRequest) ListContainerInstances operation}.
@@ -56,6 +57,7 @@ public class ListContainerInstancesRequest extends EcsMessage implements Seriali
      * hosts the container instances you want to list. If you do not specify
      * a cluster, the default cluster is assumed..
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
@@ -66,6 +68,7 @@ public class ListContainerInstancesRequest extends EcsMessage implements Seriali
      * results that returned the <code>nextToken</code> value. This value is
      * <code>null</code> when there are no more results to return.
      */
+    @HttpParameterMapping( parameter = "nextToken" )
     private String nextToken;
 
     /**
@@ -81,6 +84,7 @@ public class ListContainerInstancesRequest extends EcsMessage implements Seriali
      * returns up to 100 results and a <code>nextToken</code> value if
      * applicable.
      */
+    @HttpParameterMapping( parameter = "maxResults" )
     private Integer maxResults;
 
     /**

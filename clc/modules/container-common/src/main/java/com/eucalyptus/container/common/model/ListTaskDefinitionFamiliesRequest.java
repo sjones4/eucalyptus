@@ -37,6 +37,7 @@
 package com.eucalyptus.container.common.model;
 
 import java.io.Serializable;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#listTaskDefinitionFamilies(ListTaskDefinitionFamiliesRequest) ListTaskDefinitionFamilies operation}.
@@ -56,6 +57,7 @@ public class ListTaskDefinitionFamiliesRequest extends EcsMessage implements Ser
      * <code>familyPrefix</code>, only task definition family names that
      * begin with the <code>familyPrefix</code> string are returned.
      */
+    @HttpParameterMapping( parameter = "familyPrefix" )
     private String familyPrefix;
 
     /**
@@ -66,6 +68,7 @@ public class ListTaskDefinitionFamiliesRequest extends EcsMessage implements Ser
      * results that returned the <code>nextToken</code> value. This value is
      * <code>null</code> when there are no more results to return.
      */
+    @HttpParameterMapping( parameter = "nextToken" )
     private String nextToken;
 
     /**
@@ -81,6 +84,7 @@ public class ListTaskDefinitionFamiliesRequest extends EcsMessage implements Ser
      * <code>ListTaskDefinitionFamilies</code> returns up to 100 results and
      * a <code>nextToken</code> value if applicable.
      */
+    @HttpParameterMapping( parameter = "maxResults" )
     private Integer maxResults;
 
     /**

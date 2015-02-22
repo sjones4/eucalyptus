@@ -40,6 +40,7 @@ import java.io.Serializable;
 
 import javax.annotation.Nonnull;
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#registerContainerInstance(RegisterContainerInstanceRequest) RegisterContainerInstance operation}.
@@ -63,21 +64,25 @@ public class RegisterContainerInstanceRequest extends EcsMessage implements Seri
      * specify a cluster, the default cluster is assumed..
      */
     @Nonnull
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
      * 
      */
+    @HttpParameterMapping( parameter = "instanceIdentityDocument" )
     private String instanceIdentityDocument;
 
     /**
      * 
      */
+    @HttpParameterMapping( parameter = "instanceIdentityDocumentSignature" )
     private String instanceIdentityDocumentSignature;
 
     /**
      * 
      */
+    @HttpParameterMapping( parameter = "totalResources" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<Resource> totalResources;
 
     /**

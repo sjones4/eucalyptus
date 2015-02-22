@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#describeClusters(DescribeClustersRequest) DescribeClusters operation}.
@@ -56,6 +57,7 @@ public class DescribeClustersRequest extends EcsMessage implements Serializable 
      * Resource Name (ARN) entries. If you do not specify a cluster, the
      * default cluster is assumed.
      */
+    @HttpParameterMapping( parameter = "clusters" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> clusters;
 
     /**

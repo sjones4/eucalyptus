@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#describeTasks(DescribeTasksRequest) DescribeTasks operation}.
@@ -56,12 +57,14 @@ public class DescribeTasksRequest extends EcsMessage implements Serializable {
      * hosts the task you want to describe. If you do not specify a cluster,
      * the default cluster is assumed.
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
      * A space-separated list of task UUIDs or full Amazon Resource Name
      * (ARN) entries.
      */
+    @HttpParameterMapping( parameter = "tasks" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> tasks;
 
     /**

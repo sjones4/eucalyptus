@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#describeContainerInstances(DescribeContainerInstancesRequest) DescribeContainerInstances operation}.
@@ -58,12 +59,14 @@ public class DescribeContainerInstancesRequest extends EcsMessage implements Ser
      * hosts the container instances you want to describe. If you do not
      * specify a cluster, the default cluster is assumed.
      */
+    @HttpParameterMapping( parameter = "cluster" )
     private String cluster;
 
     /**
      * A space-separated list of container instance UUIDs or full Amazon
      * Resource Name (ARN) entries.
      */
+    @HttpParameterMapping( parameter = "containerInstances" )
     private com.amazonaws.internal.ListWithAutoConstructFlag<String> containerInstances;
 
     /**

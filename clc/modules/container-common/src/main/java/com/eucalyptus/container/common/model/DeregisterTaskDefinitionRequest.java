@@ -39,6 +39,7 @@ package com.eucalyptus.container.common.model;
 import java.io.Serializable;
 
 import com.eucalyptus.auth.policy.PolicyAction;
+import com.eucalyptus.binding.HttpParameterMapping;
 
 /**
  * Container for the parameters to the {@link com.amazonaws.services.ecs.AmazonECS#deregisterTaskDefinition(DeregisterTaskDefinitionRequest) DeregisterTaskDefinition operation}.
@@ -57,6 +58,7 @@ public class DeregisterTaskDefinitionRequest extends EcsMessage implements Seria
      * (<code>family:revision</code>) or full Amazon Resource Name (ARN) of
      * the task definition that you want to deregister.
      */
+    @HttpParameterMapping( parameter = "taskDefinition" )
     private String taskDefinition;
 
     /**

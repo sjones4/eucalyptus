@@ -26,21 +26,27 @@ import com.eucalyptus.util.RestrictedType;
 /**
  *
  */
-@PolicyVendor( ContainerMetadata.VENDOR )
-public interface ContainerMetadata extends RestrictedType {
+@PolicyVendor( EcsMetadata.VENDOR )
+public interface EcsMetadata extends RestrictedType {
 
   String VENDOR = "ecs";
 
-  public interface ContainerMetadataWithResourceName extends ContainerMetadata {
+  public interface EcsMetadataWithResourceName extends EcsMetadata {
     String getArn();
   }
 
   @PolicyResourceType( "cluster" )
-  interface ClusterMetadata extends ContainerMetadataWithResourceName {}
+  interface ClusterMetadata extends EcsMetadataWithResourceName {}
 
   @PolicyResourceType( "container-instance" )
-  interface ContainerInstanceMetadata extends ContainerMetadataWithResourceName {}
+  interface ContainerInstanceMetadata extends EcsMetadataWithResourceName {}
+
+  @PolicyResourceType( "container" )
+  interface ContainerMetadata extends EcsMetadataWithResourceName {}
 
   @PolicyResourceType( "task-definition" )
-  interface TaskDefinitionMetadata extends ContainerMetadataWithResourceName {}
+  interface TaskDefinitionMetadata extends EcsMetadataWithResourceName {}
+
+  @PolicyResourceType( "task" )
+  interface TaskMetadata extends EcsMetadataWithResourceName {}
 }

@@ -19,7 +19,7 @@
  ************************************************************************/
 package com.eucalyptus.container;
 
-import static com.eucalyptus.container.common.ContainerMetadata.TaskDefinitionMetadata;
+import static com.eucalyptus.container.common.EcsMetadata.TaskDefinitionMetadata;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
