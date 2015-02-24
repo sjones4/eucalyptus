@@ -19,11 +19,15 @@
  ************************************************************************/
 package com.eucalyptus.container;
 
+import java.util.List;
 import java.util.UUID;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
@@ -53,7 +57,7 @@ public class Container extends AbstractOwnedPersistent implements EcsMetadata.Co
   @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
   private Task task;
 
-  @Column( name = "last_status", nullable = false, updatable = false )
+  @Column( name = "last_status", nullable = false )
   private String lastStatus;
 
   @Column( name = "exit_code" )
@@ -62,7 +66,12 @@ public class Container extends AbstractOwnedPersistent implements EcsMetadata.Co
   @Column( name = "reason" )
   private String reason;
 
-  //TODO:STEVE: NetworkBinding
+  @ElementCollection
+  @CollectionTable( name = "ecs_container_network_binding" )
+  @JoinColumn( name = "container_id" )
+  @OrderColumn( name = "network_binding_index")
+  @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
+  private List<NetworkBinding> networkBindings;
 
   protected Container( final OwnerFullName owner, final String displayName ) {
     super( owner, displayName );
@@ -135,5 +144,13 @@ public class Container extends AbstractOwnedPersistent implements EcsMetadata.Co
 
   public void setExitCode( final Integer exitCode ) {
     this.exitCode = exitCode;
+  }
+
+  public List<NetworkBinding> getNetworkBindings() {
+    return networkBindings;
+  }
+
+  public void setNetworkBindings( final List<NetworkBinding> networkBindings ) {
+    this.networkBindings = networkBindings;
   }
 }

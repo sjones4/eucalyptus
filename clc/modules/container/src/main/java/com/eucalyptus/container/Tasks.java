@@ -19,6 +19,7 @@
  ************************************************************************/
 package com.eucalyptus.container;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -27,6 +28,7 @@ import com.eucalyptus.util.OwnerFullName;
 import com.eucalyptus.util.TypeMapper;
 import com.eucalyptus.util.TypeMappers;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
@@ -66,12 +68,70 @@ public interface Tasks {
           new com.eucalyptus.container.common.model.Task( )
             .withClusterArn( task.getClusterArn( ) )
             .withContainerInstanceArn( task.getContainerInstanceArn( ) )
-            .withContainers(  )
+            .withContainers( Collections2.transform(
+                task.getContainers( ),
+                TypeMappers.lookup( Container.class, com.eucalyptus.container.common.model.Container.class ) ) )
             .withDesiredStatus( task.getDesiredStatus( ) )
             .withLastStatus( task.getLastStatus( ) )
             //.withOverrides(  ) TODO:STEVE: overrides
             .withTaskArn( task.getArn( ) )
-            .withTaskDefinitionArn( task.getTaskDefinitionArn( ) );
+            .withTaskDefinitionArn( task.getTaskDefinitionArn( ) )
+            .withStartedBy( task.getStartedBy( ) );
+    }
+  }
+
+  @TypeMapper
+  public enum ContainerToContainerTransform implements Function<Container,com.eucalyptus.container.common.model.Container> {
+    INSTANCE;
+
+    @Nullable
+    @Override
+    public com.eucalyptus.container.common.model.Container apply( @Nullable final Container container ) {
+      return container == null ?
+          null :
+          new com.eucalyptus.container.common.model.Container( )
+            .withName( container.getName( ) )
+            .withContainerArn( container.getArn( ) )
+            .withTaskArn( container.getTaskArn( ) )
+            .withLastStatus( container.getLastStatus( ) )
+            .withExitCode( container.getExitCode( ) )
+            .withReason( container.getReason( ) )
+            .withNetworkBindings( Collections2.transform(
+              Objects.firstNonNull( container.getNetworkBindings( ), Collections.<NetworkBinding>emptySet( ) ),
+              TypeMappers.lookup( NetworkBinding.class, com.eucalyptus.container.common.model.NetworkBinding.class ) ) );
+    }
+  }
+
+  @TypeMapper
+  public enum NetworkBindingModelToNetworkBindingTransform implements Function<com.eucalyptus.container.common.model.NetworkBinding,NetworkBinding> {
+    INSTANCE;
+
+    @Nullable
+    @Override
+    public NetworkBinding apply( @Nullable final com.eucalyptus.container.common.model.NetworkBinding networkBinding ) {
+      return networkBinding == null ?
+          null :
+          new NetworkBinding(
+              networkBinding.getBindIP( ),
+              networkBinding.getContainerPort( ),
+              networkBinding.getHostPort( )
+          );
+    }
+  }
+
+  @TypeMapper
+  public enum NetworkBindingToNetworkBindingTransform implements Function<NetworkBinding,com.eucalyptus.container.common.model.NetworkBinding> {
+    INSTANCE;
+
+    @Nullable
+    @Override
+    public com.eucalyptus.container.common.model.NetworkBinding apply( @Nullable final NetworkBinding networkBinding ) {
+      return networkBinding == null ?
+          null :
+          new com.eucalyptus.container.common.model.NetworkBinding( )
+              .withBindIP( networkBinding.getBindAddress( ) )
+              .withContainerPort( networkBinding.getContainerPort( ) )
+              .withHostPort( networkBinding.getHostPort( ) );
     }
   }
 
@@ -101,6 +161,15 @@ public interface Tasks {
         return task == null ?
             null :
             task.getFamily( );
+      }
+    },
+    STARTED_BY {
+      @Nullable
+      @Override
+      public String apply( @Nullable final Task task ) {
+        return task == null ?
+            null :
+            task.getStartedBy();
       }
     },
   }

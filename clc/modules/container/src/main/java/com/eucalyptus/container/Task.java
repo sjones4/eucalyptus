@@ -22,6 +22,7 @@ package com.eucalyptus.container;
 import static com.eucalyptus.container.common.EcsMetadata.TaskMetadata;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,7 +47,7 @@ import com.google.common.collect.Lists;
 public class Task extends AbstractOwnedPersistent implements TaskMetadata {
   private static final long serialVersionUID = 1L;
 
-  //TODO:STEVE: references (cluster, container instance, containers?)
+  //TODO:STEVE: references (cluster, container instance, task definition, containers?)
 
   @Column( name = "cluster_arn", nullable = false, updatable = false )
   private String clusterArn;
@@ -63,15 +64,18 @@ public class Task extends AbstractOwnedPersistent implements TaskMetadata {
   @Column( name = "family", nullable = false, updatable = false )
   private String family;
 
+  @Column( name = "started_by", nullable = true, updatable = false )
+  private String startedBy;
+
   @OneToMany( fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true, mappedBy = "task" )
   @OrderColumn( name = "container_index")
   private List<Container> containers = Lists.newArrayList();
 
   @Column( name = "desired_status", nullable = false )
-  private String desiredStatus; //TODO:STEVE: enum?
+  private String desiredStatus;
 
   @Column( name = "last_status" )
-  private String lastStatus; //TODO:STEVE: enum?
+  private String lastStatus;
 
   //TODO:STEVE: task overrides
 
@@ -89,15 +93,17 @@ public class Task extends AbstractOwnedPersistent implements TaskMetadata {
                              final Cluster cluster,
                              final ContainerInstance containerInstance,
                              final TaskDefinition taskDefinition,
-                             final Iterable<Container> containers ) {
+                             final Iterable<Container> containers,
+                             @Nullable final String startedBy ) {
     final String name = UUID.randomUUID( ).toString( );
     final Task task = new Task( owner, name );
     task.setNaturalId( name );
-    task.setClusterArn( cluster.getArn( ) );
-    task.setClusterName( cluster.getDisplayName( ) );
-    task.setContainerInstanceArn( containerInstance.getArn( ) );
-    task.setContainerInstanceName( containerInstance.getDisplayName( ) );
-    task.setFamily( taskDefinition.getFamily( ) );
+    task.setClusterArn( cluster.getArn() );
+    task.setClusterName( cluster.getDisplayName() );
+    task.setContainerInstanceArn( containerInstance.getArn() );
+    task.setContainerInstanceName( containerInstance.getDisplayName() );
+    task.setFamily( taskDefinition.getFamily() );
+    task.setStartedBy( startedBy);
     task.setDesiredStatus( "RUNNING" );
     task.setLastStatus( "PENDING" );
     task.setTaskDefinitionArn( taskDefinition.getArn( ) );
@@ -169,6 +175,14 @@ public class Task extends AbstractOwnedPersistent implements TaskMetadata {
 
   public void setFamily( final String family ) {
     this.family = family;
+  }
+
+  public String getStartedBy() {
+    return startedBy;
+  }
+
+  public void setStartedBy( final String startedBy ) {
+    this.startedBy = startedBy;
   }
 
   public List<Container> getContainers() {

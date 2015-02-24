@@ -105,6 +105,11 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
     private Integer maxResults;
 
     /**
+     *
+     */
+    private String startedBy;
+
+    /**
      * The short name or full Amazon Resource Name (ARN) of the cluster that
      * hosts the tasks you want to list. If you do not specify a cluster, the
      * default cluster is assumed..
@@ -390,6 +395,39 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
     }
 
     /**
+     *
+     *
+     * @return
+     */
+    public String getStartedBy() {
+        return startedBy;
+    }
+
+    /**
+     *
+     *
+     * @param startedBy
+     */
+    public void setStartedBy(String startedBy) {
+        this.startedBy = startedBy;
+    }
+
+    /**
+     *
+     * <p>
+     * Returns a reference to this object so that method calls can be chained together.
+     *
+     * @param startedBy
+     *
+     * @return A reference to this updated object so that method calls can be chained
+     *         together.
+     */
+    public ListTasksRequest withStartedBy(String startedBy) {
+        this.startedBy = startedBy;
+        return this;
+    }
+
+    /**
      * Returns a string representation of this object; useful for testing and
      * debugging.
      *
@@ -405,24 +443,26 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
         if (getContainerInstance() != null) sb.append("ContainerInstance: " + getContainerInstance() + ",");
         if (getFamily() != null) sb.append("Family: " + getFamily() + ",");
         if (getNextToken() != null) sb.append("NextToken: " + getNextToken() + ",");
-        if (getMaxResults() != null) sb.append("MaxResults: " + getMaxResults() );
+        if (getMaxResults() != null) sb.append("MaxResults: " + getMaxResults() + ",");
+        if (getStartedBy() != null) sb.append("StartedBy: " + getStartedBy() + ",");
         sb.append("}");
         return sb.toString();
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int hashCode = 1;
-        
-        hashCode = prime * hashCode + ((getCluster() == null) ? 0 : getCluster().hashCode()); 
-        hashCode = prime * hashCode + ((getContainerInstance() == null) ? 0 : getContainerInstance().hashCode()); 
-        hashCode = prime * hashCode + ((getFamily() == null) ? 0 : getFamily().hashCode()); 
-        hashCode = prime * hashCode + ((getNextToken() == null) ? 0 : getNextToken().hashCode()); 
-        hashCode = prime * hashCode + ((getMaxResults() == null) ? 0 : getMaxResults().hashCode()); 
+
+        hashCode = prime * hashCode + ((getCluster() == null) ? 0 : getCluster().hashCode());
+        hashCode = prime * hashCode + ((getContainerInstance() == null) ? 0 : getContainerInstance().hashCode());
+        hashCode = prime * hashCode + ((getFamily() == null) ? 0 : getFamily().hashCode());
+        hashCode = prime * hashCode + ((getNextToken() == null) ? 0 : getNextToken().hashCode());
+        hashCode = prime * hashCode + ((getMaxResults() == null) ? 0 : getMaxResults().hashCode());
+        hashCode = prime * hashCode + ((getStartedBy() == null) ? 0 : getStartedBy().hashCode());
         return hashCode;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -430,17 +470,19 @@ public class ListTasksRequest extends EcsMessage implements Serializable {
 
         if (obj instanceof ListTasksRequest == false) return false;
         ListTasksRequest other = (ListTasksRequest)obj;
-        
+
         if (other.getCluster() == null ^ this.getCluster() == null) return false;
-        if (other.getCluster() != null && other.getCluster().equals(this.getCluster()) == false) return false; 
+        if (other.getCluster() != null && other.getCluster().equals(this.getCluster()) == false) return false;
         if (other.getContainerInstance() == null ^ this.getContainerInstance() == null) return false;
-        if (other.getContainerInstance() != null && other.getContainerInstance().equals(this.getContainerInstance()) == false) return false; 
+        if (other.getContainerInstance() != null && other.getContainerInstance().equals(this.getContainerInstance()) == false) return false;
         if (other.getFamily() == null ^ this.getFamily() == null) return false;
-        if (other.getFamily() != null && other.getFamily().equals(this.getFamily()) == false) return false; 
+        if (other.getFamily() != null && other.getFamily().equals(this.getFamily()) == false) return false;
         if (other.getNextToken() == null ^ this.getNextToken() == null) return false;
-        if (other.getNextToken() != null && other.getNextToken().equals(this.getNextToken()) == false) return false; 
+        if (other.getNextToken() != null && other.getNextToken().equals(this.getNextToken()) == false) return false;
         if (other.getMaxResults() == null ^ this.getMaxResults() == null) return false;
-        if (other.getMaxResults() != null && other.getMaxResults().equals(this.getMaxResults()) == false) return false; 
+        if (other.getMaxResults() != null && other.getMaxResults().equals(this.getMaxResults()) == false) return false;
+        if (other.getStartedBy() == null ^ this.getStartedBy() == null) return false;
+        if (other.getStartedBy() != null && other.getStartedBy().equals(this.getStartedBy()) == false) return false;
         return true;
     }
     

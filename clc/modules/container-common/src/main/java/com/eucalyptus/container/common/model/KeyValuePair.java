@@ -37,6 +37,8 @@
 package com.eucalyptus.container.common.model;
 
 import java.io.Serializable;
+import javax.annotation.Nullable;
+import com.google.common.base.Function;
 
 /**
  * 
@@ -161,6 +163,30 @@ public class KeyValuePair implements Serializable {
         if (other.getValue() != null && other.getValue().equals(this.getValue()) == false) return false; 
         return true;
     }
-    
+
+    public static Function<KeyValuePair,String> name( ) {
+      return StringPropertyFunctions.NAME;
+    }
+
+    public static Function<KeyValuePair,String> value( ) {
+      return StringPropertyFunctions.VALUE;
+    }
+
+    private enum StringPropertyFunctions implements Function<KeyValuePair,String> {
+      NAME {
+        @Nullable
+        @Override
+        public String apply( @Nullable final KeyValuePair keyValuePair ) {
+          return keyValuePair == null ? null : keyValuePair.getName( );
+        }
+      },
+      VALUE {
+        @Nullable
+        @Override
+        public String apply( @Nullable final KeyValuePair keyValuePair ) {
+          return keyValuePair == null ? null : keyValuePair.getValue( );
+        }
+      },
+    }
 }
     

@@ -19,10 +19,16 @@
  ************************************************************************/
 package com.eucalyptus.container.persist;
 
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Projections;
+import com.eucalyptus.auth.principal.AccountFullName;
 import com.eucalyptus.component.annotation.ComponentNamed;
+import com.eucalyptus.container.EcsMetadataException;
 import com.eucalyptus.container.TaskDefinition;
 import com.eucalyptus.container.TaskDefinitions;
 import com.eucalyptus.container.common.EcsMetadata;
+import com.eucalyptus.entities.Entities;
+import com.eucalyptus.entities.TransactionResource;
 import com.eucalyptus.util.OwnerFullName;
 
 /**
@@ -33,6 +39,22 @@ public class PersistenceTaskDefinitions extends EcsPersistenceSupport<EcsMetadat
 
   public PersistenceTaskDefinitions( ) {
     super( "task-definition" );
+  }
+
+  @Override
+  public Integer getNextRevision( final AccountFullName accountFullName,
+                                  final String family ) throws EcsMetadataException {
+    try ( final TransactionResource tx = Entities.transactionFor( TaskDefinition.class ) ) {
+      final Number maxRevision = (Number) Entities.createCriteria( TaskDefinition.class )
+          .add( Example.create( TaskDefinition.exampleWithFamily( accountFullName, family ) ) )
+          .setProjection( Projections.max( "revision" ) )
+          .uniqueResult( ) ;
+      return maxRevision == null ?
+          1 :
+          maxRevision.intValue( ) + 1;
+    } catch ( Exception e ) {
+      throw new EcsMetadataException( "Error getting next revision for task definition family " + family, e );
+    }
   }
 
   @Override

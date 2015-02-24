@@ -20,12 +20,14 @@
 package com.eucalyptus.container;
 
 import java.util.List;
+import java.util.Map;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OrderColumn;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
@@ -67,35 +69,13 @@ public class ContainerDefinition extends AbstractPersistent {
   @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
   private List<String> entryPoints;
 
-  protected ContainerDefinition( ) {
-
-  }
-
-  public ContainerDefinition( final List<String> commands,
-                              final Integer cpu,
-                              final List<String> entryPoints,
-                              final Boolean essential,
-                              final String image,
-                              final List<String> links,
-                              final Integer memory,
-                              final String name ) {
-    this.commands = commands;
-    this.cpu = cpu;
-    this.entryPoints = entryPoints;
-    this.essential = essential;
-    this.image = image;
-    this.links = links;
-    this.memory = memory;
-    this.name = name;
-  }
-
-  //Environment
-//
-//    The environment variables to pass to a container.
-//
-//    Type: KeyValuePair list
-//
-//    Required: No
+  @ElementCollection
+  @CollectionTable( name = "ecs_container_definition_environment" )
+  @JoinColumn( name = "task_definition_id" )
+  @MapKeyColumn( name = "environment_name" )
+  @Column( name = "environment_value" )
+  @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
+  Map<String, String> environment;
 
   @Column( name = "essential" )
   private Boolean essential;
@@ -117,14 +97,38 @@ public class ContainerDefinition extends AbstractPersistent {
   @Column( name = "name" )
   private String name;
 
-//PortMappings
-//
-//    The list of port mappings for the container.
-//
-//    Type: PortMapping list
-//
-//    Required: No
+  @ElementCollection
+  @CollectionTable( name = "ecs_container_port_mapping" )
+  @JoinColumn( name = "task_definition_id" )
+  @OrderColumn( name = "port_mapping_index")
+  @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
+  private List<PortMapping> portMappings;
 
+  protected ContainerDefinition( ) {
+
+  }
+
+  public ContainerDefinition( final List<String> commands,
+                              final Integer cpu,
+                              final List<String> entryPoints,
+                              final Map<String,String> environment,
+                              final Boolean essential,
+                              final String image,
+                              final List<String> links,
+                              final Integer memory,
+                              final String name,
+                              final List<PortMapping> portMappings ) {
+    this.commands = commands;
+    this.cpu = cpu;
+    this.entryPoints = entryPoints;
+    this.environment = environment;
+    this.essential = essential;
+    this.image = image;
+    this.links = links;
+    this.memory = memory;
+    this.name = name;
+    this.portMappings = portMappings;
+  }
 
   public TaskDefinition getTaskDefinition( ) {
     return taskDefinition;
@@ -156,6 +160,14 @@ public class ContainerDefinition extends AbstractPersistent {
 
   public void setEntryPoints( final List<String> entryPoints ) {
     this.entryPoints = entryPoints;
+  }
+
+  public Map<String, String> getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment( final Map<String, String> environment ) {
+    this.environment = environment;
   }
 
   public Boolean getEssential( ) {
@@ -196,5 +208,13 @@ public class ContainerDefinition extends AbstractPersistent {
 
   public void setName( final String name ) {
     this.name = name;
+  }
+
+  public List<PortMapping> getPortMappings() {
+    return portMappings;
+  }
+
+  public void setPortMappings( final List<PortMapping> portMappings ) {
+    this.portMappings = portMappings;
   }
 }

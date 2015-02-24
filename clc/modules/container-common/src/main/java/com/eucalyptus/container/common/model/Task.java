@@ -87,6 +87,11 @@ public class Task implements Serializable {
     private com.amazonaws.internal.ListWithAutoConstructFlag<Container> containers;
 
     /**
+     *
+     */
+    private String startedBy;
+
+    /**
      * The Amazon Resource Name (ARN) of the task.
      *
      * @return The Amazon Resource Name (ARN) of the task.
@@ -404,6 +409,39 @@ public class Task implements Serializable {
     }
 
     /**
+     *
+     *
+     * @return
+     */
+    public String getStartedBy() {
+        return startedBy;
+    }
+
+    /**
+     *
+     *
+     * @param startedBy
+     */
+    public void setStartedBy(String startedBy) {
+        this.startedBy = startedBy;
+    }
+
+    /**
+     *
+     * <p>
+     * Returns a reference to this object so that method calls can be chained together.
+     *
+     * @param startedBy
+     *
+     * @return A reference to this updated object so that method calls can be chained
+     *         together.
+     */
+    public Task withStartedBy(String startedBy) {
+        this.startedBy = startedBy;
+        return this;
+    }
+
+    /**
      * Returns a string representation of this object; useful for testing and
      * debugging.
      *
@@ -423,6 +461,7 @@ public class Task implements Serializable {
         if (getLastStatus() != null) sb.append("LastStatus: " + getLastStatus() + ",");
         if (getDesiredStatus() != null) sb.append("DesiredStatus: " + getDesiredStatus() + ",");
         if (getContainers() != null) sb.append("Containers: " + getContainers() );
+        if (getStartedBy() != null) sb.append("StartedBy: " + getStartedBy() );
         sb.append("}");
         return sb.toString();
     }
@@ -439,7 +478,8 @@ public class Task implements Serializable {
         hashCode = prime * hashCode + ((getOverrides() == null) ? 0 : getOverrides().hashCode()); 
         hashCode = prime * hashCode + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode()); 
         hashCode = prime * hashCode + ((getDesiredStatus() == null) ? 0 : getDesiredStatus().hashCode()); 
-        hashCode = prime * hashCode + ((getContainers() == null) ? 0 : getContainers().hashCode()); 
+        hashCode = prime * hashCode + ((getContainers() == null) ? 0 : getContainers().hashCode());
+        hashCode = prime * hashCode + ((getStartedBy() == null) ? 0 : getStartedBy().hashCode());
         return hashCode;
     }
     
@@ -466,7 +506,9 @@ public class Task implements Serializable {
         if (other.getDesiredStatus() == null ^ this.getDesiredStatus() == null) return false;
         if (other.getDesiredStatus() != null && other.getDesiredStatus().equals(this.getDesiredStatus()) == false) return false; 
         if (other.getContainers() == null ^ this.getContainers() == null) return false;
-        if (other.getContainers() != null && other.getContainers().equals(this.getContainers()) == false) return false; 
+        if (other.getContainers() != null && other.getContainers().equals(this.getContainers()) == false) return false;
+        if (other.getStartedBy() == null ^ this.getStartedBy() == null) return false;
+        if (other.getStartedBy() != null && other.getStartedBy().equals(this.getStartedBy()) == false) return false;
         return true;
     }
     

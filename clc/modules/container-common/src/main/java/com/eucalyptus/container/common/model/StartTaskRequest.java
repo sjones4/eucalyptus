@@ -77,6 +77,12 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
     private TaskOverride overrides;
 
     /**
+     *
+     */
+    @HttpParameterMapping( parameter = "startedBy" )
+    private String startedBy;
+
+    /**
      * The container instance UUIDs or full Amazon Resource Name (ARN)
      * entries for the container instances on which you would like to place
      * your task.
@@ -292,6 +298,39 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
     }
 
     /**
+     *
+     *
+     * @return
+     */
+    public String getStartedBy() {
+      return startedBy;
+    }
+
+    /**
+     *
+     *
+     * @param startedBy
+     */
+    public void setStartedBy(String startedBy) {
+      this.startedBy = startedBy;
+    }
+
+    /**
+     *
+     * <p>
+     * Returns a reference to this object so that method calls can be chained together.
+     *
+     * @param startedBy
+     *
+     * @return A reference to this updated object so that method calls can be chained
+     *         together.
+     */
+    public StartTaskRequest withStartedBy(String startedBy) {
+      this.startedBy = startedBy;
+      return this;
+    }
+
+    /**
      * Returns a string representation of this object; useful for testing and
      * debugging.
      *
@@ -307,6 +346,7 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
         if (getTaskDefinition() != null) sb.append("TaskDefinition: " + getTaskDefinition() + ",");
         if (getOverrides() != null) sb.append("Overrides: " + getOverrides() + ",");
         if (getContainerInstances() != null) sb.append("ContainerInstances: " + getContainerInstances() );
+        if (getStartedBy() != null) sb.append("StartedBy: " + getStartedBy() );
         sb.append("}");
         return sb.toString();
     }
@@ -320,6 +360,7 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
         hashCode = prime * hashCode + ((getTaskDefinition() == null) ? 0 : getTaskDefinition().hashCode()); 
         hashCode = prime * hashCode + ((getOverrides() == null) ? 0 : getOverrides().hashCode()); 
         hashCode = prime * hashCode + ((getContainerInstances() == null) ? 0 : getContainerInstances().hashCode()); 
+        hashCode = prime * hashCode + ((getStartedBy() == null) ? 0 : getStartedBy().hashCode());
         return hashCode;
     }
     
@@ -339,6 +380,8 @@ public class StartTaskRequest extends EcsMessage implements Serializable {
         if (other.getOverrides() != null && other.getOverrides().equals(this.getOverrides()) == false) return false; 
         if (other.getContainerInstances() == null ^ this.getContainerInstances() == null) return false;
         if (other.getContainerInstances() != null && other.getContainerInstances().equals(this.getContainerInstances()) == false) return false; 
+        if (other.getStartedBy() == null ^ this.getStartedBy() == null) return false;
+        if (other.getStartedBy() != null && other.getStartedBy().equals(this.getStartedBy()) == false) return false;
         return true;
     }
     

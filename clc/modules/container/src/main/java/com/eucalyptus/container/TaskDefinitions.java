@@ -23,12 +23,17 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.hibernate.criterion.Criterion;
+import com.eucalyptus.auth.principal.AccountFullName;
+import com.eucalyptus.container.common.model.*;
+import com.eucalyptus.util.CollectionUtils;
 import com.eucalyptus.util.OwnerFullName;
 import com.eucalyptus.util.TypeMapper;
 import com.eucalyptus.util.TypeMappers;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  *
@@ -47,6 +52,8 @@ public interface TaskDefinitions {
                     Function<? super TaskDefinition,T> transform ) throws EcsMetadataException;
 
   TaskDefinition save( TaskDefinition taskDefinition ) throws EcsMetadataException;
+
+  Integer getNextRevision( AccountFullName accountFullName, String family ) throws EcsMetadataException;
 
   @TypeMapper
   public enum TaskDefinitionToTaskDefinitionTransform implements Function<TaskDefinition,com.eucalyptus.container.common.model.TaskDefinition> {
@@ -81,9 +88,9 @@ public interface TaskDefinitions {
               .withEntryPoint( containerDefinition.getEntryPoints( ) )
               .withEssential( containerDefinition.getEssential( ) )
               .withImage( containerDefinition.getImage( ) )
-              .withLinks( containerDefinition.getLinks( ) )
-              .withMemory( containerDefinition.getMemory( ) )
-              .withName( containerDefinition.getName( ) );
+              .withLinks( containerDefinition.getLinks() )
+              .withMemory( containerDefinition.getMemory() )
+              .withName( containerDefinition.getName() );
     }
   }
 
@@ -100,11 +107,35 @@ public interface TaskDefinitions {
               containerDefinition.getCommand( ),
               containerDefinition.getCpu( ),
               containerDefinition.getEntryPoint( ),
+              CollectionUtils.putAll(
+                  containerDefinition.getEnvironment( ),
+                  Maps.<String,String>newHashMap( ),
+                  KeyValuePair.name( ),
+                  KeyValuePair.value( ) ),
               containerDefinition.getEssential( ),
               containerDefinition.getImage( ),
               containerDefinition.getLinks( ),
               containerDefinition.getMemory( ),
-              containerDefinition.getName( )
+              containerDefinition.getName( ),
+              Lists.transform(
+                  containerDefinition.getPortMappings( ),
+                  TypeMappers.lookup( com.eucalyptus.container.common.model.PortMapping.class, PortMapping.class ) )
+          );
+    }
+  }
+
+  @TypeMapper
+  public enum PortMappingToPortMappingTransform implements Function<com.eucalyptus.container.common.model.PortMapping, PortMapping> {
+    INSTANCE;
+
+    @Nullable
+    @Override
+    public PortMapping apply( @Nullable final com.eucalyptus.container.common.model.PortMapping portMapping ) {
+      return portMapping == null ?
+          null :
+          new PortMapping(
+              portMapping.getContainerPort( ),
+              portMapping.getHostPort()
           );
     }
   }

@@ -57,7 +57,7 @@ public class EcsJsonUtils {
 
   private static final ObjectMapper mapper = new ObjectMapper( );
   static {
-    final SimpleModule module = new SimpleModule( "SwfModule", new Version(1, 0, 0, null) )
+    final SimpleModule module = new SimpleModule( "EcsModule", new Version(1, 0, 0, null) )
         .addSerializer( Date.class, new EpochSecondsDateSerializer( )  )
         .addDeserializer( Date.class, new EpochSecondsDateDeserializer( ) );
     mapper.registerModule( module );
@@ -66,6 +66,7 @@ public class EcsJsonUtils {
     mapper.getSerializationConfig().addMixInAnnotations( com.eucalyptus.container.common.model.ContainerDefinition.class, BindingMixIn.class );
     mapper.getSerializationConfig().addMixInAnnotations( com.eucalyptus.container.common.model.ContainerInstance.class, BindingMixIn.class );
     mapper.getSerializationConfig().set( SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false );
+    mapper.getSerializationConfig().set( SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true );
     mapper.getSerializationConfig().setSerializationInclusion( JsonSerialize.Inclusion.NON_NULL );
   }
 

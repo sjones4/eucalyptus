@@ -57,8 +57,8 @@ public class ContainerInstance extends AccountMetadata<ContainerInstance.State> 
   @Cache( usage = CacheConcurrencyStrategy.TRANSACTIONAL )
   private Cluster cluster;
 
-  @Column( name = "ec2_instance_id", nullable = false, updatable = false )
-  private String ec2InstanceId;  //TODO:STEVE: should be unique
+  @Column( name = "ec2_instance_id", nullable = false, updatable = false, unique = true )
+  private String ec2InstanceId;
 
   @Column( name = "agent_connected", nullable = false )
   private Boolean agentConnected;

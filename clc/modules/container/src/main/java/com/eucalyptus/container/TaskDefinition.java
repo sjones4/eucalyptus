@@ -81,6 +81,12 @@ public class TaskDefinition extends AbstractOwnedPersistent implements TaskDefin
     return new TaskDefinition( owner, name );
   }
 
+  public static TaskDefinition exampleWithFamily( final OwnerFullName owner, final String family ) {
+    final TaskDefinition taskDefinition = new TaskDefinition( owner, null );
+    taskDefinition.setFamily( family );
+    return taskDefinition;
+  }
+
   @Override
   public String getArn( ) {
     return String.format(

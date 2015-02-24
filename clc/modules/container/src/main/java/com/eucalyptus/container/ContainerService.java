@@ -27,6 +27,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +37,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import com.eucalyptus.auth.Accounts;
 import com.eucalyptus.auth.AuthQuotaException;
+import com.eucalyptus.auth.policy.ern.Ern;
 import com.eucalyptus.auth.policy.key.Keys;
 import com.eucalyptus.auth.principal.AccountFullName;
 import com.eucalyptus.auth.principal.UserFullName;
@@ -44,6 +47,7 @@ import com.eucalyptus.compute.common.Compute;
 import com.eucalyptus.compute.common.DescribeInstancesResponseType;
 import com.eucalyptus.compute.common.DescribeInstancesType;
 import com.eucalyptus.compute.common.Filter;
+import com.eucalyptus.container.agent.AgentRendezvous;
 import com.eucalyptus.container.common.*;
 import com.eucalyptus.context.Context;
 import com.eucalyptus.context.Contexts;
@@ -53,6 +57,7 @@ import com.eucalyptus.entities.Entities;
 import com.eucalyptus.util.CollectionUtils;
 import com.eucalyptus.util.Exceptions;
 import com.eucalyptus.util.Internets;
+import com.eucalyptus.util.NonNullFunction;
 import com.eucalyptus.util.Pair;
 import com.eucalyptus.util.RestrictedType;
 import com.eucalyptus.util.RestrictedTypes;
@@ -62,6 +67,7 @@ import com.eucalyptus.util.async.AsyncRequests;
 import com.eucalyptus.ws.Role;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -71,6 +77,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import edu.ucsb.eucalyptus.msgs.BaseCallerContext;
 import edu.ucsb.eucalyptus.msgs.EvaluatedIamConditionKey;
+import net.sf.json.JSONException;
 
 /**
  *
@@ -128,7 +135,7 @@ public class ContainerService {
         ContainerMetadatas.filteringFor( Cluster.class ).byPrivileges( ) .buildPredicate( );
     final Cluster cluster;
     try {
-      cluster = clusters.lookupByName( accountFullName, request.getCluster( ), accessible, Functions.<Cluster>identity( ) );
+      cluster = clusters.lookupByName( accountFullName, arnResourceName( ).apply( request.getCluster() ), accessible, Functions.<Cluster>identity( ) );
       clusters.delete( cluster );
     } catch ( EcsMetadataNotFoundException e ) {
       throw new EcsClientException( "UnknownResourceFault", "Cluster not found: " + request.getCluster() );
@@ -141,9 +148,6 @@ public class ContainerService {
   }
 
   public DeregisterContainerInstanceResponse deregisterContainerInstance( final DeregisterContainerInstanceRequest request ) throws EcsException {
-    logger.error( "DeregisterContainerInstance: " + request.getCluster() ); //TODO:STEVE: remove  // default
-    logger.error( "DeregisterContainerInstance: " + request.getContainerInstance() );//TODO:STEVE: remove  // arn:aws:ecs::315214428084:container-instance/400f014e-4963-45db-a096-7b0cbe97d4fc
-    logger.error( "DeregisterContainerInstance: " + request.getForce() ); //TODO:STEVE: remove // null
     final DeregisterContainerInstanceResponse response = new DeregisterContainerInstanceResponse( );
     final Context ctx = Contexts.lookup( );
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
@@ -153,7 +157,7 @@ public class ContainerService {
     try {
       containerInstancePair = containerInstances.lookupByName(
           accountFullName,
-          request.getContainerInstance( ).substring( request.getContainerInstance( ).length( ) - 36 ),
+          arnResourceName( ).apply( request.getContainerInstance( ) ),
           accessible,
           Pair.builder(
               Functions.<ContainerInstanceMetadata>identity( ),
@@ -171,17 +175,20 @@ public class ContainerService {
   }
 
   public DeregisterTaskDefinitionResponse deregisterTaskDefinition( final DeregisterTaskDefinitionRequest request ) throws EcsException {
-    return request.reply( new DeregisterTaskDefinitionResponse( ) );
+    // Not supported in AWS/ECS
+    throw new EcsClientException( "InvalidAction", "Deregistering task definitions is currently unsupported." );
   }
 
   public DescribeClustersResponse describeClusters( final DescribeClustersRequest request ) throws EcsException {
     final DescribeClustersResponse response = new DescribeClustersResponse( );
     final Context ctx = Contexts.lookup( );
-    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName();
+    final Set<String> clusterNames =
+        Sets.newLinkedHashSet( Iterables.transform( request.getClusters(), arnResourceName( ) ) );
     final Predicate<? super Cluster> requestedAndAccessible = ContainerMetadatas.filteringFor( Cluster.class )
-        .byId( request.getClusters( ) )  //TODO:STEVE: allow for ARN
+        .byId( Iterables.isEmpty( clusterNames ) ? Collections.singleton( "default" ) : clusterNames )
         .byPrivileges()
-        .buildPredicate( );
+        .buildPredicate();
     try {
       response.setResult( new DescribeClustersResult().withClusters( clusters.list(
           accountFullName,
@@ -195,14 +202,21 @@ public class ContainerService {
     return request.reply( response );
   }
 
+  // TODO:STEVE: Port reservations
+  // The default reserved ports are 22 for SSH, the Docker ports 2375 and 2376, and the Amazon ECS container agent
+  // port 51678. Any host port that was previously user-specified for a running task is also reserved while the
+  // task is running (after a task stops, the host port is released). The current reserved ports are displayed in
+  // the remainingResources of describe-container-instances output, and a container instance may have up to 50
+  // reserved ports at a time, including the default reserved ports (automatically assigned ports do not count
+  // toward this limit).
   public DescribeContainerInstancesResponse describeContainerInstances( final DescribeContainerInstancesRequest request ) throws EcsException {
     final DescribeContainerInstancesResponse response = new DescribeContainerInstancesResponse( );
     final Context ctx = Contexts.lookup( );
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
     final Predicate<? super ContainerInstance> requestedAndAccessible = ContainerMetadatas
         .filteringFor( ContainerInstance.class )
-        .byId( request.getContainerInstances() ) //TODO:STEVE: allow for ARN also
-        .byProperty( Optional.fromNullable( request.getCluster( ) ).asSet(), CLUSTER ) //TODO:STEVE: allow for ARN
+        .byId( Sets.newLinkedHashSet( Iterables.transform( request.getContainerInstances( ), arnResourceName( ) ) ) )
+        .byProperty( Optional.fromNullable( request.getCluster( ) ).transform( arnResourceName( ) ).asSet(), CLUSTER )
         .byPrivileges()
         .buildPredicate();
     try {
@@ -227,7 +241,7 @@ public class ContainerService {
     try {
       response.setResult( new DescribeTaskDefinitionResult( ).withTaskDefinition( taskDefinitions.lookupByName(
           accountFullName,
-          request.getTaskDefinition(),
+          arnResourceName( ).apply( request.getTaskDefinition() ),
           accessible,
           TypeMappers.lookup( TaskDefinition.class, com.eucalyptus.container.common.model.TaskDefinition.class ) ) ) );
     } catch ( Exception e ) {
@@ -242,10 +256,10 @@ public class ContainerService {
     final Context ctx = Contexts.lookup( );
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
     final Predicate<? super Task> requestedAndAccessible = ContainerMetadatas.filteringFor( Task.class )
-        .byId( request.getTasks( ) )
-        .byProperty( Optional.fromNullable( request.getCluster( ) ).asSet( ), TaskStringFunctions.CLUSTER ) //TODO:STEVE: allow for ARN
-        .byPrivileges( )
-        .buildPredicate( );
+        .byId( Sets.newLinkedHashSet( Iterables.transform( request.getTasks( ), arnResourceName( ) ) ) )
+        .byProperty( Optional.fromNullable( request.getCluster( ) ).transform( arnResourceName( ) ).asSet( ), TaskStringFunctions.CLUSTER )
+        .byPrivileges()
+        .buildPredicate();
     try {
       response.setResult( new DescribeTasksResult( ).withTasks( tasks.list(
           accountFullName,
@@ -261,9 +275,9 @@ public class ContainerService {
   }
 
   public DiscoverPollEndpointResponse discoverPollEndpoint( final DiscoverPollEndpointRequest request ) throws EcsException {
-    logger.error( "DiscoverPollEndpoint: " + request.getContainerInstance( ) ); //TODO:STEVE: remove
     final DiscoverPollEndpointResponse response = new DiscoverPollEndpointResponse( );
-    response.setResult( new DiscoverPollEndpointResult( ).withEndpoint( "http://" + StringUtils.substringBefore( ServiceUris.remotePublicify( com.eucalyptus.container.common.Container.class ).getHost(), ":" ) ) );
+    final String endpoint =  "http://" + StringUtils.substringBefore( ServiceUris.remotePublicify( com.eucalyptus.container.common.Container.class ).getHost(), ":" );
+    response.setResult( new DiscoverPollEndpointResult( ).withEndpoint( endpoint ) );
     return request.reply( response );
   }
 
@@ -362,11 +376,12 @@ public class ContainerService {
     final Context ctx = Contexts.lookup( );
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
     final Predicate<? super Task> requestedAndAccessible = ContainerMetadatas.filteringFor( Task.class )
-        .byProperty( Optional.fromNullable( request.getCluster() ).asSet(), TaskStringFunctions.CLUSTER )                       //TODO:STEVE: allow for ARN
-        .byProperty( Optional.fromNullable( request.getContainerInstance() ).asSet(), TaskStringFunctions.CONTAINER_INSTANCE )  //TODO:STEVE: allow for ARN
-        .byProperty( Optional.fromNullable( request.getFamily( ) ).asSet( ), TaskStringFunctions.FAMILY )
-        .byPrivileges( )
-        .buildPredicate( );
+        .byProperty( Optional.fromNullable( request.getCluster() ).transform( arnResourceName() ).asSet(), TaskStringFunctions.CLUSTER )
+        .byProperty( Optional.fromNullable( request.getContainerInstance() ).transform( arnResourceName( ) ).asSet(), TaskStringFunctions.CONTAINER_INSTANCE )
+        .byProperty( Optional.fromNullable( request.getFamily() ).asSet(), TaskStringFunctions.FAMILY )
+        .byProperty( Optional.fromNullable( request.getStartedBy() ).asSet(), TaskStringFunctions.STARTED_BY )
+        .byPrivileges()
+        .buildPredicate();
     try {
       response.setResult( new ListTasksResult( ).withTaskArns( tasks.list(
           accountFullName,
@@ -382,8 +397,6 @@ public class ContainerService {
 
   public RegisterContainerInstanceResponse registerContainerInstance( final RegisterContainerInstanceRequest request ) throws EcsException {
     final RegisterContainerInstanceResponse response = new RegisterContainerInstanceResponse( );
-    //TODO:STEVE: allow ARN for cluster
-
     final Context ctx = Contexts.lookup( );
     final UserFullName userFullName = ctx.getUserFullName( );
     final String ip = ctx.getRemoteAddress( ).getHostAddress( );
@@ -413,12 +426,12 @@ public class ContainerService {
           Cluster cluster;
           try {
             cluster =
-                clusters.lookupByName( userFullName.asAccountFullName( ), request.getCluster( ), Predicates.alwaysTrue(), Functions.<Cluster>identity( ) );
+                clusters.lookupByName( userFullName.asAccountFullName( ), arnResourceName( ).apply( request.getCluster() ), Predicates.alwaysTrue(), Functions.<Cluster>identity( ) );
           } catch ( EcsMetadataNotFoundException e ) {
             if ( "default".equals( request.getCluster( ) ) ) {
               cluster = clusters.save( Cluster.create( userFullName, "default" ) );
             } else {
-              throw Exceptions.toUndeclared( new EcsClientException( "ValidationError", "Cluster not found '"+request.getCluster()+"'" ) ); //TODO:STEVE: return the right error
+              throw Exceptions.toUndeclared( new EcsClientException( "ValidationError", "Cluster not found '"+request.getCluster()+"'" ) );
             }
           }
 
@@ -455,10 +468,10 @@ public class ContainerService {
           final TaskDefinition taskDefinition = TaskDefinition.create(
               userFullName,
               request.getFamily(),
-              1 ); //TODO:STEVE: determine next revision#
-           for ( final com.eucalyptus.container.common.model.ContainerDefinition definition : request.getContainerDefinitions( )  ) {
-             taskDefinition.getContainerDefinitions( ).add( TypeMappers.transform( definition, ContainerDefinition.class ) );
-           }
+              taskDefinitions.getNextRevision( userFullName.asAccountFullName( ), request.getFamily( ) ) );
+          for ( final com.eucalyptus.container.common.model.ContainerDefinition definition : request.getContainerDefinitions( )  ) {
+            taskDefinition.getContainerDefinitions( ).add( TypeMappers.transform( definition, ContainerDefinition.class ) );
+          }
           return taskDefinitions.save( taskDefinition );
         } catch ( Exception ex ) {
           throw new RuntimeException( ex );
@@ -472,6 +485,7 @@ public class ContainerService {
 
   public RunTaskResponse runTask( final RunTaskRequest request ) throws EcsException {
     final RunTaskResponse response = new RunTaskResponse( );
+    final RunTaskResult result = new RunTaskResult( );
     final Context ctx = Contexts.lookup( );
     final UserFullName userFullName = ctx.getUserFullName( );
     final AccountFullName accountFullName = userFullName.asAccountFullName( );
@@ -479,70 +493,150 @@ public class ContainerService {
       @Override
       public Task get( ) {
         try {
-          final RunTaskResult result = new RunTaskResult( );
-
-          //TODO:STEVE: request count
           final Cluster cluster = clusters.lookupByName(
               accountFullName,
-              request.getCluster( ),
+              Optional.fromNullable( request.getCluster( ) ).transform( arnResourceName( ) ).or( "default" ),
               RestrictedTypes.filterPrivileged( ),
-              Functions.<Cluster>identity( ) ); //TODO:STEVE: allow for ARN
+              Functions.<Cluster>identity( ) );
 
           final TaskDefinition taskDefinition = taskDefinitions.lookupByName(
               accountFullName,
-              request.getTaskDefinition( ),
+              arnResourceName( ).apply( request.getTaskDefinition() ),
               RestrictedTypes.filterPrivileged( ),
-              Functions.<TaskDefinition>identity( ) ); //TODO:STEVE: allow for ARN
+              Functions.<TaskDefinition>identity( ) );
 
           final List<ContainerInstance> containerInstanceList = containerInstances.list(
               accountFullName,
-              Restrictions.eqProperty( "clusterName", cluster.getDisplayName( ) ),
+              Restrictions.and(
+                  Restrictions.eq( "clusterName", cluster.getDisplayName( ) ),
+                  Restrictions.eq( "agentConnected", true )
+              ),
               Collections.<String,String>emptyMap( ),
               RestrictedTypes.filterPrivileged( ),
               Functions.<ContainerInstance>identity( ) );
 
+          //TODO:STEVE: overrides
+          Task task = null;
           if ( !containerInstanceList.isEmpty( ) ) {
-            final int index = random.nextInt( ) % containerInstanceList.size( );
+            final int index = Math.abs( random.nextInt( ) % containerInstanceList.size( ) );
             //TODO:STEVE: verify resources
             final ContainerInstance instance = containerInstanceList.get( index );
             final List<Container> containers = Lists.newArrayList( );
             for ( final ContainerDefinition containerDefinition : taskDefinition.getContainerDefinitions( ) ) {
               containers.add( Container.create( userFullName, containerDefinition ) );
             }
-            final Task task = tasks.save( Task.create( userFullName, cluster, instance, taskDefinition, containers ) );
-            result.setTasks( Lists.newArrayList( TypeMappers.transform( task, com.eucalyptus.container.common.model.Task.class ) ) );
-          } // else //TODO:STEVE: failures?
-
-          response.setResult( result );
-          return null;
+            task = tasks.save( Task.create( userFullName, cluster, instance, taskDefinition, containers, request.getStartedBy( ) ) );
+            result.getTasks( ).add( TypeMappers.transform( task, com.eucalyptus.container.common.model.Task.class ) );
+            AgentRendezvous.dispatchTask( instance, taskDefinition, task );
+          } else {
+            result.getFailures( ).add( new Failure( )
+                .withArn( taskDefinition.getArn() )
+                .withReason( "Container instance not available" ) );
+          }
+          return task;
         } catch ( Exception ex ) {
+          logger.error( ex, ex );
           throw new RuntimeException( ex );
         }
       }
-    }, Task.class, request.getTaskDefinition( ) );
+    }, Task.class, request.getTaskDefinition( ), Objects.firstNonNull( request.getCount( ), 1 ) );
+    response.setResult( result );
     return request.reply( response );
   }
 
   public StartTaskResponse startTask( final StartTaskRequest request ) throws EcsException {
-    return request.reply( new StartTaskResponse( ) );
+    final StartTaskResponse response = new StartTaskResponse( );
+    final StartTaskResult result = new StartTaskResult( );
+    final Context ctx = Contexts.lookup( );
+    final UserFullName userFullName = ctx.getUserFullName( );
+    final AccountFullName accountFullName = userFullName.asAccountFullName( );
+    final List<String> taskContainerInstances = Lists.newArrayList( request.getContainerInstances( ) );
+    allocate( new Supplier<Task>( ) {
+      @Override
+      public Task get( ) {
+        try {
+          final Cluster cluster = clusters.lookupByName(
+              accountFullName,
+              Optional.fromNullable( request.getCluster( ) ).transform( arnResourceName( ) ).or( "default" ),
+              RestrictedTypes.filterPrivileged( ),
+              Functions.<Cluster>identity( ) );
+
+          final TaskDefinition taskDefinition = taskDefinitions.lookupByName(
+              accountFullName,
+              arnResourceName( ).apply( request.getTaskDefinition() ),
+              RestrictedTypes.filterPrivileged( ),
+              Functions.<TaskDefinition>identity( ) );
+
+          final ContainerInstance instance = containerInstances.lookupByName(
+              accountFullName,
+              arnResourceName( ).apply( taskContainerInstances.remove( 0 ) ),
+              RestrictedTypes.filterPrivileged( ),
+              Functions.<ContainerInstance>identity( ) );
+
+          //TODO:STEVE: overrides
+          //TODO:STEVE: verify resources
+          Task task = null;
+          if ( instance.getAgentConnected( ) ) {
+            final List<Container> containers = Lists.newArrayList();
+            for ( final ContainerDefinition containerDefinition : taskDefinition.getContainerDefinitions() ) {
+              containers.add( Container.create( userFullName, containerDefinition ) );
+            }
+            task = tasks.save( Task.create( userFullName, cluster, instance, taskDefinition, containers, request.getStartedBy() ) );
+            result.getTasks().add( TypeMappers.transform( task, com.eucalyptus.container.common.model.Task.class ) );
+            AgentRendezvous.dispatchTask( instance, taskDefinition, task );
+          } else {
+            result.getFailures( ).add( new Failure( )
+                .withArn( taskDefinition.getArn() )
+                .withReason( "Container instance not available" ) );
+          }
+
+          return task;
+        } catch ( Exception ex ) {
+          logger.error( ex, ex );
+          throw new RuntimeException( ex );
+        }
+      }
+    }, Task.class, request.getTaskDefinition( ), request.getContainerInstances( ).size( ) );
+    response.setResult( result );
+    return request.reply( response );
   }
 
   public StopTaskResponse stopTask( final StopTaskRequest request ) throws EcsException {
     final StopTaskResponse response = new StopTaskResponse( );
     final Context ctx = Contexts.lookup();
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
+    final String task = arnResourceName( ).apply( request.getTask( ) );
+    final String cluster = arnResourceName( ).apply( Objects.firstNonNull( request.getCluster( ), "default" ) );
     try {
       response.setResult( new StopTaskResult( )
           .withTask( tasks.updateByExample(
-              Task.exampleWithNameAndCluster( accountFullName, request.getTask(), request.getCluster() ),
+              Task.exampleWithNameAndCluster( accountFullName, task, cluster ),
               accountFullName,
-              request.getTask(),
+              task,
               new Function<Task, com.eucalyptus.container.common.model.Task>( ){
                 @Nullable
                 @Override
                 public com.eucalyptus.container.common.model.Task apply( final Task task ) {
-                  task.setLastStatus( "RUNNING" );
                   task.setDesiredStatus( "STOPPED" );
+
+                  try {
+                    final TaskDefinition taskDefinition = taskDefinitions.lookupByName(
+                        accountFullName,
+                        arnResourceName().apply( task.getTaskDefinitionArn() ),
+                        Predicates.alwaysTrue( ),
+                        Functions.<TaskDefinition>identity() );
+
+                    final ContainerInstance instance = containerInstances.lookupByName(
+                        accountFullName,
+                        arnResourceName().apply( task.getContainerInstanceArn() ),
+                        Predicates.alwaysTrue(),
+                        Functions.<ContainerInstance>identity() );
+
+                    AgentRendezvous.dispatchTask( instance, taskDefinition, task );
+                  } catch ( Exception e ) {
+                    logger.error( "Error dispatching stop task", e );
+                  }
+
                   return TypeMappers.transform( task, com.eucalyptus.container.common.model.Task.class );
                 }
               } ) ) );
@@ -556,20 +650,14 @@ public class ContainerService {
 
   public SubmitContainerStateChangeResponse submitContainerStateChange( final SubmitContainerStateChangeRequest request ) throws EcsException {
     final SubmitContainerStateChangeResponse response = new SubmitContainerStateChangeResponse( );
-    logger.error( "SubmitContainerStateChange: " + request.getCluster() ); //TODO:STEVE: remove
-    logger.error( "SubmitContainerStateChange: " + request.getTask() );//TODO:STEVE: remove
-    logger.error( "SubmitContainerStateChange: " + request.getContainerName() ); //TODO:STEVE: remove
-    logger.error( "SubmitContainerStateChange: " + request.getReason() ); //TODO:STEVE: remove
-    logger.error( "SubmitContainerStateChange: " + request.getStatus() ); //TODO:STEVE: remove
-    logger.error( "SubmitContainerStateChange: " + request.getExitCode() ); //TODO:STEVE: remove
-    logger.error( "SubmitContainerStateChange: " + request.getNetworkBindings() ); //TODO:STEVE: remove
     final Context ctx = Contexts.lookup( );
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
     try {
+      final String taskUuid = arnResourceName( ).apply( request.getTask( ) );
       tasks.updateByExample(
-          Task.exampleWithNameAndCluster( accountFullName, request.getTask( ), request.getCluster( ) ),
+          Task.exampleWithNameAndCluster( accountFullName, taskUuid, arnResourceName( ).apply( request.getCluster( ) ) ),
           accountFullName,
-          request.getTask(),
+          taskUuid,
           new Function<Task, Void>( ){
             @Nullable
             @Override
@@ -582,7 +670,9 @@ public class ContainerService {
                 container.get( ).setLastStatus( request.getStatus( ) );
                 container.get( ).setReason( request.getReason( ) );
                 container.get( ).setExitCode( request.getExitCode( ) );
-                //TODO:STEVE: network bindings
+                container.get( ).setNetworkBindings( Lists.transform(
+                    request.getNetworkBindings( ),
+                    TypeMappers.lookup( com.eucalyptus.container.common.model.NetworkBinding.class, NetworkBinding.class ) ) );
               }
               return null;
             }
@@ -597,22 +687,19 @@ public class ContainerService {
 
   public SubmitTaskStateChangeResponse submitTaskStateChange ( final SubmitTaskStateChangeRequest request ) throws EcsException {
     final SubmitTaskStateChangeResponse response = new SubmitTaskStateChangeResponse( );
-    logger.error( "SubmitTaskStateChange: " + request.getCluster() ); //TODO:STEVE: remove
-    logger.error( "SubmitTaskStateChange: " + request.getTask() );//TODO:STEVE: remove
-    logger.error( "SubmitTaskStateChange: " + request.getReason() ); //TODO:STEVE: remove
-    logger.error( "SubmitTaskStateChange: " + request.getStatus() ); //TODO:STEVE: remove
     final Context ctx = Contexts.lookup( );
     final AccountFullName accountFullName = ctx.getUserFullName( ).asAccountFullName( );
     try {
+      final String taskUuid = arnResourceName( ).apply( request.getTask( ) );
       tasks.updateByExample(
-          Task.exampleWithNameAndCluster( accountFullName, request.getTask( ), request.getCluster( ) ),
+          Task.exampleWithNameAndCluster( accountFullName, taskUuid, arnResourceName( ).apply( request.getCluster() ) ),
           accountFullName,
-          request.getTask(),
+          taskUuid,
           new Function<Task, Void>( ){
             @Nullable
             @Override
             public Void apply( final Task task ) {
-              task.setLastStatus( request.getStatus( ) );
+              task.setLastStatus( request.getStatus( ) ); //TODO:STEVE: should be recording the reason?
               return null;
             }
           } );
@@ -625,13 +712,38 @@ public class ContainerService {
     return request.reply( response );
   }
 
+  public static NonNullFunction<String,String> arnResourceName( ) {
+    return new NonNullFunction<String,String>( ){
+      @Nonnull
+      @Override
+      public String apply( final String perhapsArn ) {
+        try {
+          return perhapsArn.startsWith( "arn:" ) ?
+              Ern.parse( perhapsArn ).getResourceName( ) :
+              perhapsArn;
+        } catch ( JSONException e ) {
+          return perhapsArn;
+        }
+      }
+    };
+  }
+
   private <T extends AbstractPersistent & RestrictedType> T allocate(
       final Supplier<T> allocator,
       final Class<T> type,
       final String name
   ) throws EcsException {
+    return allocate( allocator, type, name, 1 ).get( 0 );
+  }
+
+  private <T extends AbstractPersistent & RestrictedType> List<T> allocate(
+      final Supplier<T> allocator,
+      final Class<T> type,
+      final String name,
+      final int count
+  ) throws EcsException {
     try {
-      return RestrictedTypes.allocateUnitlessResources( type, 1, transactional( allocator ) ).get( 0 );
+      return RestrictedTypes.allocateUnitlessResources( type, count, transactional( allocator ) );
     } catch ( Exception e ) {
       final SQLException sqlException = Exceptions.findCause( e, SQLException.class );
       final ConstraintViolationException constraintViolationException =
