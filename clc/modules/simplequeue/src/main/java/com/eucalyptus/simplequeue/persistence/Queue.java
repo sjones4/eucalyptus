@@ -32,62 +32,68 @@ import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+import org.springframework.cassandra.core.PrimaryKeyType;
+import org.springframework.data.cassandra.mapping.Column;
+import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.mapping.Table;
 
 /**
  * Created by ethomas on 9/7/16.
  */
+@Table(value = "queues")
 public class Queue implements SimpleQueueMetadata.QueueMetadata {
 
   public static class Key {
-    private String accountId;
-    private String queueName;
+    private final String accountId;
+    private final String queueName;
 
-    public String getAccountId() {
+    public String getAccountId( ) {
       return accountId;
     }
 
-    public String getQueueName() {
+    public String getQueueName( ) {
       return queueName;
     }
 
-    public Key(String accountId, String queueName) {
+    public Key( final String accountId, final String queueName ) {
       this.accountId = accountId;
       this.queueName = queueName;
     }
 
     @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-
-      Key key = (Key) o;
-
-      if (accountId != null ? !accountId.equals(key.accountId) : key.accountId != null) return false;
-      return queueName != null ? queueName.equals(key.queueName) : key.queueName == null;
-
+    public boolean equals( final Object o ) {
+      if ( this == o ) return true;
+      if ( o == null || getClass( ) != o.getClass( ) ) return false;
+      final Key key = (Key) o;
+      return Objects.equals( accountId, key.accountId ) &&
+          Objects.equals( queueName, key.queueName );
     }
 
     @Override
     public int hashCode() {
-      int result = accountId != null ? accountId.hashCode() : 0;
-      result = 31 * result + (queueName != null ? queueName.hashCode() : 0);
-      return result;
+      return Objects.hash( accountId, queueName );
     }
 
     public String getArn() {
       return "arn:aws:sqs:" + RegionConfigurations.getRegionNameOrDefault() + ":" + getAccountId()
         + ":" + getQueueName();
     }
-
   }
 
-
+  @PrimaryKeyColumn(name = "account_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
   private String accountId;
+
+  @PrimaryKeyColumn(name = "queue_name", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
   private String queueName;
 
+  @Column("partition_token")
+  private String partitionToken;
+
+  @Column("unique_id_per_version")
   private String uniqueIdPerVersion;
 
-
+  @Column("attributes")
   private Map<String, String> attributes = Maps.newTreeMap();
 
   public Queue() {
@@ -115,6 +121,18 @@ public class Queue implements SimpleQueueMetadata.QueueMetadata {
 
   public String getQueueName() {
     return queueName;
+  }
+
+  public void setQueueName(String queueName) {
+    this.queueName = queueName;
+  }
+
+  public String getPartitionToken( ) {
+    return partitionToken;
+  }
+
+  public void setPartitionToken( final String partitionToken ) {
+    this.partitionToken = partitionToken;
   }
 
   // some getter wrappers
@@ -170,10 +188,6 @@ public class Queue implements SimpleQueueMetadata.QueueMetadata {
       // timestamp is in seconds
       return new Date(1000L * Long.parseLong(attributes.get(Constants.LAST_MODIFIED_TIMESTAMP)));
     }
-  }
-
-  public void setQueueName(String queueName) {
-    this.queueName = queueName;
   }
 
   public Map<String, String> getAttributes() {

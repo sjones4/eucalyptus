@@ -33,7 +33,6 @@ package com.eucalyptus.simplequeue.persistence.cassandra;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.eucalyptus.cassandra.common.CassandraComponent;
-import com.eucalyptus.cassandra.common.CassandraKeyspace;
 import com.eucalyptus.cassandra.common.CassandraKeyspaceSpecification;
 import com.eucalyptus.cassandra.common.CassandraPersistence;
 import com.eucalyptus.cassandra.common.util.CqlUtil;
@@ -117,14 +116,6 @@ public class CassandraSessionManager implements CassandraComponent {
     return session;
   }
 
-  public static SessionProvider externalProvider( ) {
-    return new ExternalSessionProvider( );
-  }
-
-  public static SessionProvider internalProvider( ) {
-    return new InternalSessionProvider( );
-  }
-
   public static class ChangeListener implements PropertyChangeListener {
     @Override
     public void fireChange(ConfigurableProperty t, Object newValue) throws ConfigurablePropertyException {
@@ -136,12 +127,20 @@ public class CassandraSessionManager implements CassandraComponent {
     }
   }
 
-  static interface SessionProvider {
+  static SessionProvider externalProvider( ) {
+    return new ExternalSessionProvider( );
+  }
+
+  static SessionProvider internalProvider( ) {
+    return new InternalSessionProvider( );
+  }
+
+  interface SessionProvider {
     <R,E extends SimpleQueueException> R doThrowsWithSession( final ThrowingFunction<Session,R,E> callbackFunction ) throws E;
     <R> R doWithSession( final Function<Session,R> callbackFunction );
   }
 
-  static class ExternalSessionProvider implements SessionProvider {
+  private static class ExternalSessionProvider implements SessionProvider {
     public <R,E extends SimpleQueueException> R doThrowsWithSession( final ThrowingFunction<Session,R,E> callbackFunction ) throws E {
       return callbackFunction.apply( CassandraSessionManager.external( ).getSession( ) );
     }

@@ -23,6 +23,7 @@ import com.eucalyptus.simplequeue.common.policy.SimpleQueueResourceName;
 import com.eucalyptus.simplequeue.config.SimpleQueueProperties;
 import com.eucalyptus.simplequeue.persistence.cassandra.CassandraMessagePersistence;
 import com.eucalyptus.simplequeue.persistence.cassandra.CassandraQueuePersistence;
+import com.eucalyptus.simplequeue.persistence.cassandra.CassandraQueueRepositoryPersistence;
 import com.eucalyptus.simplequeue.persistence.postgresql.PostgresqlMessagePersistence;
 import com.eucalyptus.simplequeue.persistence.postgresql.PostgresqlQueuePersistence;
 import com.google.common.base.MoreObjects;
@@ -38,7 +39,7 @@ public class PersistenceFactory {
   private static final Map<String, Tuple2<QueuePersistence,MessagePersistence>> persistenceMap =
       ImmutableMap.<String,Tuple2<QueuePersistence,MessagePersistence>>builder( )
       .put( "cassandra", Tuple.of( CassandraQueuePersistence.external( ), CassandraMessagePersistence.external( ) ) )
-      .put( "euca-cassandra", Tuple.of( CassandraQueuePersistence.internal( ), CassandraMessagePersistence.internal( ) ) )
+      .put( "euca-cassandra", Tuple.of( new CassandraQueueRepositoryPersistence( ), CassandraMessagePersistence.internal( ) ) )
       .put( defaultPersistence, Tuple.of( new PostgresqlQueuePersistence( ), new PostgresqlMessagePersistence( ) ) )
       .build( );
 

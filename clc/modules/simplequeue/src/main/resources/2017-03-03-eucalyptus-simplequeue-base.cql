@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS eucalyptus_simplequeue.queues (
   queue_name TEXT,
   unique_id_per_version TIMEUUID,
   attributes MAP<TEXT, TEXT>,
-  partition_token text,
+  partition_token TEXT,
   PRIMARY KEY ((account_id), queue_name)
 ) WITH CLUSTERING ORDER BY (queue_name ASC);
 
