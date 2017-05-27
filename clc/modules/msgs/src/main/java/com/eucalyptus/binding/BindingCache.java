@@ -66,7 +66,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -80,7 +79,6 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,11 +88,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import javax.annotation.Nullable;
 import javax.persistence.Transient;
-import org.apache.bcel.util.ClassPath;
 import org.apache.log4j.Logger;
 import org.jibx.binding.Utility;
 import org.jibx.binding.classes.BoundClass;
@@ -111,15 +106,13 @@ import org.jibx.binding.model.MappingElementBase;
 import org.jibx.binding.model.ValidationContext;
 import org.jibx.runtime.JiBXException;
 import org.jibx.util.ClasspathUrlExtender;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import com.eucalyptus.bootstrap.BillOfMaterials;
 import com.eucalyptus.bootstrap.ServiceJarDiscovery;
 import com.eucalyptus.component.annotation.ComponentMessage;
-import com.eucalyptus.crypto.Digest;
-import com.eucalyptus.records.EventRecord;
-import com.eucalyptus.records.EventType;
 import com.eucalyptus.records.Logs;
 import com.eucalyptus.system.Ats;
-import com.eucalyptus.system.BaseDirectory;
 import com.eucalyptus.system.SubDirectory;
 import com.eucalyptus.util.Exceptions;
 import com.google.common.base.Predicate;
@@ -141,9 +134,11 @@ public class BindingCache {
   private static Logger LOG = Logger.getLogger( BindingCache.class );
   
   public static void compileBindings( ) {
+    ServiceJarDiscovery.processLibraries( );
     BindingFileSearch.compile( );
   }
   
+  @SuppressWarnings( "WeakerAccess" )
   enum BindingFileSearch implements Predicate<URI> {
     INSTANCE;
     private static final String                 BINDING_EMPTY                = "<binding>\n</binding>";
@@ -156,16 +151,14 @@ public class BindingCache {
      * determine multiple assignments during binnding time so we can do conflict resolution.
      */
     private static Multimap<String, Class>      BINDING_CLASS_ELEMENT_MAP    = HashMultimap.create( );
-    private static final String                 BINDING_CACHE_JAR_PREFIX     = "jar.";
     private static final String                 BINDING_CACHE_BINDING_PREFIX = "binding.";
     private static final String                 BINDING_CACHE_DIGEST_LIST    = "classcache.properties";
     private static final File                   CACHE_LIST                   = SubDirectory.CLASSCACHE.getChildFile( BINDING_CACHE_DIGEST_LIST );
     private final Class<?>                      MSG_BASE_CLASS;
     private final Class<?>                      MSG_DATA_CLASS;
-    private static final String                 FILE_PATTERN                 = System.getProperty( "euca.binding.pattern", ".*\\-binding.xml" );
     private static final Properties             CURRENT_PROPS                = new Properties( );
     
-    private BindingFileSearch( ) {
+    BindingFileSearch( ) {
       try {
         MSG_BASE_CLASS = Class.forName( "edu.ucsb.eucalyptus.msgs.BaseMessage" );
         MSG_DATA_CLASS = Class.forName( "edu.ucsb.eucalyptus.msgs.EucalyptusData" );
@@ -260,61 +253,34 @@ public class BindingCache {
       Process,
     }
 
-    public void process( final FileProcessingMode mode, File f ) throws Exception {
-      if ( f.isDirectory( ) ) {
-        File[] files = f.listFiles( new FilenameFilter( ) {
-          
-          @Override
-          public boolean accept( File dir, String name ) {
-            return name.matches( FILE_PATTERN );
-          }
-        } );
-        for ( File ff : files ) {
-          byte[] bindingBytes = Files.toByteArray( ff );
-          this.addCurrentBinding( bindingBytes, ff.getName( ), "file:" + ff.getAbsolutePath( ) );
-        }
-      } else {
-        byte[] digestBytes = Files.hash( f, Hashing.md5() ).asBytes( );
-        String digest = BaseEncoding.base16( ).lowerCase( ).encode( digestBytes );
-        CURRENT_PROPS.put( BINDING_CACHE_JAR_PREFIX + f.getName( ), digest );
-        final JarFile jar = new JarFile( f );
-        final List<JarEntry> jarList = Collections.list( jar.entries( ) );
-        final ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader( );
-        for ( final JarEntry j : jarList ) {
-          try {
-            if ( j.getName( ).matches( FILE_PATTERN ) ) {
-              byte[] bindingBytes = ByteStreams.toByteArray( jar.getInputStream( j ) );
-              String bindingName = j.getName( );
-              String bindingFullPath = "jar:file:" + f.getAbsolutePath( ) + "!/" + bindingName;
-              this.addCurrentBinding( bindingBytes, bindingName, bindingFullPath );
-            } else if ( FileProcessingMode.Process == mode && j.getName( ).matches( ".*\\.class.{0,1}" ) ) {
-              final String classGuess = j.getName( ).replace( '/', '.' ).replaceAll( "\\.class.{0,1}", "" );
-              final Class candidate = systemClassLoader.loadClass( classGuess );
-              if ( MSG_BASE_CLASS.isAssignableFrom( candidate ) || MSG_DATA_CLASS.isAssignableFrom( candidate ) ) {
-                ByteSource classSupplier = Resources.asByteSource( ClassLoader.getSystemResource( j.getName( ) ) );
-                File destClassFile = SubDirectory.CLASSCACHE.getChildFile( j.getName( ) );
-                if ( !destClassFile.exists( ) ) {
-                  Files.createParentDirs( destClassFile );
-                  try ( final InputStream in = classSupplier.openBufferedStream( );
-                        final OutputStream out = new FileOutputStream( destClassFile ) ) {
-                    ByteStreams.copy( in, out );
-                  }
-                  Logs.extreme( ).debug( "Caching: " + j.getName( ) + " => " + destClassFile.getAbsolutePath( ) );
-                }
-                BINDING_CLASS_MAP.putIfAbsent( classGuess, candidate );
-                BINDING_CLASS_ELEMENT_MAP.put( candidate.getSimpleName( ), candidate );
-              }
-            }
-          } catch ( RuntimeException ex ) {
-            LOG.error( ex, ex );
-            jar.close( );
-            throw ex;
-          }
-        }
-        jar.close( );
+    public void processBinding( Resource resource ) throws Exception {
+      try ( final InputStream resourceIn = resource.getInputStream( ) ) {
+        byte[] bindingBytes = ByteStreams.toByteArray( resourceIn );
+        String bindingName = resource.getFilename( );
+        String bindingFullPath = resource.getURI( ).toString( );
+        this.addCurrentBinding( bindingBytes, bindingName, bindingFullPath );
       }
     }
-    
+
+    public void processBoundClass( Class candidate ) throws Exception {
+      if ( MSG_BASE_CLASS.isAssignableFrom( candidate ) || MSG_DATA_CLASS.isAssignableFrom( candidate ) ) {
+        final String name = candidate.getName( ).replace( '.', '/' ) + ".class";
+        ByteSource classSupplier =
+            Resources.asByteSource( candidate.getResource( "/" + name ) );
+        File destClassFile = SubDirectory.CLASSCACHE.getChildFile( name );
+        if ( !destClassFile.exists( ) ) {
+          Files.createParentDirs( destClassFile );
+          try ( final InputStream in = classSupplier.openBufferedStream( );
+                final OutputStream out = new FileOutputStream( destClassFile ) ) {
+            ByteStreams.copy( in, out );
+          }
+          Logs.extreme( ).debug( "Caching: " + name + " => " + destClassFile.getAbsolutePath( ) );
+        }
+        BINDING_CLASS_MAP.putIfAbsent( candidate.getName( ), candidate );
+        BINDING_CLASS_ELEMENT_MAP.put( candidate.getSimpleName( ), candidate );
+      }
+    }
+
     private void addCurrentBinding( byte[] bindingBytes, String bindingName, String bindingFullPath ) {
       LOG.debug( "Binding cache: loading binding from: " + bindingFullPath );
       BINDING_LIST.add( URI.create( bindingFullPath ) );
@@ -449,27 +415,29 @@ public class BindingCache {
 
     public static void processFiles( final FileProcessingMode mode ) {
       BindingFileSearch.CURRENT_PROPS.clear( );
-      final File libDir = new File( BaseDirectory.LIB.toString( ) );
-      for ( final File f : libDir.listFiles( ) ) {
-        if ( f.getName( ).startsWith( "eucalyptus" ) && f.getName( ).endsWith( ".jar" )
-             && !f.getName( ).matches( ".*-ext-.*" ) ) {
-          EventRecord.here( ServiceJarDiscovery.class, EventType.BOOTSTRAP_INIT_SERVICE_JAR, f.getName( ) ).info( );
-          try {
-            BindingFileSearch.INSTANCE.process( mode, f );
-          } catch ( final Throwable e ) {
-            LOG.error( e.getMessage( ) );
+      if ( mode == FileProcessingMode.Process ) {
+        ServiceJarDiscovery.runDiscovery( new ServiceJarDiscovery( ) {
+          @Override
+          public boolean processClass( final Class candidate ) throws Exception {
+            BindingFileSearch.INSTANCE.processBoundClass( candidate );
+            return false;
           }
-        }
+
+          @Override
+          public Double getPriority() {
+            return 0D;
+          }
+        } );
       }
-      for ( String pathName : ClassPath.getClassPath( ).split( File.pathSeparator ) ) {
-        File pathFile = new File( pathName );
-        if ( pathFile.isDirectory( ) ) {
-          try {
-            BindingFileSearch.INSTANCE.process( mode, pathFile );
-          } catch ( final Throwable e ) {
-            LOG.error( e.getMessage( ) );
-          }
+
+      try {
+        PathMatchingResourcePatternResolver resolver =
+            new PathMatchingResourcePatternResolver( BindingCache.class.getClassLoader( ) );
+        for ( final Resource resource : resolver.getResources( "classpath*:/*-binding.xml" ) ) {
+          BindingFileSearch.INSTANCE.processBinding( resource );
         }
+      } catch ( Exception e ) {
+        LOG.error( "Error finding resources for binding", e );
       }
     }
     
@@ -486,6 +454,7 @@ public class BindingCache {
     }
   }
   
+  @SuppressWarnings( { "StaticPseudoFunctionalStyleMethod", "WeakerAccess" } )
   private static class InternalSoapBindingGenerator {
     private final String             ns           = "http://msgs.eucalyptus.com/" + BillOfMaterials.getVersion( );
     private static String            INDENT       = "";
@@ -696,6 +665,7 @@ public class BindingCache {
       return null;
     }
     
+    @SuppressWarnings( "WeakerAccess" )
     abstract class TypeBinding {
       private StringBuilder buf = new StringBuilder( );
       
@@ -883,6 +853,7 @@ public class BindingCache {
       
     }
     
+    @SuppressWarnings( "WeakerAccess" )
     class ObjectTypeBinding extends TypeBinding {
       private String name;
       private Class  type;
@@ -941,6 +912,7 @@ public class BindingCache {
       }
     }
 
+    @SuppressWarnings( "WeakerAccess" )
     class CollectionTypeBinding extends TypeBinding {
       private TypeBinding type;
       private String      name;
@@ -963,7 +935,6 @@ public class BindingCache {
         this.type.collection( this.name ).buf = new StringBuilder( );
         return ret;
       }
-      
     }
     
     class IntegerTypeBinding extends TypeBinding {
