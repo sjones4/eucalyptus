@@ -652,7 +652,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum NetworkConfigurationToNetworkInfo implements Function<NetworkConfiguration, NetworkInfo> {
+  static enum NetworkConfigurationToNetworkInfo implements Function<NetworkConfiguration, NetworkInfo> {
     INSTANCE;
 
     @Override
@@ -802,7 +802,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum VmInstanceToVmInstanceNetworkView implements Function<VmInstance,VmInstanceNetworkView> {
+  static enum VmInstanceToVmInstanceNetworkView implements Function<VmInstance,VmInstanceNetworkView> {
     INSTANCE;
 
     @Override
@@ -883,7 +883,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum NetworkGroupToNetworkGroupNetworkView implements Function<NetworkGroup,NetworkGroupNetworkView> {
+  static enum NetworkGroupToNetworkGroupNetworkView implements Function<NetworkGroup,NetworkGroupNetworkView> {
     INSTANCE;
 
     @SuppressWarnings("UnnecessaryQualifiedReference")
@@ -914,7 +914,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum VpcToVpcNetworkView implements Function<Vpc,VpcNetworkView> {
+  static enum VpcToVpcNetworkView implements Function<Vpc,VpcNetworkView> {
     INSTANCE;
 
     @Override
@@ -945,7 +945,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum SubnetToSubnetNetworkView implements Function<Subnet,SubnetNetworkView> {
+  static enum SubnetToSubnetNetworkView implements Function<Subnet,SubnetNetworkView> {
     INSTANCE;
 
     @Override
@@ -981,7 +981,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum DhcpOptionSetToDhcpOptionSetNetworkView implements Function<DhcpOptionSet,DhcpOptionSetNetworkView> {
+  static enum DhcpOptionSetToDhcpOptionSetNetworkView implements Function<DhcpOptionSet,DhcpOptionSetNetworkView> {
     INSTANCE;
 
     @Override
@@ -1025,7 +1025,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum NetworkAclToNetworkAclNetworkView implements Function<NetworkAcl,NetworkAclNetworkView> {
+  static enum NetworkAclToNetworkAclNetworkView implements Function<NetworkAcl,NetworkAclNetworkView> {
     INSTANCE;
 
     @Override
@@ -1043,7 +1043,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum NetworkAclEntryToNetworkAclEntryNetworkView implements Function<NetworkAclEntry,NetworkAclEntryNetworkView> {
+  static enum NetworkAclEntryToNetworkAclEntryNetworkView implements Function<NetworkAclEntry,NetworkAclEntryNetworkView> {
     INSTANCE;
 
     @Override
@@ -1062,7 +1062,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum NetworkAclEntryNetworkViewToNINetworkAclRule implements Function<NetworkAclEntryNetworkView,NINetworkAclEntry> {
+  static enum NetworkAclEntryNetworkViewToNINetworkAclRule implements Function<NetworkAclEntryNetworkView,NINetworkAclEntry> {
     INSTANCE;
 
     @Override
@@ -1107,7 +1107,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum RouteTableToRouteTableNetworkView implements Function<RouteTable,RouteTableNetworkView> {
+  static enum RouteTableToRouteTableNetworkView implements Function<RouteTable,RouteTableNetworkView> {
     INSTANCE;
 
     @Override
@@ -1125,7 +1125,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum RouteToRouteNetworkView implements Function<Route,RouteNetworkView> {
+  static enum RouteToRouteNetworkView implements Function<Route,RouteNetworkView> {
     INSTANCE;
 
     @Override
@@ -1143,7 +1143,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum RouteNetworkViewToNIRoute implements Function<RouteNetworkView,NIRoute> {
+  static enum RouteNetworkViewToNIRoute implements Function<RouteNetworkView,NIRoute> {
     INSTANCE;
 
     @Override
@@ -1170,7 +1170,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum InternetGatewayToInternetGatewayNetworkView implements Function<InternetGateway,InternetGatewayNetworkView> {
+  static enum InternetGatewayToInternetGatewayNetworkView implements Function<InternetGateway,InternetGatewayNetworkView> {
     INSTANCE;
 
     @Override
@@ -1208,7 +1208,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum VpcNetworkInterfaceToNetworkInterfaceNetworkView implements Function<NetworkInterface,NetworkInterfaceNetworkView> {
+  static enum VpcNetworkInterfaceToNetworkInterfaceNetworkView implements Function<NetworkInterface,NetworkInterfaceNetworkView> {
     INSTANCE;
 
     @Override
@@ -1251,7 +1251,7 @@ class NetworkInfoBroadcasts {
   }
 
   @TypeMapper
-  enum NatGatewayToNatGatewayNetworkView implements Function<NatGateway,NatGatewayNetworkView> {
+  static enum NatGatewayToNatGatewayNetworkView implements Function<NatGateway,NatGatewayNetworkView> {
     INSTANCE;
 
     @Override
