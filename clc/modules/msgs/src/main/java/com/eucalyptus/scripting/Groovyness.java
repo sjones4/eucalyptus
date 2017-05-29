@@ -73,7 +73,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -88,7 +91,15 @@ import com.google.common.collect.Maps;
 
 public class Groovyness {
   private static Logger      LOG          = Logger.getLogger( Groovyness.class );
+  private static List<Function<String,String>> fileMappers = new CopyOnWriteArrayList<>( );
   public static ScriptEngine groovyEngine = getGroovyEngine( );
+
+  static {
+    registerFileMapper( fileName ->
+        SubDirectory.SCRIPTS + File.separator + fileName + ( fileName.endsWith( ".groovy" )?
+            "" :
+            ".groovy" ) );
+  }
   
   public static <T extends GroovyObject> T expandoMetaClass( T obj ) {
     ExpandoMetaClass emc = new ExpandoMetaClass( obj.getClass( ), false );
@@ -123,10 +134,10 @@ public class Groovyness {
     GroovyObject groovyObject = null;
     try {
       File f = new File( fileName );
-      if ( !f.exists( ) ) {
-        f = new File( SubDirectory.SCRIPTS + File.separator + fileName + ( fileName.endsWith( ".groovy" )
-                                                                                                         ? ""
-                                                                                                         : ".groovy" ) );
+      for ( final Function<String,String> mapper : fileMappers ) {
+        if ( !f.exists( ) ) {
+          f = new File( mapper.apply( fileName ) );
+        }
       }
       GroovyClassLoader loader = getGroovyClassLoader( );
       Class groovyClass = loader.parseClass( f );
@@ -144,7 +155,9 @@ public class Groovyness {
   }
   
   public static <T> T run( SubDirectory dir, String fileName, Map context ) {
-    fileName = dir + File.separator + fileName;
+    fileName = fileName.startsWith( "/" ) ?
+        fileName :
+        dir + File.separator + fileName;
     String fileNameWExt = fileName + ".groovy";
     if ( !new File( fileName ).exists( ) && new File( fileNameWExt ).exists( ) ) {
       fileName = fileNameWExt;
@@ -221,7 +234,11 @@ public class Groovyness {
                                                 + "\nbecause of:\n" + Exceptions.causeString( e ), e );
     }
   }
-  
+
+  public static void registerFileMapper( final Function<String,String> fileMapper ) {
+    fileMappers.add( fileMapper );
+  }
+
   public static void loadConfig( String confFile ) {
     try {
       confFile = SubDirectory.SCRIPTS + File.separator + confFile;
