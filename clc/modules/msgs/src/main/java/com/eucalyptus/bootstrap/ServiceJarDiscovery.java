@@ -238,8 +238,7 @@ public abstract class ServiceJarDiscovery implements Comparable<ServiceJarDiscov
               ClassUtils.getDefaultClassLoader() );
           classes.add(cls);
         } catch (Throwable e) {
-          //LOG.debug( e, e );
-          e.printStackTrace();
+          LOG.debug( e, e );
         }
       }
       return classes;

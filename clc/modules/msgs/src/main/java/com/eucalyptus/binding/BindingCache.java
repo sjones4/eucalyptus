@@ -186,7 +186,9 @@ public class BindingCache {
         return true;
       } else {
         LOG.info( "Binding class cache expired, rebuilding." );
-        DeleteRecursively.PREDICATE.apply( SubDirectory.CLASSCACHE.getFile( ) );
+        if ( !oldProps.isEmpty( ) ) {
+          DeleteRecursively.PREDICATE.apply( SubDirectory.CLASSCACHE.getFile( ) );
+        }
         if ( !SubDirectory.CLASSCACHE.getFile( ).mkdirs( ) && !SubDirectory.CLASSCACHE.getFile( ).exists( ) ) {
           LOG.error( "Error creating class cache directory: " + SubDirectory.CLASSCACHE.getFile( ).getAbsolutePath( ) );
         }

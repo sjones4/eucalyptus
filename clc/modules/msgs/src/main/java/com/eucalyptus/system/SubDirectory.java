@@ -109,7 +109,7 @@ public enum SubDirectory {
       }
     }
   },
-  CLASSCACHE( BaseDirectory.RUN, "/classcache" ),
+  CLASSCACHE( BaseDirectory.RUN, "/classcache", true, "euca.classcache.dir" ),
   KEYS( BaseDirectory.STATE, "keys" ) {
     @Override
     protected void assertPermissions( ) {
@@ -159,23 +159,28 @@ public enum SubDirectory {
   };
   
   private static Logger LOG = Logger.getLogger( SubDirectory.class );
-  private final BaseDirectory         parent;
-  private final String                dir;
+  private final String                path;
   private final boolean               assertPermissions;
 
   SubDirectory( final BaseDirectory parent, final String dir ) {
-    this( parent, dir, true );
+    this( parent, dir, true, null );
   }
 
   SubDirectory( final BaseDirectory parent, final String dir, final boolean assertPermissions ) {
-    this.parent = parent;
-    this.dir = dir;
+    this( parent, dir, assertPermissions, null );
+  }
+
+  SubDirectory( final BaseDirectory parent, final String dir, final boolean assertPermissions, final String key ) {
+    final String pathForBase = parent.toString( ) + File.separator + dir;
+    this.path = key == null ?
+        pathForBase :
+        System.getProperty( key, pathForBase );
     this.assertPermissions = assertPermissions;
   }
-  
+
   @Override
   public String toString( ) {
-    return this.parent.toString( ) + File.separator + this.dir;
+    return this.path;
   }
   
   public File getFile( ) {

@@ -189,6 +189,15 @@ public class Groovyness {
   }
   
   public static <T> T run( String fileName ) {
+    if ( !new File( fileName ).exists( ) ) { //TODO:STEVE: break this out
+      for ( final Function<String,String> fileNameMapper : fileMappers ) {
+        final String mappedFileName = fileNameMapper.apply( fileName );
+        if ( new File( mappedFileName ).exists( ) ) {
+          fileName = mappedFileName;
+          break;
+        }
+      }
+    }
     return ( T ) run( SubDirectory.SCRIPTS, fileName );
   }
   

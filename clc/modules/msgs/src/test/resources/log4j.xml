@@ -70,7 +70,16 @@
         <layout class="com.eucalyptus.system.EucaLayout" />
     </appender>
 
+    <logger name="edu.ucsb.eucalyptus">
+        <level value="DEBUG" />
+    </logger>
+
+    <logger name="com.eucalyptus">
+        <level value="DEBUG" />
+    </logger>
+
     <root>
+        <level value ="INFO" />
         <appender-ref ref="console" />
     </root>
 
