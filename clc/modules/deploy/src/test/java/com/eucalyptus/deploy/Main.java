@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.apache.log4j.Level;
 import com.eucalyptus.bootstrap.DatabaseBootstrapper;
@@ -28,13 +29,12 @@ import com.eucalyptus.scripting.Groovyness;
 import com.eucalyptus.system.SubDirectory;
 import com.eucalyptus.util.DNSProperties;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 
 /**
  * Entry point for test eucalyptus cloud.
  *
  * Run with the working directory set to eucalyptus home.
- *
- * TODO:STEVE: move to deploy and run using that modules classpath / build dir
  */
 public class Main {
 
@@ -45,6 +45,9 @@ public class Main {
     org.apache.log4j.LogManager.getRootLogger().setLevel( Level.INFO);
 
     //TODO:STEVE: check if postgres available?
+    //TODO:STEVE: set up fault registry?
+    //TODO:STEVE: java.lang.ClassNotFoundException: com.eucalyptus.database.activities.VmDatabaseSSLSocketFactory
+    //TODO:STEVE: java.util.concurrent.ExecutionException: java.net.ConnectException: Connection refused: /127.0.0.1:8775
 
     final URL resourcePath = Main.class.getResource(".");
     File clcDir = new File( resourcePath.getPath( ) );
@@ -75,18 +78,17 @@ public class Main {
     System.setProperty("euca.version", "5.0.0");
     System.setProperty("euca.log.appender", "console");
     System.setProperty("euca.db.user", System.getProperty( "user.name", DatabaseBootstrapper.DB_USERNAME ));
+    System.setProperty("euca.user", System.getProperty( "user.name", DatabaseBootstrapper.DB_USERNAME ));
     System.setProperty("euca.log.level", "INFO");
 
-
+    System.setProperty("com.eucalyptus.cluster.service.enable", "true");
+    System.setProperty("com.eucalyptus.deploy.register", "clusterservice,user-api,walrusbackend");
 
     DNSProperties.PORT = 5553;
-//    File ibdata1 = SubDirectory.DB.getChildFile( "data", "ibdata1" );
-//    if ( !ibdata1.exists( ) ) {
-//      ibdata1.getParentFile( ).mkdirs( );
-//      ibdata1.createNewFile( );
-//    }
     final Map<String,String> scriptMap = ImmutableMap.<String,String>builder( ) //TODO:STEVE: simpler to just copy these?
         .put( "initialize_cloud.groovy", new File( clcDir, "modules/msgs/conf/scripts/initialize_cloud.groovy" ).getPath( ) )
+        .put( "notifications", new File( clcDir, "modules/msgs/conf/scripts/notifications.groovy" ).getPath( ) )
+        .put( "notifications_digest", new File( clcDir, "modules/msgs/conf/scripts/notifications_digest.groovy" ).getPath( ) )
         .put( "setup_db", new File( clcDir, "modules/postgresql/conf/scripts/setup_db.groovy" ).getPath( ) )
         .put( "setup_dbpool.groovy", new File( clcDir, "modules/msgs/conf/scripts/setup_dbpool.groovy" ).getPath( ) )
         .put( "setup_dbpool_remote.groovy", new File( clcDir, "modules/msgs/conf/scripts/setup_dbpool_remote.groovy" ).getPath( ) )
@@ -96,8 +98,13 @@ public class Main {
         .build( );
     Groovyness.registerFileMapper( scriptMap::get );
 
-    // /home/steve/Work/euca-internal-clean/eucalyptus/clc/modules/deploy/build/deploy/run/classcache
-    //TODO:STEVE: add a shutdown handler that detects changes to binding properties and copies to deploy build directory
+    File eucaConf = new File( "conf/eucalyptus.conf" );
+    Files.write(
+        "SCHEDPOLICY=\"ROUNDROBIN\"\n" +
+        "NODES=\"127.0.0.1\"\n" +
+        "\n",
+        eucaConf,
+        StandardCharsets.UTF_8 );
 
     final SystemBootstrapper boot = SystemBootstrapper.getInstance();
     if ( !SubDirectory.DB.getChildFile( "data", "postgresql.conf" ).exists( ) ) {
@@ -109,8 +116,6 @@ public class Main {
     boot.init( );
     boot.load( );
     boot.start( );
-
-    //TODO:STEVE: configure basic services, create a keypair and log it ...
   }
 
   private static String path( final File file, final String path ) {

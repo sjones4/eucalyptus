@@ -27,6 +27,8 @@
         <dependency name="eucalyptus-compute-service" rev="latest.integration"/>
         <dependency name="eucalyptus-dns" rev="latest.integration"/>
         <dependency name="eucalyptus-euare" rev="latest.integration"/>
+        <dependency name="eucalyptus-imaging-backend" rev="latest.integration"/>
+        <dependency name="eucalyptus-imaging-service" rev="latest.integration"/>
         <dependency name="eucalyptus-loadbalancing" rev="latest.integration"/>
         <dependency name="eucalyptus-object-storage" rev="latest.integration"/>
         <dependency name="eucalyptus-postgresql" rev="latest.integration"/>
