@@ -93,7 +93,6 @@ public class WalrusBootstrapper extends Bootstrapper {
 
   @Override
   public boolean load() throws Exception {
-    WalrusControl.checkPreconditions();
     return true;
   }
 
