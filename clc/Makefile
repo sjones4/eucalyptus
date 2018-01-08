@@ -135,16 +135,16 @@ build: deps
 	@# we need JAVA_HOME
 	@if test -z "${JAVA_HOME}" ; then \
 		echo "You need to define JAVA_HOME!"; exit 1; fi
-	ANT_OPTS="-Xmx1g -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) build-all
-	ANT_OPTS="-Xmx1g -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) jar
+	ANT_OPTS="-Xmx256m -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) build-all
+	ANT_OPTS="-Xmx256m -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) jar
 	make -C eucadmin
 
 build-test: deps
 	@# we need JAVA_HOME
 	@if test -z "${JAVA_HOME}" ; then \
 		echo "You need to define JAVA_HOME!"; exit 1; fi
-	ANT_OPTS="-Xmx1g -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) build-test
-	ANT_OPTS="-Xmx1g -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) jar
+	ANT_OPTS="-Xmx256m -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) build-test
+	ANT_OPTS="-Xmx256m -noverify" $(ANT) -Dlib.dir=${CLOUD_LIBS_DIR} -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) jar
 	make -C eucadmin
 
 indent:
@@ -169,14 +169,14 @@ distclean: clean
 	make -C eucadmin distclean
 
 install: build
-	ANT_OPTS="-Xmx1g -noverify" $(ANT) -Dlib.dir=$(CLOUD_LIBS_DIR) -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) install
+	ANT_OPTS="-Xmx256m -noverify" $(ANT) -Dlib.dir=$(CLOUD_LIBS_DIR) -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) install
 	make -C eucadmin install
 ifneq ($(USE_BUNDLED_JARS), no)
 	install -D -m 0644 $(CLOUD_LIBS_DIR)/*.jar $(DESTDIR)$(datarootdir)/eucalyptus
 endif
 
 install-test: build-test
-	ANT_OPTS="-Xmx1g -noverify" $(ANT) -Dlib.dir=$(CLOUD_LIBS_DIR) -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) install
+	ANT_OPTS="-Xmx256m -noverify" $(ANT) -Dlib.dir=$(CLOUD_LIBS_DIR) -Ddeps.lib.dir=$(CLOUD_LIBS_DIR) install
 	make -C eucadmin install
 
 deploy: install
