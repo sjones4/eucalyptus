@@ -35,6 +35,10 @@
         http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
 >
 
-  <int:service-activator input-channel="properties-request" ref="propertiesManager"/>
+  <int:service-activator input-channel="properties-request" ref="propertiesManager">
+    <int:request-handler-advice-chain>
+      <ref bean="componentHostDispatcher" />
+    </int:request-handler-advice-chain>
+  </int:service-activator>
 
 </beans>
