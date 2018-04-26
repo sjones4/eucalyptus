@@ -703,11 +703,11 @@ usermod -a -G libvirt eucalyptus || :
 
 
 %changelog
-* Thu Dec 28 2017 Steve Jones <steve.jones@appscale.com> - 4.4.3
-- Remove imaging-toolkit httpd dependency
-
 * Fri Mar  9 2018 Steve Jones <steve.jones@appscale.com> - 4.4.3
 - Build now handles rpm version
+
+* Thu Dec 28 2017 Steve Jones <steve.jones@appscale.com> - 4.4.2
+- Remove imaging-toolkit httpd dependency
 
 * Fri Aug  4 2017 Garrett Holmstrom <gholms@dxc.com> - 4.4.2
 - Version bump (4.4.2)
