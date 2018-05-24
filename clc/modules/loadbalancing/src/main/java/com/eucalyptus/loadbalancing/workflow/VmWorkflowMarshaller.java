@@ -44,6 +44,7 @@ import com.eucalyptus.cloudwatch.common.msgs.MetricData;
 import com.eucalyptus.cloudwatch.common.msgs.MetricDatum;
 import com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescriptions;
 import com.eucalyptus.util.Exceptions;
+import com.eucalyptus.util.Pair;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -72,6 +73,14 @@ public class VmWorkflowMarshaller {
     return marshalLoadBalancer(descriptions);
   }
 
+  public static String marshalLoadBalancer(final LoadBalancerServoDescription desc) {
+    final LoadBalancerServoDescriptions lbDescriptions = new LoadBalancerServoDescriptions();
+    lbDescriptions.setMember(new ArrayList<>());
+    lbDescriptions.getMember().add(desc);
+    final String encoded = marshalLoadBalancer(lbDescriptions);
+    return encoded;
+  }
+
   public static String marshalLoadBalancer(final LoadBalancerServoDescriptions desc) {
     final Binding binding =
         BindingManager.getBinding(LOADBALANCING_BINDING_NAME);
@@ -86,8 +95,15 @@ public class VmWorkflowMarshaller {
     return outString;
   }
 
-  public static Map<String,String> unmarshalInstances(final String encodedStatus) {
-    return decodeJsonStringMap(encodedStatus);
+  public static Pair<Integer,Map<String,String>> unmarshalInstances(final String encodedStatus) {
+    final int versionEnd = encodedStatus.indexOf( '|' );
+    if (versionEnd > 3 && encodedStatus.startsWith( "viv" )) {
+      return Pair.of(
+          Integer.parseInt(encodedStatus.substring( 3, versionEnd)),
+          decodeJsonStringMap(encodedStatus.substring( versionEnd+1)));
+    } else {
+      return Pair.of(0,decodeJsonStringMap(encodedStatus));
+    }
   }
 
   // only fill metric name and value;

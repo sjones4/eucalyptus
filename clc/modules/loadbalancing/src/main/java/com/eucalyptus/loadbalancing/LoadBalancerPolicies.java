@@ -66,13 +66,17 @@ import com.eucalyptus.loadbalancing.service.LoadBalancingException;
 import com.eucalyptus.loadbalancing.service.PolicyTypeNotFoundException;
 import com.eucalyptus.system.BaseDirectory;
 import com.eucalyptus.util.Exceptions;
+import com.eucalyptus.util.FUtils;
+import com.eucalyptus.util.Strings;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.base.Predicate;
 /**
@@ -757,6 +761,7 @@ public class LoadBalancerPolicies {
       }
       final PolicyAttributeDescriptions descs = new PolicyAttributeDescriptions();
       descs.setMember((ArrayList<PolicyAttributeDescription>) attrDescs);
+      descs.getMember().sort(Ordering.natural().onResultOf(Strings.nonNull(PolicyAttributeDescription::getAttributeName)));
       policy.setPolicyAttributeDescriptions(descs);
       return policy;
     }

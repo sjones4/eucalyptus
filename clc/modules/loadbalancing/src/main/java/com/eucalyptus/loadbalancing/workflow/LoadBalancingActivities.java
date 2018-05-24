@@ -152,9 +152,9 @@ public interface LoadBalancingActivities {
   /***** Activities for ELB VMs *****/
   /// to update servo VMs with the latest ELB
   List<String> lookupServoInstances(String accountNumber, String lbName) throws LoadBalancingActivityException;
-  List<String> listLoadBalancerPolicies(String accountNumber, String lbName) throws LoadBalancingActivityException;
-  PolicyDescription getLoadBalancerPolicy(String accountNumber, String lbName, String policyName) throws LoadBalancingActivityException;
-  Map<String, LoadBalancerServoDescription> lookupLoadBalancerDescription(String accountNumber, String lbName)
+  List<String> listLoadBalancerPolicies(String accountNumber, String lbName, String policiesSha1) throws LoadBalancingActivityException;
+  PolicyDescription getLoadBalancerPolicy(String accountNumber, String lbName, String policyName, String policySha1) throws LoadBalancingActivityException;
+  Map<String, LoadBalancerServoDescription> lookupLoadBalancerDescription(String accountNumber, String lbName, String lbSha1)
       throws LoadBalancingActivityException;
 
   /// backend instance status update

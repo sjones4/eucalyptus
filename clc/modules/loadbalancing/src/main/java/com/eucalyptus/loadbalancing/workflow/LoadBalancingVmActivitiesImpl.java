@@ -28,10 +28,19 @@
  ************************************************************************/
 package com.eucalyptus.loadbalancing.workflow;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import com.eucalyptus.crypto.Digest;
+import com.eucalyptus.util.Pair;
 import com.google.common.base.Supplier;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheBuilderSpec;
+import com.google.common.hash.Hasher;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -58,8 +67,15 @@ public class LoadBalancingVmActivitiesImpl
       new RedisPubSubClient("localhost", "get-cloudwatch-metrics");
   private static RedisBlockingListClient getCloudwatchMetricsReplyClient =
       new RedisBlockingListClient("localhost", "get-cloudwatch-metrics-reply");
-  
-  
+
+  private enum CacheType { LoadBalancer, Policy }
+
+  private static final int vmInterfaceVersion = 1;
+  private static final Pattern sha1Pattern = Pattern.compile("[a-f0-9]{40}");
+  private static final String resourceCacheSpec = "maximumSize=500, expireAfterAccess=120s";
+  private static final Cache<Pair<CacheType,String>,String> resourceCache =
+      CacheBuilder.from(CacheBuilderSpec.parse(resourceCacheSpec)).build();
+
   static class RedisClient {
     private String server = null;
     private Jedis jedis = null;
@@ -144,9 +160,43 @@ public class LoadBalancingVmActivitiesImpl
     }
   }
 
+  private String getCachedResource(final CacheType type, final String key) throws LoadBalancingActivityException {
+    final String resource = resourceCache.getIfPresent(Pair.of(type, key));
+    if (resource == null) {
+      throw new LoadBalancingActivityException(type.name() + " not found for " + key);
+    }
+    return resource;
+  }
+
+  private String setCachedResource(final CacheType type, final String resource) {
+    if (resource != null) {
+      resourceCache.put(Pair.of(type, sha1(resource)), resource);
+    }
+    return resource;
+  }
+
+  private String sha1(final String text) {
+    return Digest.SHA1.digestHex(text.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private String cacheProcess(final CacheType type, final String resourceOrResourceSha1) throws LoadBalancingActivityException {
+    final String resource;
+    if(sha1Pattern.matcher(resourceOrResourceSha1).matches()) {
+      resource = getCachedResource(type, resourceOrResourceSha1);
+    } else {
+      resource = setCachedResource(type, resourceOrResourceSha1);
+    }
+    return resource;
+  }
+
+  private String getVersionPrefix() {
+    return "viv" + vmInterfaceVersion + "|";
+  }
+
   @Override
-  public void setPolicy(final String policy) throws LoadBalancingActivityException {
+  public void setPolicy(final String policyOrPolicySha1) throws LoadBalancingActivityException {
     try {
+      final String policy = cacheProcess(CacheType.Policy, policyOrPolicySha1);
       setPolicyClient.publish(new Supplier<String>() {
         @Override
         public String get() {
@@ -159,16 +209,16 @@ public class LoadBalancingVmActivitiesImpl
   }
 
   @Override
-  public void setLoadBalancer(final String loadbalancer) throws LoadBalancingActivityException{
-   // serialize loadbalancer
+  public void setLoadBalancer(final String loadbalancerOrloadbalancerSha1) throws LoadBalancingActivityException{
     try{
-    setLoadBalancerClient.publish(new Supplier<String>() {
-      @Override
-      public String get() {
-        return loadbalancer;
-      }
-    });
-    LOG.debug(String.format("New loadbalancer: %n%s", loadbalancer));
+      final String loadbalancer = cacheProcess(CacheType.LoadBalancer, loadbalancerOrloadbalancerSha1);
+      setLoadBalancerClient.publish(new Supplier<String>() {
+        @Override
+        public String get() {
+          return loadbalancer;
+        }
+      });
+      LOG.debug(String.format("New loadbalancer: %n%s", loadbalancer));
     }catch(final NoSubscriberException ex) {
       throw new LoadBalancingActivityException("No subscriber is found to receive the loadbalanacer");
     }
@@ -212,7 +262,7 @@ public class LoadBalancingVmActivitiesImpl
 
     String output = null;
     try{
-      output = getInstanceStatusReplyClient.pop();
+      output =  getVersionPrefix() + getInstanceStatusReplyClient.pop();
     }catch(final Exception ex) {
       throw new LoadBalancingActivityException("Failed to receive instance status");
     }
