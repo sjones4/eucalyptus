@@ -64,6 +64,7 @@ import com.eucalyptus.component.annotation.ComponentPart;
 import com.eucalyptus.loadbalancing.common.LoadBalancing;
 import com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription;
 import com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescriptions;
+import com.eucalyptus.util.Exceptions;
 import com.eucalyptus.util.Pair;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Supplier;
@@ -106,6 +107,9 @@ public class UpdateLoadBalancerWorkflowImpl implements UpdateLoadBalancerWorkflo
   private static final String resourceCacheSpec = "expireAfterAccess=120s";
   private static final Cache<String,VmInstanceResourceSha1s> resourceCache =
       CacheBuilder.from(CacheBuilderSpec.parse(resourceCacheSpec)).build();
+  private static final String sha1CacheSpec = "expireAfterAccess=60s";
+  private static final Cache<String,String> sha1Cache =
+      CacheBuilder.from(CacheBuilderSpec.parse(sha1CacheSpec)).build();
   private static final Callable<VmInstanceResourceSha1s> EMPTY =
       Callables.returning(VmInstanceResourceSha1s.empty());
 
@@ -326,7 +330,13 @@ public class UpdateLoadBalancerWorkflowImpl implements UpdateLoadBalancerWorkflo
   }
 
   private static String sha1(final String text) {
-    return Digest.SHA1.digestHex(text.getBytes(StandardCharsets.UTF_8));
+    try {
+      return sha1Cache.get(
+          text,
+          () -> Digest.SHA1.digestHex(text.getBytes(StandardCharsets.UTF_8)));
+    } catch ( ExecutionException e ) {
+      throw Exceptions.toUndeclared( e );
+    }
   }
 
   private static Set<String> sha1s(final Set<String> texts) {

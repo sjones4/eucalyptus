@@ -29,6 +29,7 @@
 package com.eucalyptus.loadbalancing.workflow;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -84,14 +85,14 @@ public class VmWorkflowMarshaller {
   public static String marshalLoadBalancer(final LoadBalancerServoDescriptions desc) {
     final Binding binding =
         BindingManager.getBinding(LOADBALANCING_BINDING_NAME);
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stream = new ByteArrayOutputStream(512);
     try{
       binding.toStream(stream, desc);
     }catch(final BindingException ex) {
       LOG.error("Marshalling failed", ex);
       throw Exceptions.toUndeclared(ex);
     }
-    final String outString = new String(stream.toByteArray());
+    final String outString = stream.toString();
     return outString;
   }
 
