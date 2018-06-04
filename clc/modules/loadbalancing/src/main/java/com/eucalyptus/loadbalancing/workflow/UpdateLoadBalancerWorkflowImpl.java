@@ -29,7 +29,6 @@
 package com.eucalyptus.loadbalancing.workflow;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.eucalyptus.crypto.Digest;
-import com.eucalyptus.loadbalancing.common.msgs.LoadBalancerDescription;
 import com.eucalyptus.loadbalancing.common.msgs.PolicyDescription;
 import org.apache.log4j.Logger;
 
@@ -63,9 +61,7 @@ import com.amazonaws.services.simpleworkflow.flow.core.TryCatchFinally;
 import com.eucalyptus.component.annotation.ComponentPart;
 import com.eucalyptus.loadbalancing.common.LoadBalancing;
 import com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription;
-import com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescriptions;
 import com.eucalyptus.util.Exceptions;
-import com.eucalyptus.util.Pair;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -77,7 +73,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Callables;
-import javaslang.Value;
 import javaslang.control.Option;
 
 /**
@@ -90,7 +85,7 @@ public class UpdateLoadBalancerWorkflowImpl implements UpdateLoadBalancerWorkflo
       Logger.getLogger(  UpdateLoadBalancerWorkflowImpl.class );
 
   private final LoadBalancingActivitiesClient client =
-      new LoadBalancingActivitiesClientImpl();
+      new LoadBalancingActivitiesClientImpl(null, LoadBalancingJsonDataConverter.getDefault(), null);
   
   private final UpdateLoadBalancerWorkflowSelfClient selfClient =
       new UpdateLoadBalancerWorkflowSelfClientImpl();
@@ -107,7 +102,7 @@ public class UpdateLoadBalancerWorkflowImpl implements UpdateLoadBalancerWorkflo
   private static final String resourceCacheSpec = "expireAfterAccess=120s";
   private static final Cache<String,VmInstanceResourceSha1s> resourceCache =
       CacheBuilder.from(CacheBuilderSpec.parse(resourceCacheSpec)).build();
-  private static final String sha1CacheSpec = "expireAfterAccess=60s";
+  private static final String sha1CacheSpec = "expireAfterAccess=120s";
   private static final Cache<String,String> sha1Cache =
       CacheBuilder.from(CacheBuilderSpec.parse(sha1CacheSpec)).build();
   private static final Callable<VmInstanceResourceSha1s> EMPTY =

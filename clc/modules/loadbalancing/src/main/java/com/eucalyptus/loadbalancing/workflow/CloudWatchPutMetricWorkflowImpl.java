@@ -63,7 +63,7 @@ public class CloudWatchPutMetricWorkflowImpl implements CloudWatchPutMetricWorkf
   final LoadBalancingVmActivitiesClient vmClient = 
       new LoadBalancingVmActivitiesClientImpl();
   final LoadBalancingActivitiesClient client =
-      new LoadBalancingActivitiesClientImpl();
+      new LoadBalancingActivitiesClientImpl(null, LoadBalancingJsonDataConverter.getDefault(), null);
   final CloudWatchPutMetricWorkflowSelfClient selfClient =
       new CloudWatchPutMetricWorkflowSelfClientImpl();
 

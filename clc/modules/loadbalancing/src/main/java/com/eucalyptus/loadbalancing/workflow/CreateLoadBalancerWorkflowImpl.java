@@ -37,8 +37,6 @@ import com.amazonaws.services.simpleworkflow.flow.core.Promise;
 import com.amazonaws.services.simpleworkflow.flow.core.TryCatchFinally;
 import com.eucalyptus.component.annotation.ComponentPart;
 import com.eucalyptus.loadbalancing.common.LoadBalancing;
-import com.eucalyptus.loadbalancing.workflow.LoadBalancingActivitiesClient;
-import com.eucalyptus.loadbalancing.workflow.LoadBalancingActivitiesClientImpl;
 
 /**
  * @author Sang-Min Park (sangmin.park@hpe.com)
@@ -48,7 +46,7 @@ import com.eucalyptus.loadbalancing.workflow.LoadBalancingActivitiesClientImpl;
 public class CreateLoadBalancerWorkflowImpl implements CreateLoadBalancerWorkflow {
   private static Logger    LOG     = Logger.getLogger(  CreateLoadBalancerWorkflowImpl.class );
   final LoadBalancingActivitiesClient client = 
-      new LoadBalancingActivitiesClientImpl();
+      new LoadBalancingActivitiesClientImpl(null, LoadBalancingJsonDataConverter.getDefault(), null);
   TryCatchFinally task = null;
   Promise<Boolean> admission = null;
   Promise<String> roleName = null;

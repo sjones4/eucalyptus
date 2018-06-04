@@ -47,7 +47,7 @@ public class UpgradeLoadBalancerWorkflowImpl implements  UpgradeLoadBalancerWork
           Logger.getLogger(  UpgradeLoadBalancerWorkflowImpl.class );
 
   private final LoadBalancingActivitiesClient client =
-          new LoadBalancingActivitiesClientImpl();
+          new LoadBalancingActivitiesClientImpl(null, LoadBalancingJsonDataConverter.getDefault(), null);
   private ElbWorkflowState state =
           ElbWorkflowState.WORKFLOW_RUNNING;
 

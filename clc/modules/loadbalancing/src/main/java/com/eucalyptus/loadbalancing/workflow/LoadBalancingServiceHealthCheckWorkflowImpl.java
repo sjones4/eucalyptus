@@ -51,7 +51,7 @@ implements LoadBalancingServiceHealthCheckWorkflow {
       Logger.getLogger(  LoadBalancingServiceHealthCheckWorkflowImpl.class );
 
   final LoadBalancingActivitiesClient client = 
-      new LoadBalancingActivitiesClientImpl();
+      new LoadBalancingActivitiesClientImpl(null, LoadBalancingJsonDataConverter.getDefault(), null);
   private ElbWorkflowState state = 
       ElbWorkflowState.WORKFLOW_RUNNING;
   TryCatchFinally task = null;

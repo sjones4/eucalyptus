@@ -64,7 +64,7 @@ public class InstanceStatusWorkflowImpl implements InstanceStatusWorkflow {
   final LoadBalancingVmActivitiesClient vmClient = 
       new LoadBalancingVmActivitiesClientImpl();
   final LoadBalancingActivitiesClient client =
-      new LoadBalancingActivitiesClientImpl();
+      new LoadBalancingActivitiesClientImpl(null, LoadBalancingJsonDataConverter.getDefault(), null);
   final InstanceStatusWorkflowSelfClient selfClient =
       new InstanceStatusWorkflowSelfClientImpl();
 
