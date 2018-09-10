@@ -1,0 +1,941 @@
+<?xml version="1.0" standalone="yes"?>
+<!--
+  Copyright 2018 AppScale Systems, Inc
+
+  Use of this source code is governed by a BSD-2-Clause
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/BSD-2-Clause
+-->
+<binding name="cloudfront_amazonaws_com_doc_2018_06_18" force-classes="true" add-constructors="true">
+  <namespace uri="http://cloudfront.amazonaws.com/doc/2018-06-18/" default="elements"/>
+  <format type="java.util.Date" deserializer="org.jibx.runtime.Utility.deserializeDateTime" serializer="com.eucalyptus.ws.util.SerializationUtils.serializeDateTime"/>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Error" abstract="true">
+    <value name="Type" field="type" usage="required"/>
+    <value name="Code" field="code" usage="required"/>
+    <value name="Message" field="message" usage="required"/>
+    <structure name="Detail" field="detail" usage="required" type="com.eucalyptus.cloudfront.common.msgs.ErrorDetail"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ErrorDetail" abstract="true"/>
+  <mapping name="ErrorResponse" class="com.eucalyptus.cloudfront.common.msgs.ErrorResponse">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <collection field="error">
+      <structure name="Error" type="com.eucalyptus.cloudfront.common.msgs.Error"/>
+    </collection>
+    <value name="RequestId" field="requestId" usage="required"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage" abstract="true"/>
+  <mapping name="CreateCloudFrontOriginAccessIdentity" class="com.eucalyptus.cloudfront.common.msgs.CreateCloudFrontOriginAccessIdentityType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentityConfig" set-method="setCloudFrontOriginAccessIdentityConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityConfig"/>
+  </mapping>
+  <mapping name="CreateCloudFrontOriginAccessIdentityResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateCloudFrontOriginAccessIdentityResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentity" set-method="setCloudFrontOriginAccessIdentity" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentity"/>
+  </mapping>
+  <mapping name="CreateDistribution" class="com.eucalyptus.cloudfront.common.msgs.CreateDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistributionConfig" set-method="setDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionConfig"/>
+  </mapping>
+  <mapping name="CreateDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistribution" set-method="setDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Distribution"/>
+  </mapping>
+  <mapping name="CreateDistributionWithTags" class="com.eucalyptus.cloudfront.common.msgs.CreateDistributionWithTagsType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistributionConfigWithTags" set-method="setDistributionConfigWithTags" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionConfigWithTags"/>
+  </mapping>
+  <mapping name="CreateDistributionWithTagsResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateDistributionWithTagsResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistribution" set-method="setDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Distribution"/>
+  </mapping>
+  <mapping name="CreateFieldLevelEncryptionConfig" class="com.eucalyptus.cloudfront.common.msgs.CreateFieldLevelEncryptionConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionConfig" set-method="setFieldLevelEncryptionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionConfig"/>
+  </mapping>
+  <mapping name="CreateFieldLevelEncryptionConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateFieldLevelEncryptionConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryption" set-method="setFieldLevelEncryption" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryption"/>
+  </mapping>
+  <mapping name="CreateFieldLevelEncryptionProfile" class="com.eucalyptus.cloudfront.common.msgs.CreateFieldLevelEncryptionProfileType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfileConfig" set-method="setFieldLevelEncryptionProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileConfig"/>
+  </mapping>
+  <mapping name="CreateFieldLevelEncryptionProfileResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateFieldLevelEncryptionProfileResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfile" set-method="setFieldLevelEncryptionProfile" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfile"/>
+  </mapping>
+  <mapping name="CreateInvalidation" class="com.eucalyptus.cloudfront.common.msgs.CreateInvalidationType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getInvalidationBatch" set-method="setInvalidationBatch" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.InvalidationBatch"/>
+  </mapping>
+  <mapping name="CreateInvalidationResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateInvalidationResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getInvalidation" set-method="setInvalidation" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Invalidation"/>
+  </mapping>
+  <mapping name="CreatePublicKey" class="com.eucalyptus.cloudfront.common.msgs.CreatePublicKeyType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKeyConfig" set-method="setPublicKeyConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKeyConfig"/>
+  </mapping>
+  <mapping name="CreatePublicKeyResponse" class="com.eucalyptus.cloudfront.common.msgs.CreatePublicKeyResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKey" set-method="setPublicKey" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKey"/>
+  </mapping>
+  <mapping name="CreateStreamingDistribution" class="com.eucalyptus.cloudfront.common.msgs.CreateStreamingDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistributionConfig" set-method="setStreamingDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfig"/>
+  </mapping>
+  <mapping name="CreateStreamingDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateStreamingDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistribution" set-method="setStreamingDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistribution"/>
+  </mapping>
+  <mapping name="CreateStreamingDistributionWithTags" class="com.eucalyptus.cloudfront.common.msgs.CreateStreamingDistributionWithTagsType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistributionConfigWithTags" set-method="setStreamingDistributionConfigWithTags" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfigWithTags"/>
+  </mapping>
+  <mapping name="CreateStreamingDistributionWithTagsResponse" class="com.eucalyptus.cloudfront.common.msgs.CreateStreamingDistributionWithTagsResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistribution" set-method="setStreamingDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistribution"/>
+  </mapping>
+  <mapping name="DeleteCloudFrontOriginAccessIdentity" class="com.eucalyptus.cloudfront.common.msgs.DeleteCloudFrontOriginAccessIdentityType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteCloudFrontOriginAccessIdentityResponse" class="com.eucalyptus.cloudfront.common.msgs.DeleteCloudFrontOriginAccessIdentityResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteDistribution" class="com.eucalyptus.cloudfront.common.msgs.DeleteDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.DeleteDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteFieldLevelEncryptionConfig" class="com.eucalyptus.cloudfront.common.msgs.DeleteFieldLevelEncryptionConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteFieldLevelEncryptionConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.DeleteFieldLevelEncryptionConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteFieldLevelEncryptionProfile" class="com.eucalyptus.cloudfront.common.msgs.DeleteFieldLevelEncryptionProfileType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteFieldLevelEncryptionProfileResponse" class="com.eucalyptus.cloudfront.common.msgs.DeleteFieldLevelEncryptionProfileResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeletePublicKey" class="com.eucalyptus.cloudfront.common.msgs.DeletePublicKeyType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeletePublicKeyResponse" class="com.eucalyptus.cloudfront.common.msgs.DeletePublicKeyResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteStreamingDistribution" class="com.eucalyptus.cloudfront.common.msgs.DeleteStreamingDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="DeleteStreamingDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.DeleteStreamingDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetCloudFrontOriginAccessIdentity" class="com.eucalyptus.cloudfront.common.msgs.GetCloudFrontOriginAccessIdentityType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetCloudFrontOriginAccessIdentityResponse" class="com.eucalyptus.cloudfront.common.msgs.GetCloudFrontOriginAccessIdentityResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentity" set-method="setCloudFrontOriginAccessIdentity" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentity"/>
+  </mapping>
+  <mapping name="GetCloudFrontOriginAccessIdentityConfig" class="com.eucalyptus.cloudfront.common.msgs.GetCloudFrontOriginAccessIdentityConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetCloudFrontOriginAccessIdentityConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.GetCloudFrontOriginAccessIdentityConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentityConfig" set-method="setCloudFrontOriginAccessIdentityConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityConfig"/>
+  </mapping>
+  <mapping name="GetDistribution" class="com.eucalyptus.cloudfront.common.msgs.GetDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.GetDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistribution" set-method="setDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Distribution"/>
+  </mapping>
+  <mapping name="GetDistributionConfig" class="com.eucalyptus.cloudfront.common.msgs.GetDistributionConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetDistributionConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.GetDistributionConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistributionConfig" set-method="setDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionConfig"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryption" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionResponse" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryption" set-method="setFieldLevelEncryption" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryption"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionConfig" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionConfig" set-method="setFieldLevelEncryptionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionConfig"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionProfile" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionProfileType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionProfileResponse" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionProfileResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfile" set-method="setFieldLevelEncryptionProfile" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfile"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionProfileConfig" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionProfileConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetFieldLevelEncryptionProfileConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.GetFieldLevelEncryptionProfileConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfileConfig" set-method="setFieldLevelEncryptionProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileConfig"/>
+  </mapping>
+  <mapping name="GetInvalidation" class="com.eucalyptus.cloudfront.common.msgs.GetInvalidationType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetInvalidationResponse" class="com.eucalyptus.cloudfront.common.msgs.GetInvalidationResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getInvalidation" set-method="setInvalidation" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Invalidation"/>
+  </mapping>
+  <mapping name="GetPublicKey" class="com.eucalyptus.cloudfront.common.msgs.GetPublicKeyType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetPublicKeyResponse" class="com.eucalyptus.cloudfront.common.msgs.GetPublicKeyResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKey" set-method="setPublicKey" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKey"/>
+  </mapping>
+  <mapping name="GetPublicKeyConfig" class="com.eucalyptus.cloudfront.common.msgs.GetPublicKeyConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetPublicKeyConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.GetPublicKeyConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKeyConfig" set-method="setPublicKeyConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKeyConfig"/>
+  </mapping>
+  <mapping name="GetStreamingDistribution" class="com.eucalyptus.cloudfront.common.msgs.GetStreamingDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetStreamingDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.GetStreamingDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistribution" set-method="setStreamingDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistribution"/>
+  </mapping>
+  <mapping name="GetStreamingDistributionConfig" class="com.eucalyptus.cloudfront.common.msgs.GetStreamingDistributionConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="GetStreamingDistributionConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.GetStreamingDistributionConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistributionConfig" set-method="setStreamingDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfig"/>
+  </mapping>
+  <mapping name="ListCloudFrontOriginAccessIdentities" class="com.eucalyptus.cloudfront.common.msgs.ListCloudFrontOriginAccessIdentitiesType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListCloudFrontOriginAccessIdentitiesResponse" class="com.eucalyptus.cloudfront.common.msgs.ListCloudFrontOriginAccessIdentitiesResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentityList" set-method="setCloudFrontOriginAccessIdentityList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityList"/>
+  </mapping>
+  <mapping name="ListDistributions" class="com.eucalyptus.cloudfront.common.msgs.ListDistributionsType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListDistributionsResponse" class="com.eucalyptus.cloudfront.common.msgs.ListDistributionsResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistributionList" set-method="setDistributionList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionList"/>
+  </mapping>
+  <mapping name="ListDistributionsByWebACLId" class="com.eucalyptus.cloudfront.common.msgs.ListDistributionsByWebACLIdType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListDistributionsByWebACLIdResponse" class="com.eucalyptus.cloudfront.common.msgs.ListDistributionsByWebACLIdResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistributionList" set-method="setDistributionList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionList"/>
+  </mapping>
+  <mapping name="ListFieldLevelEncryptionConfigs" class="com.eucalyptus.cloudfront.common.msgs.ListFieldLevelEncryptionConfigsType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListFieldLevelEncryptionConfigsResponse" class="com.eucalyptus.cloudfront.common.msgs.ListFieldLevelEncryptionConfigsResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionList" set-method="setFieldLevelEncryptionList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionList"/>
+  </mapping>
+  <mapping name="ListFieldLevelEncryptionProfiles" class="com.eucalyptus.cloudfront.common.msgs.ListFieldLevelEncryptionProfilesType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListFieldLevelEncryptionProfilesResponse" class="com.eucalyptus.cloudfront.common.msgs.ListFieldLevelEncryptionProfilesResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfileList" set-method="setFieldLevelEncryptionProfileList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileList"/>
+  </mapping>
+  <mapping name="ListInvalidations" class="com.eucalyptus.cloudfront.common.msgs.ListInvalidationsType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListInvalidationsResponse" class="com.eucalyptus.cloudfront.common.msgs.ListInvalidationsResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getInvalidationList" set-method="setInvalidationList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.InvalidationList"/>
+  </mapping>
+  <mapping name="ListPublicKeys" class="com.eucalyptus.cloudfront.common.msgs.ListPublicKeysType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListPublicKeysResponse" class="com.eucalyptus.cloudfront.common.msgs.ListPublicKeysResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKeyList" set-method="setPublicKeyList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKeyList"/>
+  </mapping>
+  <mapping name="ListStreamingDistributions" class="com.eucalyptus.cloudfront.common.msgs.ListStreamingDistributionsType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListStreamingDistributionsResponse" class="com.eucalyptus.cloudfront.common.msgs.ListStreamingDistributionsResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistributionList" set-method="setStreamingDistributionList" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionList"/>
+  </mapping>
+  <mapping name="ListTagsForResource" class="com.eucalyptus.cloudfront.common.msgs.ListTagsForResourceType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="ListTagsForResourceResponse" class="com.eucalyptus.cloudfront.common.msgs.ListTagsForResourceResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getTags" set-method="setTags" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Tags"/>
+  </mapping>
+  <mapping name="TagResource" class="com.eucalyptus.cloudfront.common.msgs.TagResourceType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getTags" set-method="setTags" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Tags"/>
+  </mapping>
+  <mapping name="TagResourceResponse" class="com.eucalyptus.cloudfront.common.msgs.TagResourceResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="UntagResource" class="com.eucalyptus.cloudfront.common.msgs.UntagResourceType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getTagKeys" set-method="setTagKeys" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TagKeys"/>
+  </mapping>
+  <mapping name="UntagResourceResponse" class="com.eucalyptus.cloudfront.common.msgs.UntagResourceResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+  </mapping>
+  <mapping name="UpdateCloudFrontOriginAccessIdentity" class="com.eucalyptus.cloudfront.common.msgs.UpdateCloudFrontOriginAccessIdentityType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentityConfig" set-method="setCloudFrontOriginAccessIdentityConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityConfig"/>
+  </mapping>
+  <mapping name="UpdateCloudFrontOriginAccessIdentityResponse" class="com.eucalyptus.cloudfront.common.msgs.UpdateCloudFrontOriginAccessIdentityResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getCloudFrontOriginAccessIdentity" set-method="setCloudFrontOriginAccessIdentity" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentity"/>
+  </mapping>
+  <mapping name="UpdateDistribution" class="com.eucalyptus.cloudfront.common.msgs.UpdateDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistributionConfig" set-method="setDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionConfig"/>
+  </mapping>
+  <mapping name="UpdateDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.UpdateDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getDistribution" set-method="setDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Distribution"/>
+  </mapping>
+  <mapping name="UpdateFieldLevelEncryptionConfig" class="com.eucalyptus.cloudfront.common.msgs.UpdateFieldLevelEncryptionConfigType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionConfig" set-method="setFieldLevelEncryptionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionConfig"/>
+  </mapping>
+  <mapping name="UpdateFieldLevelEncryptionConfigResponse" class="com.eucalyptus.cloudfront.common.msgs.UpdateFieldLevelEncryptionConfigResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryption" set-method="setFieldLevelEncryption" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryption"/>
+  </mapping>
+  <mapping name="UpdateFieldLevelEncryptionProfile" class="com.eucalyptus.cloudfront.common.msgs.UpdateFieldLevelEncryptionProfileType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfileConfig" set-method="setFieldLevelEncryptionProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileConfig"/>
+  </mapping>
+  <mapping name="UpdateFieldLevelEncryptionProfileResponse" class="com.eucalyptus.cloudfront.common.msgs.UpdateFieldLevelEncryptionProfileResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getFieldLevelEncryptionProfile" set-method="setFieldLevelEncryptionProfile" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfile"/>
+  </mapping>
+  <mapping name="UpdatePublicKey" class="com.eucalyptus.cloudfront.common.msgs.UpdatePublicKeyType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKeyConfig" set-method="setPublicKeyConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKeyConfig"/>
+  </mapping>
+  <mapping name="UpdatePublicKeyResponse" class="com.eucalyptus.cloudfront.common.msgs.UpdatePublicKeyResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getPublicKey" set-method="setPublicKey" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKey"/>
+  </mapping>
+  <mapping name="UpdateStreamingDistribution" class="com.eucalyptus.cloudfront.common.msgs.UpdateStreamingDistributionType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistributionConfig" set-method="setStreamingDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfig"/>
+  </mapping>
+  <mapping name="UpdateStreamingDistributionResponse" class="com.eucalyptus.cloudfront.common.msgs.UpdateStreamingDistributionResponseType" ordered="false">
+    <structure map-as="com.eucalyptus.cloudfront.common.msgs.CloudfrontMessage"/>
+    <structure get-method="getStreamingDistribution" set-method="setStreamingDistribution" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistribution"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ActiveTrustedSigners" abstract="true" ordered="false">
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.SignerList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.AliasList" abstract="true">
+    <collection field="member">
+      <value name="CNAME" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Aliases" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.AliasList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.AllowedMethods" abstract="true" ordered="false">
+    <structure get-method="getCachedMethods" set-method="setCachedMethods" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CachedMethods" name="CachedMethods"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.MethodsList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.AwsAccountNumberList" abstract="true">
+    <collection field="member">
+      <value name="AwsAccountNumber" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CacheBehavior" abstract="true" ordered="false">
+    <structure get-method="getAllowedMethods" set-method="setAllowedMethods" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.AllowedMethods" name="AllowedMethods"/>
+    <value name="Compress" get-method="getCompress" set-method="setCompress" usage="optional"/>
+    <value name="DefaultTTL" get-method="getDefaultTTL" set-method="setDefaultTTL" usage="optional"/>
+    <value name="FieldLevelEncryptionId" get-method="getFieldLevelEncryptionId" set-method="setFieldLevelEncryptionId" usage="optional"/>
+    <structure get-method="getForwardedValues" set-method="setForwardedValues" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ForwardedValues" name="ForwardedValues"/>
+    <structure get-method="getLambdaFunctionAssociations" set-method="setLambdaFunctionAssociations" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociations" name="LambdaFunctionAssociations"/>
+    <value name="MaxTTL" get-method="getMaxTTL" set-method="setMaxTTL" usage="optional"/>
+    <value name="MinTTL" get-method="getMinTTL" set-method="setMinTTL" usage="optional"/>
+    <value name="PathPattern" get-method="getPathPattern" set-method="setPathPattern" usage="optional"/>
+    <value name="SmoothStreaming" get-method="getSmoothStreaming" set-method="setSmoothStreaming" usage="optional"/>
+    <value name="TargetOriginId" get-method="getTargetOriginId" set-method="setTargetOriginId" usage="optional"/>
+    <structure get-method="getTrustedSigners" set-method="setTrustedSigners" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TrustedSigners" name="TrustedSigners"/>
+    <value name="ViewerProtocolPolicy" get-method="getViewerProtocolPolicy" set-method="setViewerProtocolPolicy" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CacheBehaviorList" abstract="true">
+    <collection field="member">
+      <structure name="CacheBehavior" type="com.eucalyptus.cloudfront.common.msgs.CacheBehavior"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CacheBehaviors" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CacheBehaviorList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CachedMethods" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.MethodsList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentity" abstract="false" ordered="false" name="CloudFrontOriginAccessIdentity">
+    <structure get-method="getCloudFrontOriginAccessIdentityConfig" set-method="setCloudFrontOriginAccessIdentityConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityConfig"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="S3CanonicalUserId" get-method="getS3CanonicalUserId" set-method="setS3CanonicalUserId" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityConfig" abstract="false" ordered="false" name="CloudFrontOriginAccessIdentityConfig">
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentityList" abstract="false" ordered="false" name="CloudFrontOriginAccessIdentityList">
+    <value name="IsTruncated" get-method="getIsTruncated" set-method="setIsTruncated" usage="optional"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentitySummaryList" name="Items"/>
+    <value name="Marker" get-method="getMarker" set-method="setMarker" usage="optional"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentitySummary" abstract="true" ordered="false">
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="S3CanonicalUserId" get-method="getS3CanonicalUserId" set-method="setS3CanonicalUserId" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentitySummaryList" abstract="true">
+    <collection field="member">
+      <structure name="CloudFrontOriginAccessIdentitySummary" type="com.eucalyptus.cloudfront.common.msgs.CloudFrontOriginAccessIdentitySummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfile" abstract="true" ordered="false">
+    <value name="ContentType" get-method="getContentType" set-method="setContentType" usage="optional"/>
+    <value name="Format" get-method="getFormat" set-method="setFormat" usage="optional"/>
+    <value name="ProfileId" get-method="getProfileId" set-method="setProfileId" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfileConfig" abstract="true" ordered="false">
+    <structure get-method="getContentTypeProfiles" set-method="setContentTypeProfiles" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfiles" name="ContentTypeProfiles"/>
+    <value name="ForwardWhenContentTypeIsUnknown" get-method="getForwardWhenContentTypeIsUnknown" set-method="setForwardWhenContentTypeIsUnknown" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfileList" abstract="true">
+    <collection field="member">
+      <structure name="ContentTypeProfile" type="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfile"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfiles" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfileList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CookieNameList" abstract="true">
+    <collection field="member">
+      <value name="Name" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CookieNames" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CookieNameList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CookiePreference" abstract="true" ordered="false">
+    <value name="Forward" get-method="getForward" set-method="setForward" usage="optional"/>
+    <structure get-method="getWhitelistedNames" set-method="setWhitelistedNames" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CookieNames" name="WhitelistedNames"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponse" abstract="true" ordered="false">
+    <value name="ErrorCachingMinTTL" get-method="getErrorCachingMinTTL" set-method="setErrorCachingMinTTL" usage="optional"/>
+    <value name="ErrorCode" get-method="getErrorCode" set-method="setErrorCode" usage="optional"/>
+    <value name="ResponseCode" get-method="getResponseCode" set-method="setResponseCode" usage="optional"/>
+    <value name="ResponsePagePath" get-method="getResponsePagePath" set-method="setResponsePagePath" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponseList" abstract="true">
+    <collection field="member">
+      <structure name="CustomErrorResponse" type="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponse"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponses" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponseList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CustomHeaders" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.OriginCustomHeadersList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.CustomOriginConfig" abstract="true" ordered="false">
+    <value name="HTTPPort" get-method="getHTTPPort" set-method="setHTTPPort" usage="optional"/>
+    <value name="HTTPSPort" get-method="getHTTPSPort" set-method="setHTTPSPort" usage="optional"/>
+    <value name="OriginKeepaliveTimeout" get-method="getOriginKeepaliveTimeout" set-method="setOriginKeepaliveTimeout" usage="optional"/>
+    <value name="OriginProtocolPolicy" get-method="getOriginProtocolPolicy" set-method="setOriginProtocolPolicy" usage="optional"/>
+    <value name="OriginReadTimeout" get-method="getOriginReadTimeout" set-method="setOriginReadTimeout" usage="optional"/>
+    <structure get-method="getOriginSslProtocols" set-method="setOriginSslProtocols" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.OriginSslProtocols" name="OriginSslProtocols"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.DefaultCacheBehavior" abstract="true" ordered="false">
+    <structure get-method="getAllowedMethods" set-method="setAllowedMethods" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.AllowedMethods" name="AllowedMethods"/>
+    <value name="Compress" get-method="getCompress" set-method="setCompress" usage="optional"/>
+    <value name="DefaultTTL" get-method="getDefaultTTL" set-method="setDefaultTTL" usage="optional"/>
+    <value name="FieldLevelEncryptionId" get-method="getFieldLevelEncryptionId" set-method="setFieldLevelEncryptionId" usage="optional"/>
+    <structure get-method="getForwardedValues" set-method="setForwardedValues" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ForwardedValues" name="ForwardedValues"/>
+    <structure get-method="getLambdaFunctionAssociations" set-method="setLambdaFunctionAssociations" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociations" name="LambdaFunctionAssociations"/>
+    <value name="MaxTTL" get-method="getMaxTTL" set-method="setMaxTTL" usage="optional"/>
+    <value name="MinTTL" get-method="getMinTTL" set-method="setMinTTL" usage="optional"/>
+    <value name="SmoothStreaming" get-method="getSmoothStreaming" set-method="setSmoothStreaming" usage="optional"/>
+    <value name="TargetOriginId" get-method="getTargetOriginId" set-method="setTargetOriginId" usage="optional"/>
+    <structure get-method="getTrustedSigners" set-method="setTrustedSigners" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TrustedSigners" name="TrustedSigners"/>
+    <value name="ViewerProtocolPolicy" get-method="getViewerProtocolPolicy" set-method="setViewerProtocolPolicy" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Distribution" abstract="false" ordered="false" name="Distribution">
+    <value name="ARN" get-method="getARN" set-method="setARN" usage="optional"/>
+    <structure get-method="getActiveTrustedSigners" set-method="setActiveTrustedSigners" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ActiveTrustedSigners" name="ActiveTrustedSigners"/>
+    <structure get-method="getDistributionConfig" set-method="setDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionConfig"/>
+    <value name="DomainName" get-method="getDomainName" set-method="setDomainName" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="InProgressInvalidationBatches" get-method="getInProgressInvalidationBatches" set-method="setInProgressInvalidationBatches" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+    <value name="Status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.DistributionConfig" abstract="false" ordered="false" name="DistributionConfig">
+    <structure get-method="getAliases" set-method="setAliases" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Aliases" name="Aliases"/>
+    <structure get-method="getCacheBehaviors" set-method="setCacheBehaviors" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CacheBehaviors" name="CacheBehaviors"/>
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <structure get-method="getCustomErrorResponses" set-method="setCustomErrorResponses" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponses" name="CustomErrorResponses"/>
+    <structure get-method="getDefaultCacheBehavior" set-method="setDefaultCacheBehavior" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DefaultCacheBehavior" name="DefaultCacheBehavior"/>
+    <value name="DefaultRootObject" get-method="getDefaultRootObject" set-method="setDefaultRootObject" usage="optional"/>
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <value name="HttpVersion" get-method="getHttpVersion" set-method="setHttpVersion" usage="optional"/>
+    <value name="IsIPV6Enabled" get-method="getIsIPV6Enabled" set-method="setIsIPV6Enabled" usage="optional"/>
+    <structure get-method="getLogging" set-method="setLogging" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.LoggingConfig" name="Logging"/>
+    <structure get-method="getOrigins" set-method="setOrigins" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Origins" name="Origins"/>
+    <value name="PriceClass" get-method="getPriceClass" set-method="setPriceClass" usage="optional"/>
+    <structure get-method="getRestrictions" set-method="setRestrictions" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Restrictions" name="Restrictions"/>
+    <structure get-method="getViewerCertificate" set-method="setViewerCertificate" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ViewerCertificate" name="ViewerCertificate"/>
+    <value name="WebACLId" get-method="getWebACLId" set-method="setWebACLId" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.DistributionConfigWithTags" abstract="false" ordered="false" name="DistributionConfigWithTags">
+    <structure get-method="getDistributionConfig" set-method="setDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionConfig"/>
+    <structure get-method="getTags" set-method="setTags" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Tags"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.DistributionList" abstract="false" ordered="false" name="DistributionList">
+    <value name="IsTruncated" get-method="getIsTruncated" set-method="setIsTruncated" usage="optional"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DistributionSummaryList" name="Items"/>
+    <value name="Marker" get-method="getMarker" set-method="setMarker" usage="optional"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.DistributionSummary" abstract="true" ordered="false">
+    <value name="ARN" get-method="getARN" set-method="setARN" usage="optional"/>
+    <structure get-method="getAliases" set-method="setAliases" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Aliases" name="Aliases"/>
+    <structure get-method="getCacheBehaviors" set-method="setCacheBehaviors" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CacheBehaviors" name="CacheBehaviors"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <structure get-method="getCustomErrorResponses" set-method="setCustomErrorResponses" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CustomErrorResponses" name="CustomErrorResponses"/>
+    <structure get-method="getDefaultCacheBehavior" set-method="setDefaultCacheBehavior" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.DefaultCacheBehavior" name="DefaultCacheBehavior"/>
+    <value name="DomainName" get-method="getDomainName" set-method="setDomainName" usage="optional"/>
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <value name="HttpVersion" get-method="getHttpVersion" set-method="setHttpVersion" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="IsIPV6Enabled" get-method="getIsIPV6Enabled" set-method="setIsIPV6Enabled" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+    <structure get-method="getOrigins" set-method="setOrigins" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Origins" name="Origins"/>
+    <value name="PriceClass" get-method="getPriceClass" set-method="setPriceClass" usage="optional"/>
+    <structure get-method="getRestrictions" set-method="setRestrictions" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Restrictions" name="Restrictions"/>
+    <value name="Status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+    <structure get-method="getViewerCertificate" set-method="setViewerCertificate" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ViewerCertificate" name="ViewerCertificate"/>
+    <value name="WebACLId" get-method="getWebACLId" set-method="setWebACLId" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.DistributionSummaryList" abstract="true">
+    <collection field="member">
+      <structure name="DistributionSummary" type="com.eucalyptus.cloudfront.common.msgs.DistributionSummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.EncryptionEntities" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.EncryptionEntityList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.EncryptionEntity" abstract="true" ordered="false">
+    <structure get-method="getFieldPatterns" set-method="setFieldPatterns" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldPatterns" name="FieldPatterns"/>
+    <value name="ProviderId" get-method="getProviderId" set-method="setProviderId" usage="optional"/>
+    <value name="PublicKeyId" get-method="getPublicKeyId" set-method="setPublicKeyId" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.EncryptionEntityList" abstract="true">
+    <collection field="member">
+      <structure name="EncryptionEntity" type="com.eucalyptus.cloudfront.common.msgs.EncryptionEntity"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryption" abstract="false" ordered="false" name="FieldLevelEncryption">
+    <structure get-method="getFieldLevelEncryptionConfig" set-method="setFieldLevelEncryptionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionConfig"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionConfig" abstract="false" ordered="false" name="FieldLevelEncryptionConfig">
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <structure get-method="getContentTypeProfileConfig" set-method="setContentTypeProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfileConfig" name="ContentTypeProfileConfig"/>
+    <structure get-method="getQueryArgProfileConfig" set-method="setQueryArgProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.QueryArgProfileConfig" name="QueryArgProfileConfig"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionList" abstract="false" ordered="false" name="FieldLevelEncryptionList">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionSummaryList" name="Items"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfile" abstract="false" ordered="false" name="FieldLevelEncryptionProfile">
+    <structure get-method="getFieldLevelEncryptionProfileConfig" set-method="setFieldLevelEncryptionProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileConfig"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileConfig" abstract="false" ordered="false" name="FieldLevelEncryptionProfileConfig">
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <structure get-method="getEncryptionEntities" set-method="setEncryptionEntities" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.EncryptionEntities" name="EncryptionEntities"/>
+    <value name="Name" get-method="getName" set-method="setName" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileList" abstract="false" ordered="false" name="FieldLevelEncryptionProfileList">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileSummaryList" name="Items"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileSummary" abstract="true" ordered="false">
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <structure get-method="getEncryptionEntities" set-method="setEncryptionEntities" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.EncryptionEntities" name="EncryptionEntities"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+    <value name="Name" get-method="getName" set-method="setName" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileSummaryList" abstract="true">
+    <collection field="member">
+      <structure name="FieldLevelEncryptionProfileSummary" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionProfileSummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionSummary" abstract="true" ordered="false">
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <structure get-method="getContentTypeProfileConfig" set-method="setContentTypeProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ContentTypeProfileConfig" name="ContentTypeProfileConfig"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+    <structure get-method="getQueryArgProfileConfig" set-method="setQueryArgProfileConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.QueryArgProfileConfig" name="QueryArgProfileConfig"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionSummaryList" abstract="true">
+    <collection field="member">
+      <structure name="FieldLevelEncryptionSummary" type="com.eucalyptus.cloudfront.common.msgs.FieldLevelEncryptionSummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldPatternList" abstract="true">
+    <collection field="member">
+      <value name="FieldPattern" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.FieldPatterns" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.FieldPatternList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ForwardedValues" abstract="true" ordered="false">
+    <structure get-method="getCookies" set-method="setCookies" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CookiePreference" name="Cookies"/>
+    <structure get-method="getHeaders" set-method="setHeaders" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Headers" name="Headers"/>
+    <value name="QueryString" get-method="getQueryString" set-method="setQueryString" usage="optional"/>
+    <structure get-method="getQueryStringCacheKeys" set-method="setQueryStringCacheKeys" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.QueryStringCacheKeys" name="QueryStringCacheKeys"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.GeoRestriction" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.LocationList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+    <value name="RestrictionType" get-method="getRestrictionType" set-method="setRestrictionType" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.HeaderList" abstract="true">
+    <collection field="member">
+      <value name="Name" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Headers" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.HeaderList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Invalidation" abstract="false" ordered="false" name="Invalidation">
+    <value name="CreateTime" get-method="getCreateTime" set-method="setCreateTime" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <structure get-method="getInvalidationBatch" set-method="setInvalidationBatch" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.InvalidationBatch"/>
+    <value name="Status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.InvalidationBatch" abstract="false" ordered="false" name="InvalidationBatch">
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <structure get-method="getPaths" set-method="setPaths" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Paths" name="Paths"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.InvalidationList" abstract="false" ordered="false" name="InvalidationList">
+    <value name="IsTruncated" get-method="getIsTruncated" set-method="setIsTruncated" usage="optional"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.InvalidationSummaryList" name="Items"/>
+    <value name="Marker" get-method="getMarker" set-method="setMarker" usage="optional"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.InvalidationSummary" abstract="true" ordered="false">
+    <value name="CreateTime" get-method="getCreateTime" set-method="setCreateTime" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="Status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.InvalidationSummaryList" abstract="true">
+    <collection field="member">
+      <structure name="InvalidationSummary" type="com.eucalyptus.cloudfront.common.msgs.InvalidationSummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.KeyPairIdList" abstract="true">
+    <collection field="member">
+      <value name="KeyPairId" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.KeyPairIds" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.KeyPairIdList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociation" abstract="true" ordered="false">
+    <value name="EventType" get-method="getEventType" set-method="setEventType" usage="optional"/>
+    <value name="IncludeBody" get-method="getIncludeBody" set-method="setIncludeBody" usage="optional"/>
+    <value name="LambdaFunctionARN" get-method="getLambdaFunctionARN" set-method="setLambdaFunctionARN" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociationList" abstract="true">
+    <collection field="member">
+      <structure name="LambdaFunctionAssociation" type="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociation"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociations" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.LambdaFunctionAssociationList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.LocationList" abstract="true">
+    <collection field="member">
+      <value name="Location" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.LoggingConfig" abstract="true" ordered="false">
+    <value name="Bucket" get-method="getBucket" set-method="setBucket" usage="optional"/>
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <value name="IncludeCookies" get-method="getIncludeCookies" set-method="setIncludeCookies" usage="optional"/>
+    <value name="Prefix" get-method="getPrefix" set-method="setPrefix" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.MethodsList" abstract="true">
+    <collection field="member">
+      <value name="Method" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Origin" abstract="true" ordered="false">
+    <structure get-method="getCustomHeaders" set-method="setCustomHeaders" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CustomHeaders" name="CustomHeaders"/>
+    <structure get-method="getCustomOriginConfig" set-method="setCustomOriginConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.CustomOriginConfig" name="CustomOriginConfig"/>
+    <value name="DomainName" get-method="getDomainName" set-method="setDomainName" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="OriginPath" get-method="getOriginPath" set-method="setOriginPath" usage="optional"/>
+    <structure get-method="getS3OriginConfig" set-method="setS3OriginConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.S3OriginConfig" name="S3OriginConfig"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.OriginCustomHeader" abstract="true" ordered="false">
+    <value name="HeaderName" get-method="getHeaderName" set-method="setHeaderName" usage="optional"/>
+    <value name="HeaderValue" get-method="getHeaderValue" set-method="setHeaderValue" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.OriginCustomHeadersList" abstract="true">
+    <collection field="member">
+      <structure name="OriginCustomHeader" type="com.eucalyptus.cloudfront.common.msgs.OriginCustomHeader"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.OriginList" abstract="true">
+    <collection field="member">
+      <structure name="Origin" type="com.eucalyptus.cloudfront.common.msgs.Origin"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.OriginSslProtocols" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.SslProtocolsList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Origins" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.OriginList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.PathList" abstract="true">
+    <collection field="member">
+      <value name="Path" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Paths" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PathList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.PublicKey" abstract="false" ordered="false" name="PublicKey">
+    <value name="CreatedTime" get-method="getCreatedTime" set-method="setCreatedTime" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <structure get-method="getPublicKeyConfig" set-method="setPublicKeyConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKeyConfig"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.PublicKeyConfig" abstract="false" ordered="false" name="PublicKeyConfig">
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <value name="EncodedKey" get-method="getEncodedKey" set-method="setEncodedKey" usage="optional"/>
+    <value name="Name" get-method="getName" set-method="setName" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.PublicKeyList" abstract="false" ordered="false" name="PublicKeyList">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.PublicKeySummaryList" name="Items"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.PublicKeySummary" abstract="true" ordered="false">
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <value name="CreatedTime" get-method="getCreatedTime" set-method="setCreatedTime" usage="optional"/>
+    <value name="EncodedKey" get-method="getEncodedKey" set-method="setEncodedKey" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="Name" get-method="getName" set-method="setName" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.PublicKeySummaryList" abstract="true">
+    <collection field="member">
+      <structure name="PublicKeySummary" type="com.eucalyptus.cloudfront.common.msgs.PublicKeySummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.QueryArgProfile" abstract="true" ordered="false">
+    <value name="ProfileId" get-method="getProfileId" set-method="setProfileId" usage="optional"/>
+    <value name="QueryArg" get-method="getQueryArg" set-method="setQueryArg" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.QueryArgProfileConfig" abstract="true" ordered="false">
+    <value name="ForwardWhenQueryArgProfileIsUnknown" get-method="getForwardWhenQueryArgProfileIsUnknown" set-method="setForwardWhenQueryArgProfileIsUnknown" usage="optional"/>
+    <structure get-method="getQueryArgProfiles" set-method="setQueryArgProfiles" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.QueryArgProfiles" name="QueryArgProfiles"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.QueryArgProfileList" abstract="true">
+    <collection field="member">
+      <structure name="QueryArgProfile" type="com.eucalyptus.cloudfront.common.msgs.QueryArgProfile"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.QueryArgProfiles" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.QueryArgProfileList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.QueryStringCacheKeys" abstract="true" ordered="false">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.QueryStringCacheKeysList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.QueryStringCacheKeysList" abstract="true">
+    <collection field="member">
+      <value name="Name" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Restrictions" abstract="true" ordered="false">
+    <structure get-method="getGeoRestriction" set-method="setGeoRestriction" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.GeoRestriction" name="GeoRestriction"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.S3Origin" abstract="true" ordered="false">
+    <value name="DomainName" get-method="getDomainName" set-method="setDomainName" usage="optional"/>
+    <value name="OriginAccessIdentity" get-method="getOriginAccessIdentity" set-method="setOriginAccessIdentity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.S3OriginConfig" abstract="true" ordered="false">
+    <value name="OriginAccessIdentity" get-method="getOriginAccessIdentity" set-method="setOriginAccessIdentity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Signer" abstract="true" ordered="false">
+    <value name="AwsAccountNumber" get-method="getAwsAccountNumber" set-method="setAwsAccountNumber" usage="optional"/>
+    <structure get-method="getKeyPairIds" set-method="setKeyPairIds" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.KeyPairIds" name="KeyPairIds"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.SignerList" abstract="true">
+    <collection field="member">
+      <structure name="Signer" type="com.eucalyptus.cloudfront.common.msgs.Signer"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.SslProtocolsList" abstract="true">
+    <collection field="member">
+      <value name="SslProtocol" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingDistribution" abstract="false" ordered="false" name="StreamingDistribution">
+    <value name="ARN" get-method="getARN" set-method="setARN" usage="optional"/>
+    <structure get-method="getActiveTrustedSigners" set-method="setActiveTrustedSigners" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.ActiveTrustedSigners" name="ActiveTrustedSigners"/>
+    <value name="DomainName" get-method="getDomainName" set-method="setDomainName" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+    <value name="Status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+    <structure get-method="getStreamingDistributionConfig" set-method="setStreamingDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfig"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfig" abstract="false" ordered="false" name="StreamingDistributionConfig">
+    <structure get-method="getAliases" set-method="setAliases" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Aliases" name="Aliases"/>
+    <value name="CallerReference" get-method="getCallerReference" set-method="setCallerReference" usage="optional"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <structure get-method="getLogging" set-method="setLogging" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingLoggingConfig" name="Logging"/>
+    <value name="PriceClass" get-method="getPriceClass" set-method="setPriceClass" usage="optional"/>
+    <structure get-method="getS3Origin" set-method="setS3Origin" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.S3Origin" name="S3Origin"/>
+    <structure get-method="getTrustedSigners" set-method="setTrustedSigners" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TrustedSigners" name="TrustedSigners"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfigWithTags" abstract="false" ordered="false" name="StreamingDistributionConfigWithTags">
+    <structure get-method="getStreamingDistributionConfig" set-method="setStreamingDistributionConfig" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionConfig"/>
+    <structure get-method="getTags" set-method="setTags" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Tags"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionList" abstract="false" ordered="false" name="StreamingDistributionList">
+    <value name="IsTruncated" get-method="getIsTruncated" set-method="setIsTruncated" usage="optional"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionSummaryList" name="Items"/>
+    <value name="Marker" get-method="getMarker" set-method="setMarker" usage="optional"/>
+    <value name="MaxItems" get-method="getMaxItems" set-method="setMaxItems" usage="optional"/>
+    <value name="NextMarker" get-method="getNextMarker" set-method="setNextMarker" usage="optional"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionSummary" abstract="true" ordered="false">
+    <value name="ARN" get-method="getARN" set-method="setARN" usage="optional"/>
+    <structure get-method="getAliases" set-method="setAliases" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.Aliases" name="Aliases"/>
+    <value name="Comment" get-method="getComment" set-method="setComment" usage="optional"/>
+    <value name="DomainName" get-method="getDomainName" set-method="setDomainName" usage="optional"/>
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <value name="Id" get-method="getId" set-method="setId" usage="optional"/>
+    <value name="LastModifiedTime" get-method="getLastModifiedTime" set-method="setLastModifiedTime" usage="optional"/>
+    <value name="PriceClass" get-method="getPriceClass" set-method="setPriceClass" usage="optional"/>
+    <structure get-method="getS3Origin" set-method="setS3Origin" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.S3Origin" name="S3Origin"/>
+    <value name="Status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+    <structure get-method="getTrustedSigners" set-method="setTrustedSigners" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TrustedSigners" name="TrustedSigners"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionSummaryList" abstract="true">
+    <collection field="member">
+      <structure name="StreamingDistributionSummary" type="com.eucalyptus.cloudfront.common.msgs.StreamingDistributionSummary"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.StreamingLoggingConfig" abstract="true" ordered="false">
+    <value name="Bucket" get-method="getBucket" set-method="setBucket" usage="optional"/>
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <value name="Prefix" get-method="getPrefix" set-method="setPrefix" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Tag" abstract="true" ordered="false">
+    <value name="Key" get-method="getKey" set-method="setKey" usage="optional"/>
+    <value name="Value" get-method="getValue" set-method="setValue" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.TagKeyList" abstract="true">
+    <collection field="member">
+      <value name="Key" type="java.lang.String"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.TagKeys" abstract="false" ordered="false" name="TagKeys">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TagKeyList" name="Items"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.TagList" abstract="true">
+    <collection field="member">
+      <structure name="Tag" type="com.eucalyptus.cloudfront.common.msgs.Tag"/>
+    </collection>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.Tags" abstract="false" ordered="false" name="Tags">
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.TagList" name="Items"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.TrustedSigners" abstract="true" ordered="false">
+    <value name="Enabled" get-method="getEnabled" set-method="setEnabled" usage="optional"/>
+    <structure get-method="getItems" set-method="setItems" usage="optional" type="com.eucalyptus.cloudfront.common.msgs.AwsAccountNumberList" name="Items"/>
+    <value name="Quantity" get-method="getQuantity" set-method="setQuantity" usage="optional"/>
+  </mapping>
+  <mapping class="com.eucalyptus.cloudfront.common.msgs.ViewerCertificate" abstract="true" ordered="false">
+    <value name="ACMCertificateArn" get-method="getACMCertificateArn" set-method="setACMCertificateArn" usage="optional"/>
+    <value name="Certificate" get-method="getCertificate" set-method="setCertificate" usage="optional"/>
+    <value name="CertificateSource" get-method="getCertificateSource" set-method="setCertificateSource" usage="optional"/>
+    <value name="CloudFrontDefaultCertificate" get-method="getCloudFrontDefaultCertificate" set-method="setCloudFrontDefaultCertificate" usage="optional"/>
+    <value name="IAMCertificateId" get-method="getIAMCertificateId" set-method="setIAMCertificateId" usage="optional"/>
+    <value name="MinimumProtocolVersion" get-method="getMinimumProtocolVersion" set-method="setMinimumProtocolVersion" usage="optional"/>
+    <value name="SSLSupportMethod" get-method="getSSLSupportMethod" set-method="setSSLSupportMethod" usage="optional"/>
+  </mapping>
+</binding>
