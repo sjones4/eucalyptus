@@ -1,0 +1,46 @@
+/*
+ * Copyright 2018 AppScale Systems, Inc
+ *
+ * Use of this source code is governed by a BSD-2-Clause
+ * license that can be found in the LICENSE file or at
+ * https://opensource.org/licenses/BSD-2-Clause
+ */
+package com.eucalyptus.rds.common.msgs;
+
+import edu.ucsb.eucalyptus.msgs.EucalyptusData;
+import com.eucalyptus.rds.common.RdsMessageValidation.FieldRange;
+import com.eucalyptus.rds.common.RdsMessageValidation.FieldRegex;
+import com.eucalyptus.rds.common.RdsMessageValidation.FieldRegexValue;
+
+
+public class DownloadDBLogFilePortionResult extends EucalyptusData {
+
+  private Boolean additionalDataPending;
+  private String logFileData;
+  private String marker;
+
+  public Boolean getAdditionalDataPending( ) {
+    return additionalDataPending;
+  }
+
+  public void setAdditionalDataPending( final Boolean additionalDataPending ) {
+    this.additionalDataPending = additionalDataPending;
+  }
+
+  public String getLogFileData( ) {
+    return logFileData;
+  }
+
+  public void setLogFileData( final String logFileData ) {
+    this.logFileData = logFileData;
+  }
+
+  public String getMarker( ) {
+    return marker;
+  }
+
+  public void setMarker( final String marker ) {
+    this.marker = marker;
+  }
+
+}
