@@ -1372,6 +1372,13 @@ public class ComputeService {
     return request.getReply( );
   }
 
+  public DescribeInstanceCreditSpecificationsResponseType describeInstanceCreditSpecifications(
+      DescribeInstanceCreditSpecificationsType request
+  ) {
+    final DescribeInstanceCreditSpecificationsResponseType response = request.getReply( );
+    return response;
+  }
+
   public ComputeMessage proxy( final ComputeMessage request ) throws EucalyptusCloudException {
     // Dispatch
     try {

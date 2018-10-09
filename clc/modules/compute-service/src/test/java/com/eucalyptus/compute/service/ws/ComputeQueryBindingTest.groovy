@@ -367,7 +367,13 @@ class ComputeQueryBindingTest extends QueryBindingTestSupport {
         assertValidBindingXml(resource)
     }
 
-    @Test
+  @Test
+  void testValidBinding2016_11_15() {
+    URL resource = ComputeQueryBindingTest.getResource('/ec2-2016-11-15-binding.xml')
+    assertValidBindingXml(resource)
+  }
+
+  @Test
     void testBindingsForAllActions(){
       // http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_Operations.html
       String actionsCopiedAndPastedFromAWSEC2Docs = '''

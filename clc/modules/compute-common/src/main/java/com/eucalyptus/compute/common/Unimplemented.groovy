@@ -432,3 +432,21 @@ class DescribeFlowLogsType extends FlowLogMessage {
 class DescribeFlowLogsResponseType extends FlowLogMessage {
 }
 
+class InstanceIdStringList extends EucalyptusData {
+
+  @HttpParameterMapping( parameter = "InstanceId" )
+  ArrayList<String> member = new ArrayList<String>()
+}
+
+class DescribeInstanceCreditSpecificationsType extends VmControlMessage {
+  @HttpParameterMapping( parameter = "Filter" )
+  @HttpEmbedded( multiple = true )
+  ArrayList<Filter> filterSet = new ArrayList<Filter>( )
+  @HttpEmbedded
+  InstanceIdStringList instanceIds
+  Integer maxResults
+  String nextToken
+}
+
+class DescribeInstanceCreditSpecificationsResponseType extends VmControlMessage {
+}
