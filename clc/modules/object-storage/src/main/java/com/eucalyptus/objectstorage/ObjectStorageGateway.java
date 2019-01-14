@@ -82,6 +82,7 @@ import com.eucalyptus.objectstorage.exceptions.MetadataOperationFailureException
 import com.eucalyptus.objectstorage.exceptions.NoSuchEntityException;
 import com.eucalyptus.objectstorage.exceptions.ObjectStorageException;
 import com.eucalyptus.objectstorage.exceptions.s3.AccessDeniedException;
+import com.eucalyptus.objectstorage.exceptions.s3.AccessDeniedOnCreateException;
 import com.eucalyptus.objectstorage.exceptions.s3.AccountProblemException;
 import com.eucalyptus.objectstorage.exceptions.s3.BucketAlreadyExistsException;
 import com.eucalyptus.objectstorage.exceptions.s3.BucketNotEmptyException;
@@ -465,7 +466,7 @@ public class ObjectStorageGateway implements ObjectStorageService {
       ObjectEntity objectEntity = ObjectEntity.newInitializedForCreate(bucket, request.getKey(), objectSize, requestUser, request.getCopiedHeaders());
 
       if (!OsgAuthorizationHandler.getInstance().operationAllowed(request, bucket, objectEntity, objectSize)) {
-        throw new AccessDeniedException(request.getBucket());
+        throw new AccessDeniedOnCreateException(request.getBucket());
       }
 
       // Auth checks passed, check if 100-continue needs to be sent
@@ -693,7 +694,7 @@ public class ObjectStorageGateway implements ObjectStorageService {
       } else {
         LOG.error("CorrelationId: " + request.getCorrelationId() + " Create bucket " + request.getBucket()
             + " access is denied based on ACL and/or IAM policy");
-        throw new AccessDeniedException(request.getBucket());
+        throw new AccessDeniedOnCreateException(request.getBucket());
       }
     } catch (AccessDeniedException e) {
       LOG.debug("CorrelationId: " + Contexts.lookup().getCorrelationId() + " Responding to client with AccessDeniedException");
@@ -976,6 +977,13 @@ public class ObjectStorageGateway implements ObjectStorageService {
 
     // Get the listing from the back-end and copy results in.
     // return ospClient.listBucket(request);
+    final boolean v2 = "2".equals(request.getListType());
+    final String afterKey = v2 ?
+        request.getContinuationToken() != null ?
+            B64.standard.decString(request.getContinuationToken()) :
+            request.getStartAfter() :
+        request.getMarker();
+    final boolean includeOwner = !v2 || "true".equals(request.getFetchOwner());
     ListBucketResponseType reply = request.getReply();
     int maxKeys = 1000;
     try {
@@ -989,40 +997,57 @@ public class ObjectStorageGateway implements ObjectStorageService {
     reply.setMaxKeys(maxKeys);
     reply.setName(request.getBucket());
     reply.setDelimiter(request.getDelimiter());
-    reply.setMarker(request.getMarker());
+    if (v2) {
+      reply.setContinuationToken(request.getContinuationToken());
+      reply.setStartAfter(request.getStartAfter());
+    } else {
+      reply.setMarker(request.getMarker());
+    }
     reply.setPrefix(request.getPrefix());
     reply.setIsTruncated(false);
 
     PaginatedResult<ObjectEntity> result;
     try {
-      result = ObjectMetadataManagers.getInstance().listPaginated(bucket, maxKeys, request.getPrefix(), request.getDelimiter(), request.getMarker());
+      result = ObjectMetadataManagers.getInstance().listPaginated(bucket, maxKeys, request.getPrefix(), request.getDelimiter(), afterKey);
     } catch (Exception e) {
       LOG.error("Error getting object listing for bucket: " + request.getBucket(), e);
       throw new InternalErrorException(request.getBucket());
     }
 
     if (result != null) {
-      reply.setContents(new ArrayList<ListEntry>());
+      int keyCount = 0;
+      reply.setContents( new ArrayList<>( ));
 
       for (ObjectEntity obj : result.getEntityList()) {
-        reply.getContents().add(obj.toListEntry());
+        reply.getContents().add(obj.toListEntry(includeOwner));
+        keyCount++;
       }
 
       if (result.getCommonPrefixes() != null && result.getCommonPrefixes().size() > 0) {
-        reply.setCommonPrefixesList(new ArrayList<CommonPrefixesEntry>());
+        reply.setCommonPrefixesList( new ArrayList<>( ));
 
         for (String s : result.getCommonPrefixes()) {
           reply.getCommonPrefixesList().add(new CommonPrefixesEntry(s));
+          keyCount++;
         }
       }
       reply.setIsTruncated(result.isTruncated);
       if (result.isTruncated) {
+        String next;
         if (result.getLastEntry() instanceof ObjectEntity) {
-          reply.setNextMarker(((ObjectEntity) result.getLastEntry()).getObjectKey());
+          next = ((ObjectEntity) result.getLastEntry()).getObjectKey();
         } else {
           // If max-keys = 0, then last entry may be empty
-          reply.setNextMarker((result.getLastEntry() != null ? result.getLastEntry().toString() : ""));
+          next = (result.getLastEntry() != null ? result.getLastEntry().toString() : "");
         }
+        if (v2) {
+          reply.setNextContinuationToken(B64.standard.encString(next));
+        } else {
+          reply.setNextMarker(next);
+        }
+      }
+      if (v2) {
+        reply.setKeyCount(keyCount);
       }
     } else {
       // Do nothing
@@ -1677,7 +1702,7 @@ public class ObjectStorageGateway implements ObjectStorageService {
         return reply;
 
       } else {
-        throw new AccessDeniedException(destinationBucket + "/" + destinationKey);
+        throw new AccessDeniedOnCreateException(destinationBucket + "/" + destinationKey);
       }
     } else {
       throw new AccessDeniedException(sourceBucket + "/" + sourceKey);
@@ -2610,7 +2635,7 @@ public class ObjectStorageGateway implements ObjectStorageService {
         throw new InternalErrorException(partEntity.getResourceFullName(), e);
       }
     } else {
-      throw new AccessDeniedException(request.getBucket());
+      throw new AccessDeniedOnCreateException(request.getBucket());
     }
   }
 

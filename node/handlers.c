@@ -184,7 +184,7 @@ bunchOfInstances *global_instances = NULL;  //!< pointer to the instance list
 bunchOfInstances *global_instances_copy = NULL; //!< pointer to the copied instance list
 
 const int default_staging_cleanup_threshold = 60 * 60 * 2;  //!< after this many seconds any STAGING domains will be cleaned up
-const int default_booting_cleanup_threshold = 60;   //!< after this many seconds any BOOTING domains will be cleaned up
+const int default_booting_cleanup_threshold = 60 + MONITORING_PERIOD;   //!< after this many seconds any BOOTING domains will be cleaned up
 const int default_booting_envwait_threshold = NETWORK_GATE_TIMEOUT_SEC;   //!< after this many seconds an instance will fail to boot unless network environment is ready
 const int default_bundling_cleanup_threshold = 60 * 60 * 2; //!< after this many seconds any BUNDLING domains will be cleaned up
 const int default_createImage_cleanup_threshold = 60 * 60 * 2;  //!< after this many seconds any CREATEIMAGE domains will be cleaned up
@@ -1074,8 +1074,8 @@ void change_state(ncInstance * instance, instance_states state)
 
     euca_strncpy(instance->stateName, instance_state_names[instance->stateCode], CHAR_BUFFER_SIZE);
     if (old_state != state) {
-        LOGDEBUG("[%s] state change for instance: %s -> %s (%s)\n",
-                 instance->instanceId, instance_state_names[old_state], instance_state_names[instance->state], instance_state_names[instance->stateCode]);
+        LOGINFO("[%s] state change for instance: %s -> %s (%s)\n",
+                instance->instanceId, instance_state_names[old_state], instance_state_names[instance->state], instance_state_names[instance->stateCode]);
     }
 }
 
@@ -1296,8 +1296,25 @@ static void refresh_instance_info(struct nc_state_t *nc, ncInstance * instance)
                 }
             }
 
+            // on reboot ensure the domain restarts without being detected as shutdown
+            if ((old_state == BOOTING) && (
+                ((new_state == RUNNING || new_state == SHUTOFF || new_state == SHUTDOWN)
+                 && (instance->rebootTime > (time(NULL) - nc_state.reboot_grace_period_sec)))
+               )) {
+                if (new_state != RUNNING) { // running is reported while the instance is shutting down
+                    LOGINFO("[%s] ignoring hypervisor reported state %s for rebooting domain during grace period (%d)\n",
+                            instance->instanceId, instance_state_names[new_state], nc_state.reboot_grace_period_sec);
+                }
+                break;
+            }
             if (new_state == SHUTOFF || new_state == SHUTDOWN || new_state == CRASHED) {
-                LOGWARN("[%s] hypervisor reported previously running domain as %s\n", instance->instanceId, instance_state_names[new_state]);
+                if (instance->terminationRequestedTime > (time(NULL) - nc_state.shutdown_grace_period_sec)) {
+                    LOGINFO("[%s] ignoring hypervisor reported state %s for terminating domain during grace period (%d)\n",
+                            instance->instanceId, instance_state_names[new_state], nc_state.shutdown_grace_period_sec);
+                    break;
+                }
+                LOGWARN("[%s] hypervisor reported %s domain as %s\n", instance->instanceId,
+                        instance_state_names[old_state], instance_state_names[new_state]);
             }
             // change to state, whatever it happens to be
             change_state(instance, new_state);
@@ -2373,6 +2390,7 @@ static int init(void)
     GET_VAR_INT(nc_state.sc_request_timeout_sec, CONFIG_SC_REQUEST_TIMEOUT, 45);
     GET_VAR_INT(nc_state.concurrent_cleanup_ops, CONFIG_CONCURRENT_CLEANUP_OPS, 30);
     GET_VAR_INT(nc_state.disable_snapshots, CONFIG_DISABLE_SNAPSHOTS, 0);
+    GET_VAR_INT(nc_state.reboot_grace_period_sec, CONFIG_NC_REBOOT_GRACE_PERIOD_SEC, 60 + MONITORING_PERIOD);
     GET_VAR_INT(nc_state.shutdown_grace_period_sec, CONFIG_SHUTDOWN_GRACE_PERIOD_SEC, 60);
 
     strcpy(nc_state.admin_user_id, EUCALYPTUS_ADMIN);
@@ -3124,6 +3142,8 @@ int doDescribeInstances(ncMetadata * pMeta, char **instIds, int instIdsLen, ncIn
             used_disk = used_mem = used_cores = 0;
             for (i = 0; i < (*outInstsLen); i++) {
                 ncInstance *instance = (*outInsts)[i];
+                if (instance->state == TEARDOWN)
+                    continue;
                 used_disk += instance->params.disk;
                 used_mem += instance->params.mem;
                 used_cores += instance->params.cores;
