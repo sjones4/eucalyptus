@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2019 AppScale Systems, Inc
+
+ SPDX-License-Identifier: BSD-2-Clause
+-->
+<project name="eucalyptus-node" basedir=".">
+    <import file="../module-inc.xml"/>
+</project>
+

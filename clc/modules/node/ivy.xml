@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2019 AppScale Systems, Inc
+
+ SPDX-License-Identifier: BSD-2-Clause
+-->
+<ivy-module version="2.0">
+    <info organisation="com.eucalyptus" module="eucalyptus-node"/>
+    <dependencies>
+        <dependency name="eucalyptus-core" rev="latest.integration"/>
+    </dependencies>
+</ivy-module>
+

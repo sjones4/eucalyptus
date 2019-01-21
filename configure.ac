@@ -3,9 +3,7 @@
 #
 
 # Usage:
-#   configure   [--with-axis2c=<dir>]
-#               [--with-axis2=<dir>]
-#               [--with-libvirt=<dir>]
+#   configure   [--with-libvirt=<dir>]
 #               [--extra-version=<version>]
 #               [--enable-debug]
 #               [--db-home=<dir>]
@@ -39,14 +37,9 @@ else
 fi
 
 # variables we'll need later on
-APACHE2_MODULE_DIR=""
-AXIS2C_HOME="${AXIS2C_HOME}"
-AXIS2_HOME="${AXIS2_HOME}"
-AXIS2C_SERVICES=""
 LIBVIRT_HOME="${LIBVIRT_HOME}"
 ANT=""
 JAVA=""
-WSDL2C=""
 java_min_version="1.8.0"
 ant_min_version="1.6.5"
 
@@ -64,24 +57,9 @@ AC_ARG_ENABLE(bundled-jars,
         AS_HELP_STRING([--disable-bundled-jars] [do not build against or install bundled jars]),
         [USE_BUNDLED_JARS=$enableval],
         [USE_BUNDLED_JARS=yes])
-AC_ARG_WITH(apache2-module-dir,
-        [  --with-apache2-module-dir=<dir>      where Apache modules are installed],
-        [APACHE2_MODULE_DIR="${withval}"])
-AC_ARG_WITH(axis2,
-        [  --with-axis2=<dir>                   where axis2 is installed],
-        [AXIS2_HOME="${withval}"])
-AC_ARG_WITH(axis2c,
-        [  --with-axis2c=<dir>                  where axis2c is installed],
-        [AXIS2C_HOME="${withval}"])
-AC_ARG_WITH(axis2c-services,
-        [  --with-axis2c-services=<dir>         where axis2c services are installed],
-        [AXIS2C_SERVICES="${withval}"])
 AC_ARG_WITH(libvirt,
         [  --with-libvirt=<dir>                 where libvirt is installed],
         [LIBVIRT_HOME="${withval}"])
-AC_ARG_WITH(wsdl2c-sh,
-        [  --with-wsdl2c-sh=<file>              where WSDL2C.sh is installed],
-        [WSDL2C="${withval}"])
 AC_ARG_WITH(db-home,
         [  --with-db-home=<dir>                 where postgresql is installed],
         [EUCA_DB_HOME="${withval}"])
@@ -107,17 +85,6 @@ AC_ARG_WITH(java-home,
         [  --with-java-home=<dir>               where the JRE is installed (same as JAVA_HOME)],
         [JAVA_HOME="${withval}"])
 
-# If we didn't specify the services directory, let's use the default
-if test -z "$AXIS2C_SERVICES" ; then
-        AXIS2C_SERVICES="${AXIS2C_HOME}/services"
-fi
-
-# If we didn't specify the location of Apache modules, assume mod_axis2
-# resides within AXIS2C_HOME
-if test -z "$APACHE2_MODULE_DIR"; then
-        APACHE2_MODULE_DIR="${AXIS2C_HOME}/lib"
-fi
-
 AM_PATH_PYTHON([2.5])
 AC_MSG_CHECKING([whether $PYTHON version is < 3.0])
 AM_PYTHON_CHECK_VERSION([$PYTHON], [3.0],
@@ -126,23 +93,6 @@ AM_PYTHON_CHECK_VERSION([$PYTHON], [3.0],
                         [AC_MSG_RESULT([yes])])
 
 # Fix the paths for includes and libraries
-if test -n "${AXIS2C_HOME}" ; then
-        if test -d "${AXIS2C_HOME}"/include ; then
-                for x in ${AXIS2C_HOME}/include/axis2-* ${AXIS2C_HOME}/include/rampart-*; do
-                        INCLUDES="${INCLUDES} -I$x"
-                done
-        else
-                for x in /usr/include/axis2-* /usr/include/rampart-*; do
-                        INCLUDES="${INCLUDES} -I$x"
-                done
-        fi
-        if test -d "${AXIS2C_HOME}"/lib ; then
-                LDFLAGS="-L${AXIS2C_HOME}/lib ${LDFLAGS}"
-        fi
-        if test -d "${AXIS2C_HOME}"/modules/rampart ; then
-                LDFLAGS="-L${AXIS2C_HOME}/modules/rampart ${LDFLAGS}"
-        fi
-fi
 if test -n "${LIBVIRT_HOME}" ; then
         if test -d "${LIBVIRT_HOME}"/include ; then
                 INCLUDES="${INCLUDES} -I${LIBVIRT_HOME}/include"
@@ -157,10 +107,6 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PATH_PROG(RM, rm)
 AC_LANG_C
-
-if test -z "$WSDL2C"; then
-        WSDL2C=`readlink -f devel/euca-WSDL2C.sh`
-fi
 
 # we need JAVA_HOME
 if test -z "$JAVA_HOME" ; then
@@ -198,17 +144,7 @@ fi
 
 
 # Checks for libraries.
-AC_CHECK_LIB([axis2_axiom],[axiom_node_get_parent],,AC_MSG_ERROR([Cannot find axis2 libs!]))
-AC_CHECK_LIB([axis2_engine],[axis2_msg_ctx_init],,AC_MSG_ERROR([Cannot find axis2 libs!]))
-AC_CHECK_LIB([axis2_http_common],[axis2_simple_http_svr_conn_get_peer_ip],,AC_MSG_ERROR([Cannot find axis2 libs!]))
-AC_CHECK_LIB([axis2_http_receiver],[axis2_http_server_create],,AC_MSG_ERROR([Cannot find axis2 libs!]))
-AC_CHECK_LIB([axis2_http_sender],[axis2_http_transport_sender_init],,AC_MSG_ERROR([Cannot find axis2 libs!]))
-AC_CHECK_LIB([guththila],[guththila_create_xml_stream_writer],,AC_MSG_ERROR([Cannot find libguththila!]))
-AC_CHECK_LIB([axis2_parser],[axiom_xml_reader_init],,AC_MSG_ERROR([Cannot find axis2 libs!]))
-AC_CHECK_LIB([axutil],[axutil_url_get_path],,AC_MSG_ERROR([Cannot find libaxutil]))
 AC_CHECK_LIB([m],[log10])
-AC_CHECK_LIB([mod_rampart],[rampart_mod_create],,AC_MSG_ERROR([Cannot find libmod_rampart]))
-AC_CHECK_LIB([neethi],[neethi_engine_get_policy],,AC_MSG_ERROR([Cannot find libneethi!]))
 AC_CHECK_LIB([pthread],[pthread_join],,AC_MSG_ERROR([Cannot find pthreads!]))
 AC_CHECK_LIB([rt],[timer_gettime])
 AC_CHECK_LIB([virt],[virStorageVolDownload],true,AC_MSG_ERROR([Cannot find libvirt!]))
@@ -265,10 +201,6 @@ AC_CONFIG_FILES([Makedefs
 AC_DEFINE_UNQUOTED([EUCA_VERSION], "$EUCA_VERSION", [Version of Eucalyptus])
 
 AC_SUBST(ANT)
-AC_SUBST(APACHE2_MODULE_DIR)
-AC_SUBST(AXIS2C_HOME)
-AC_SUBST(AXIS2C_SERVICES)
-AC_SUBST(AXIS2_HOME)
 AC_SUBST(CFLAGS)
 AC_SUBST(EUCA_DB_HOME)
 AC_SUBST(EUCA_DB_SUFFIX)
@@ -287,7 +219,6 @@ AC_SUBST(PYTHON)
 AC_SUBST(RM)
 AC_SUBST(TOP)
 AC_SUBST(USE_BUNDLED_JARS)
-AC_SUBST(WSDL2C)
 
 
 AC_OUTPUT
@@ -308,14 +239,9 @@ echo "  Build Tools:"
 echo "    ANT.................: ${ANT} (${ant_version})"
 echo "    JAVA................: ${JAVA} (${java_version})"
 echo "    PYTHON..............: ${PYTHON} (${PYTHON_VERSION})"
-echo "    WSDL2C..............: ${WSDL2C}"
 echo ""
 echo "  Locations:"
 echo "    PREFIX..............: ${prefix:-Not Set}"
-echo "    APACHE2_MODULE_DIR..: ${APACHE2_MODULE_DIR:-Not Set}"
-echo "    AXIS2C_HOME.........: ${AXIS2C_HOME:-Not Set}"
-echo "    AXIS2C_SERVICES.....: ${AXIS2C_SERVICES:-Not Set}"
-echo "    AXIS2_HOME..........: ${AXIS2_HOME:-Not Set}"
 echo "    EUCA_DB_HOME........: ${EUCA_DB_HOME:-Not Set}"
 echo "    EUCA_DB_SUFFIX......: ${EUCA_DB_SUFFIX:-Not Set}"
 echo "    EUCA_DB_OLD_HOME....: ${EUCA_DB_OLD_HOME:-Not Set}"
