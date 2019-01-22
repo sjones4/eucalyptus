@@ -8,6 +8,7 @@
     <info organisation="com.eucalyptus" module="eucalyptus-node"/>
     <dependencies>
         <dependency name="eucalyptus-core" rev="latest.integration"/>
+        <dependency name="eucalyptus-cluster-common" rev="latest.integration"/>
     </dependencies>
 </ivy-module>
 

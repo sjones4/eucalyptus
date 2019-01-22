@@ -1,0 +1,247 @@
+[
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.InstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcAssignAddressResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcAssignAddressType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcAttachNetworkInterfaceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcAttachNetworkInterfaceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcAttachVolumeResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcAttachVolumeType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcBroadcastNetworkInfoResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcBroadcastNetworkInfoType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcBundleInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcBundleInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcBundleRestartInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcBundleRestartInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcCancelBundleTaskResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcCancelBundleTaskType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcCreateImageResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcCreateImageType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDescribeInstancesResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDescribeInstancesType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDescribeResourceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDescribeResourceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDescribeSensorsResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDescribeSensorsType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDetachNetworkInterfaceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDetachNetworkInterfaceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDetachVolumeResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcDetachVolumeType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcGetConsoleOutputResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcGetConsoleOutputType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcMigrateInstancesResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcMigrateInstancesType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcModifyNodeResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcModifyNodeType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcPowerDownResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcPowerDownType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcRebootInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcRebootInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcRunInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcRunInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcStartInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcStartInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcStartNetworkResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcStartNetworkType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcStopInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcStopInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcTerminateInstanceResponseType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NcTerminateInstanceType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.NetConfigType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.eucalyptus.cluster.common.msgs.VirtualMachineType",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  }
+]

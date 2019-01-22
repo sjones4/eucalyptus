@@ -182,6 +182,7 @@ subprojects {
     mainClass 'com.eucalyptus.node.Main'
     outputName 'eucalyptus-node-controller'
     graalVersion '1.0.0-rc11'
+    option '-H:ReflectionConfigurationResources=com/eucalyptus/graal/reflect_config.json'
   }
 
   test {

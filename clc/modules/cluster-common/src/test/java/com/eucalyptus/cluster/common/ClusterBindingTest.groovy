@@ -31,10 +31,14 @@ package com.eucalyptus.cluster.common
 import com.eucalyptus.binding.Binding
 import com.eucalyptus.binding.BindingManager
 import com.eucalyptus.cluster.common.msgs.BroadcastNetworkInfoType
+import com.eucalyptus.cluster.common.msgs.CloudNodeMessage
 import com.eucalyptus.cluster.common.msgs.ClusterDescribeServicesType
 import com.eucalyptus.cluster.common.msgs.DescribeResourcesType
 import com.eucalyptus.cluster.common.msgs.NcDescribeInstancesType
 import com.eucalyptus.cluster.common.msgs.VmDescribeType
+import com.google.common.collect.Sets
+import edu.ucsb.eucalyptus.msgs.BaseMessage
+import edu.ucsb.eucalyptus.msgs.EucalyptusData
 import org.apache.axiom.om.OMElement
 import org.jibx.binding.classes.BoundClass
 import org.jibx.binding.classes.ClassCache
@@ -46,6 +50,8 @@ import org.jibx.binding.model.ValidationContext
 import org.jibx.util.ClasspathUrlExtender
 import org.junit.BeforeClass
 import org.junit.Test
+
+import java.lang.reflect.Method
 
 import static org.junit.Assert.*
 
@@ -126,5 +132,43 @@ class ClusterBindingTest {
     Binding binding = BindingManager.getBinding( 'eucalyptus_ucsb_edu' )
     OMElement messageOm = binding.toOM( new NcDescribeInstancesType( ) )
     println binding.fromOM( messageOm )
+  }
+
+  @Test
+  void testNodeMessages( ) {
+    TreeSet<String> classes = Sets.newTreeSet()
+    URL resource = ClusterBindingTest.getResource('/nc-binding-core.xml')
+    loadMessageClassesFromBindingXml( resource ).forEach{ Class<?> clazz ->
+      if (CloudNodeMessage.isAssignableFrom(clazz)) {
+        classes.add(clazz.name)
+        collectClasses(classes, clazz)
+      }
+    }
+    classes.each{ String className ->
+      println """\
+          {
+            "name" : "${className}",
+            "allPublicConstructors" : true,
+            "allPublicMethods" : true
+          },
+        """.stripIndent()
+    }
+  }
+
+  void collectClasses(TreeSet<String> classes, Class<?> clazz) {
+    clazz.declaredMethods.each { Method method ->
+      if ( method.name.startsWith("get") && method.getParameterCount()==0 && EucalyptusData.class.isAssignableFrom(method.getReturnType()) ) {
+        classes.add(method.getReturnType().name)
+        collectClasses(classes, method.getReturnType())
+      }
+      void
+    }
+  }
+
+  List<Class> loadMessageClassesFromBindingXml( URL resource ) {
+    Node binding = new XmlParser().parse( resource.toString() )
+    binding.'mapping'.'@class'
+        .collect { String className -> Class.forName( className ) }
+        .findAll { Class clazz -> BaseMessage.class.isAssignableFrom( clazz ) }
   }
 }

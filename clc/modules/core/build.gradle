@@ -75,6 +75,7 @@ dependencies {
   api 'com.google.guava:guava:20.0'
   api 'com.io7m.xom:xom:1.2.10' // 1.2.9
   api 'com.jcraft:jsch:0.1.54'
+  api 'com.sparkjava:spark-core:2.8.0'
   api 'commons-beanutils:commons-beanutils:1.9.3'
   runtimeOnly 'commons-cli:commons-cli:1.4'
   api 'commons-codec:commons-codec:1.11'
