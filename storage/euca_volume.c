@@ -40,6 +40,8 @@
 
 #include <stdio.h>
 #include <unistd.h>                    /* getopt */
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include <libxml/debugXML.h>
 #include <libxml/parser.h>
@@ -53,7 +55,6 @@
 #include <eucalyptus.h>
 #include <misc.h>
 #include <euca_string.h>
-#include <euca_axis.h>
 #include <euca_auth.h>
 
 #include "storage-controller.h"

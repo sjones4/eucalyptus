@@ -190,7 +190,6 @@ AC_CHECK_FUNCS([bzero dup2 ftruncate gettimeofday mkdir pow select strchr strdup
 AC_CONFIG_FILES([Makedefs
                  admin-tools/eucalyptus_admin/__init__.py:admin-tools/eucalyptus_admin/__init__.py.in
                  clc/modules/postgresql/src/main/resources/postgresql-binaries.properties:clc/modules/postgresql/src/main/resources/postgresql-binaries.properties.in
-                 cluster/eucalyptus-cluster
                  node/eucalyptus-node
                  tools/eucalyptus-cloud:tools/eucalyptus-cloud.in
                  tools/eucalyptus-logrotate.conf:tools/eucalyptus-logrotate.conf.in

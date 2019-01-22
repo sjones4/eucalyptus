@@ -65,7 +65,6 @@
 #include <ipc.h>
 #include <misc.h>
 #include <euca_auth.h>
-#include <euca_axis.h>
 
 #include <config.h>
 #include <fault.h>
@@ -73,7 +72,6 @@
 #include <euca_string.h>
 
 #include "storage-controller.h"
-#include "sc-client-marshal.h"
 
 /*----------------------------------------------------------------------------*\
  |                                                                            |
@@ -170,7 +168,7 @@ int scClientCall(char *correlationId, char *userId, int use_ws_sec, char *ws_sec
     int filedes[2] = { 0 };
     char *localCorrelationId = NULL;
     char *localUserId = NULL;
-    scStub *scs = NULL;
+    //scStub *scs = NULL;
     va_list al = { {0} };
 
     LOGTRACE("invoked: scOps=%s scURL=%s timeout=%d\n", scOp, scURL, timeout);  // these are common
@@ -183,150 +181,152 @@ int scClientCall(char *correlationId, char *userId, int use_ws_sec, char *ws_sec
         return (1);
     }
 
-    va_start(al, scOp);
-
-    //Fork and exec the client stub...do this for mem protection
-    pid = fork();
-    if (!pid) {
-        //I'm the child, do the call.
-        if (correlationId) {
-            localCorrelationId = strdup(correlationId);
-        } else {
-            localCorrelationId = strdup("unset");
-        }
-        if (userId) {
-            localUserId = strdup(userId);
-        } else {
-            localUserId = strdup("eucalyptus");
-        }
-
-        close(filedes[0]);
-        scs = scStubCreate(scURL, NULL, NULL);
-        if (use_ws_sec) {
-            LOGTRACE("Configuring and Initializing WS-SEC for SC Client\n");
-            rc = InitWSSEC(scs->env, scs->stub, ws_sec_policy_file_path);
-            if (rc) {
-                LOGERROR("Error initializing WSSEC state for SC Client\n");
-            }
-        }
-
-        LOGTRACE("\tscOps=%s ppid=%d client calling '%s'\n", scOp, getppid(), scOp);
-        if (!strcmp(scOp, "ExportVolume")) {
-            // args: char *volumeId
-            // args: char *token
-            // args: char *ip
-            // args: char *iqn
-            // args: char **connectionInfo (for return)
-            char *volumeId = va_arg(al, char *);
-            char *token = va_arg(al, char *);
-            char *ip = va_arg(al, char *);
-            char *iqn = va_arg(al, char *);
-            char **connectInfo = va_arg(al, char **);
-
-            LOGTRACE("Calling Export Volume Stub\n");
-            rc = scExportVolumeStub(scs, localCorrelationId, localUserId, volumeId, token, ip, iqn, connectInfo);
-            if (connectInfo) {
-                if (!rc && *connectInfo) {
-                    len = strlen(*connectInfo) + 1;
-                    LOGTRACE("SC Client child received output %d in length: %s\n", len, *connectInfo);
-                    rc = write(filedes[1], &len, sizeof(int));
-                    rc = write(filedes[1], *connectInfo, sizeof(char) * len);
-                    rc = 0;
-                } else {
-                    len = 0;
-                    LOGTRACE("SC Client child received output %d in length\n", len);
-                    rc = write(filedes[1], &len, sizeof(int));
-                    rc = 1;
-                }
-            }
-        } else if (!strcmp(scOp, "UnexportVolume")) {
-            // args: char *volumeId
-            // args: char *token
-            // args: char *ip
-            // args: char *iqn
-            char *volumeId = va_arg(al, char *);
-            char *token = va_arg(al, char *);
-            char *ip = va_arg(al, char *);
-            char *iqn = va_arg(al, char *);
-
-            LOGTRACE("Calling Unexport Volume Stub\n");
-            rc = scUnexportVolumeStub(scs, localCorrelationId, localUserId, volumeId, token, ip, iqn);
-        } else {
-            LOGWARN("\tscOps=%s operation '%s' not found\n", scOp, scOp);
-            rc = 1;
-        }
-
-        LOGTRACE("\tscOps=%s ppid=%d done calling '%s' with exit code '%d'\n", scOp, getppid(), scOp, rc);
-        if (rc) {
-            ret = 1;
-        } else {
-            ret = 0;
-        }
-        close(filedes[1]);
-        exit(ret);
-    } else {
-        // parent returns for each client call
-        close(filedes[1]);
-
-        if (!strcmp(scOp, "ExportVolume")) {
-            // args: char *volumeId
-            // args: char *token
-            // args: char *ip
-            // args: char *iqn
-            // args: char **connectionInfo (for return)
-            char *volumeId = NULL;
-            char *token = NULL;
-            char *ip = NULL;
-            char *iqn = NULL;
-            char **connectInfo = NULL;
-
-            volumeId = va_arg(al, char *);
-            token = va_arg(al, char *);
-            ip = va_arg(al, char *);
-            iqn = va_arg(al, char *);
-            connectInfo = va_arg(al, char **);
-
-            if (connectInfo) {
-                *connectInfo = NULL;
-            }
-
-            if (connectInfo) {
-                rbytes = timeread(filedes[0], &len, sizeof(int), timeout);
-                if (rbytes <= 0) {
-                    LOGTRACE("SC Client received output length of %d, not writing data\n", rbytes);
-                    killwait(pid);
-                    opFail = 1;
-                } else {
-                    LOGTRACE("SC Client getting %d bytes of output from SC call\n", len);
-                    *connectInfo = EUCA_ALLOC(len, sizeof(char));
-                    if (!*connectInfo) {
-                        LOGFATAL("out of memory! scOps=%s\n", scOp);
-                        exit(1);
-                    }
-                    rbytes = timeread(filedes[0], *connectInfo, len, timeout);
-                    LOGTRACE("SC Client got %d bytes in connect info %s\n", rbytes, *connectInfo);
-                    if (rbytes <= 0) {
-                        killwait(pid);
-                        opFail = 1;
-                    }
-                }
-            }
-        } else {
-            //Nothing to do in default case (success/fail in exit code)
-        }
-
-        close(filedes[0]);
-        rc = timewait(pid, &status, timeout);
-        rc = WEXITSTATUS(status);
-    }
-
-    LOGDEBUG("\tdone scOps=%s clientrc=%d opFail=%d\n", scOp, rc, opFail);
-    if (rc || opFail) {
-        ret = 1;
-    } else {
-        ret = 0;
-    }
-
-    va_end(al);
-    return (ret);
+    return (1);
+//
+//    va_start(al, scOp);
+//
+//    //Fork and exec the client stub...do this for mem protection
+//    pid = fork();
+//    if (!pid) {
+//        //I'm the child, do the call.
+//        if (correlationId) {
+//            localCorrelationId = strdup(correlationId);
+//        } else {
+//            localCorrelationId = strdup("unset");
+//        }
+//        if (userId) {
+//            localUserId = strdup(userId);
+//        } else {
+//            localUserId = strdup("eucalyptus");
+//        }
+//
+//        close(filedes[0]);
+//        scs = scStubCreate(scURL, NULL, NULL);
+//        if (use_ws_sec) {
+//            LOGTRACE("Configuring and Initializing WS-SEC for SC Client\n");
+//            rc = InitWSSEC(scs->env, scs->stub, ws_sec_policy_file_path);
+//            if (rc) {
+//                LOGERROR("Error initializing WSSEC state for SC Client\n");
+//            }
+//        }
+//
+//        LOGTRACE("\tscOps=%s ppid=%d client calling '%s'\n", scOp, getppid(), scOp);
+//        if (!strcmp(scOp, "ExportVolume")) {
+//            // args: char *volumeId
+//            // args: char *token
+//            // args: char *ip
+//            // args: char *iqn
+//            // args: char **connectionInfo (for return)
+//            char *volumeId = va_arg(al, char *);
+//            char *token = va_arg(al, char *);
+//            char *ip = va_arg(al, char *);
+//            char *iqn = va_arg(al, char *);
+//            char **connectInfo = va_arg(al, char **);
+//
+//            LOGTRACE("Calling Export Volume Stub\n");
+//            rc = scExportVolumeStub(scs, localCorrelationId, localUserId, volumeId, token, ip, iqn, connectInfo);
+//            if (connectInfo) {
+//                if (!rc && *connectInfo) {
+//                    len = strlen(*connectInfo) + 1;
+//                    LOGTRACE("SC Client child received output %d in length: %s\n", len, *connectInfo);
+//                    rc = write(filedes[1], &len, sizeof(int));
+//                    rc = write(filedes[1], *connectInfo, sizeof(char) * len);
+//                    rc = 0;
+//                } else {
+//                    len = 0;
+//                    LOGTRACE("SC Client child received output %d in length\n", len);
+//                    rc = write(filedes[1], &len, sizeof(int));
+//                    rc = 1;
+//                }
+//            }
+//        } else if (!strcmp(scOp, "UnexportVolume")) {
+//            // args: char *volumeId
+//            // args: char *token
+//            // args: char *ip
+//            // args: char *iqn
+//            char *volumeId = va_arg(al, char *);
+//            char *token = va_arg(al, char *);
+//            char *ip = va_arg(al, char *);
+//            char *iqn = va_arg(al, char *);
+//
+//            LOGTRACE("Calling Unexport Volume Stub\n");
+//            rc = scUnexportVolumeStub(scs, localCorrelationId, localUserId, volumeId, token, ip, iqn);
+//        } else {
+//            LOGWARN("\tscOps=%s operation '%s' not found\n", scOp, scOp);
+//            rc = 1;
+//        }
+//
+//        LOGTRACE("\tscOps=%s ppid=%d done calling '%s' with exit code '%d'\n", scOp, getppid(), scOp, rc);
+//        if (rc) {
+//            ret = 1;
+//        } else {
+//            ret = 0;
+//        }
+//        close(filedes[1]);
+//        exit(ret);
+//    } else {
+//        // parent returns for each client call
+//        close(filedes[1]);
+//
+//        if (!strcmp(scOp, "ExportVolume")) {
+//            // args: char *volumeId
+//            // args: char *token
+//            // args: char *ip
+//            // args: char *iqn
+//            // args: char **connectionInfo (for return)
+//            char *volumeId = NULL;
+//            char *token = NULL;
+//            char *ip = NULL;
+//            char *iqn = NULL;
+//            char **connectInfo = NULL;
+//
+//            volumeId = va_arg(al, char *);
+//            token = va_arg(al, char *);
+//            ip = va_arg(al, char *);
+//            iqn = va_arg(al, char *);
+//            connectInfo = va_arg(al, char **);
+//
+//            if (connectInfo) {
+//                *connectInfo = NULL;
+//            }
+//
+//            if (connectInfo) {
+//                rbytes = timeread(filedes[0], &len, sizeof(int), timeout);
+//                if (rbytes <= 0) {
+//                    LOGTRACE("SC Client received output length of %d, not writing data\n", rbytes);
+//                    killwait(pid);
+//                    opFail = 1;
+//                } else {
+//                    LOGTRACE("SC Client getting %d bytes of output from SC call\n", len);
+//                    *connectInfo = EUCA_ALLOC(len, sizeof(char));
+//                    if (!*connectInfo) {
+//                        LOGFATAL("out of memory! scOps=%s\n", scOp);
+//                        exit(1);
+//                    }
+//                    rbytes = timeread(filedes[0], *connectInfo, len, timeout);
+//                    LOGTRACE("SC Client got %d bytes in connect info %s\n", rbytes, *connectInfo);
+//                    if (rbytes <= 0) {
+//                        killwait(pid);
+//                        opFail = 1;
+//                    }
+//                }
+//            }
+//        } else {
+//            //Nothing to do in default case (success/fail in exit code)
+//        }
+//
+//        close(filedes[0]);
+//        rc = timewait(pid, &status, timeout);
+//        rc = WEXITSTATUS(status);
+//    }
+//
+//    LOGDEBUG("\tdone scOps=%s clientrc=%d opFail=%d\n", scOp, rc, opFail);
+//    if (rc || opFail) {
+//        ret = 1;
+//    } else {
+//        ret = 0;
+//    }
+//
+//    va_end(al);
+//    return (ret);
 }

@@ -71,7 +71,7 @@
 
 include ../Makedefs
 
-SUBDIRS=generated .
+SUBDIRS=.
 WSDLPATH=../wsdl/
 CCWSDLNAME=eucalyptus_cc.wsdl
 CCWSDL=$(WSDLPATH)/$(CCWSDLNAME)
@@ -79,55 +79,44 @@ NCWSDLNAME=eucalyptus_nc.wsdl
 NCWSDL=$(WSDLPATH)/$(NCWSDLNAME)
 SCWSDLNAME=eucalyptus_sc.wsdl
 SCWSDL=$(WSDLPATH)/$(SCWSDLNAME)
-SERVICE_SO=libEucalyptusNC.so
-SERVICE_SO_FAKE=libEucalyptusNCFake.so
 SERVICE_NAME=EucalyptusNC
 CLIENT=NCclient
 GFLAGS=$(patsubst -Werror,,$(CFLAGS))
 GPPFLAGS=$(patsubst -Werror,,$(CPPFLAGS))
-NC_LIBS	= $(LIBS) $(LDFLAGS) -lvirt -lcurl -lssl -lcrypto -lrampart `xslt-config --libs`
-AXIOM_LIBS = -lrampart -laxis2_http_sender -laxis2_http_receiver -laxis2_http_common -laxis2_engine -laxis2_axiom -laxutil -lneethi
+NC_LIBS	= $(LIBS) $(LDFLAGS) -lvirt -lcurl -lssl -lcrypto `xslt-config --libs`
 OPENSSL_LIBS = -lssl -lcrypto
 NET_LIB = ../net/libeucanet.a
 NC_HANDLERS=handlers_xen.o handlers_kvm.o handlers_default.o xml.o hooks.o
-STORAGE_OBJS=../storage/backing.o ../storage/diskutil.o ../storage/blobstore.o ../storage/objectstorage.o ../storage/vbr.o ../storage/iscsi.o ../storage/ebs_utils.o ../storage/sc-client-marshal-adb.o ../storage/storage-controller.o
+STORAGE_OBJS=../storage/backing.o ../storage/diskutil.o ../storage/blobstore.o ../storage/objectstorage.o ../storage/vbr.o ../storage/iscsi.o ../storage/ebs_utils.o ../storage/storage-controller.o
 STATS_OBJS = ../util/stats/stats.o ../util/stats/sensor_common.o ../util/stats/message_sensor.o ../util/stats/service_sensor.o ../util/stats/fs_emitter.o ../util/stats/message_stats.o
 STATS_LIBS = -ljson-c -lm
-CFLAGS += 
+AR      := /usr/bin/ar
+ARFLAGS := -cq
+CFLAGS +=
+
+# The Eucalyptus Node Library
+LIBNODE       := handlers
+LIBNODEOBJS   := $(LIBNODE:=.o) $(STORAGE_OBJS) $(STATS_OBJS) $(NC_HANDLERS) ../util/config.o ../util/log.o ../util/misc.o ../util/euca_file.o ../util/euca_string.o ../util/euca_system.o ../util/euca_network.o ../util/sensor.o ../util/fault.o ../util/utf8.o ../util/wc.o ../util/hash.o ../util/data.o ../util/eucalyptus.h ../util/euca_auth.o ../util/ipc.o ../net/euca_gni.o ../net/eucanetd_util.o ../storage/http.o ../storage/storage-windows.o
+LIBNODEDEPS   := $(LIBNODEOBJS) $(NET_LIB)
+LIBNODENAME   := libeucanode.a
 
 BUILD_ID=-DEUCA_COMPILE_TIMESTAMP=\""[built `date --rfc-3339='sec'`]"\"
 
-all: generated/stubs test_hooks
+all: $(LIBNODENAME) test_hooks
 	@for subdir in $(SUBDIRS); do \
 		(cd $$subdir && $(MAKE) buildall) || exit $$? ; done
 
 build: all
 
-buildall: server client clientlib test_misc test_nc test_hooks test_xml test_xml2
+buildall: $(LIBNODENAME)
 
-generated/stubs: $(NCWSDL) $(SCWSDL) 
-	@echo Generating server stubs
-	rm -rf generated
-	mkdir -p generated
-	sh $(WSDL2C) -uri $(NCWSDL) -sd -ss -d adb -u -uw -f -o generated | grep -v 'the classpath'
-	@echo Adding marshalling calls to server stubs
-	../tools/add_marshalling.pl generated/axis2_skel_*.c generated/axis2_svc_skel_*.c
-	@echo Generating SCclient stubs
-	sh $(WSDL2C) -uri $(SCWSDL) -g -d adb -u -uw -f -o generated | grep -v 'the classpath'
-	@echo Generating client stubs
-	sh $(WSDL2C) -uri $(NCWSDL) -g -d adb -u -uw -f -o generated | grep -v 'the classpath'
-	@echo Compiling the stubs
-	patch --directory=generated -p1 <axis2_svc_generated.patch
-	@cp ../tools/Makefile.gen generated/Makefile
-	$(MAKE) -C generated CFLAGS="$(GPPFLAGS) $(GFLAGS) -Wno-unused-variable"
-	cd ..
-	@echo "this is a cute little makefile marker" >generated/stubs
-	@echo Stubs generated.
+$(LIBNODENAME): $(LIBNODEDEPS)
+	$(AR) $(ARFLAGS) $@ $(LIBNODEOBJS)
 
 .c.o:
 	$(CC) -c $(BUILD_ID) $(CPPFLAGS) $(CFLAGS) `xslt-config --cflags` $(INCLUDES) $<
 
-server: $(SCLIBS) $(NET_LIB) $(SERVICE_SO)
+server: $(SCLIBS) $(NET_LIB) $(LIBNODENAME)
 
 ../storage/backing.o: ../storage/backing.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/data.o
 	make -C ../storage
@@ -177,73 +166,14 @@ server: $(SCLIBS) $(NET_LIB) $(SERVICE_SO)
 ../storage/ebs_utils.o: ../storage/ebs_utils.c
 	make -C ../storage
 
-../storage/sc-client-marshal-adb.o: ../storage/sc-client-marshal-adb.c
-	make -C ../storage
-
-../storage/storage-controller.o: ../storage/storage-controller.c ../storage/sc-client-marshal-adb.o
+../storage/storage-controller.o: ../storage/storage-controller.c
 	make -C ../storage
 
 $(NET_LIB):
 	make -C ../net
 
-$(SERVICE_SO): generated/stubs $(STORAGE_OBJS) ../util/log.o ../util/misc.o ../util/euca_file.o ../util/euca_system.o ../util/sensor.o ../util/hash.o ../util/data.o server-marshal.o handlers.o $(NC_HANDLERS) ../util/eucalyptus.h ../util/euca_auth.o ../storage/http.o $(NET_LIB) $(STATS_OBJS)
-#	$(CC) -shared generated/*.o server-marshal.o handlers.o $(NC_HANDLERS) $(STORAGE_OBJS) $(STATS_OBJS) ../util/*.o ../storage/http.o ../storage/storage-windows.o ../net/euca_gni.o ../net/eucanetd_util.o $(SCLIBS) $(NC_LIBS) $(STATS_LIBS) $(EFENCE) -o $(SERVICE_SO)
-	$(CC) -shared generated/*.o server-marshal.o handlers.o $(NC_HANDLERS) $(STORAGE_OBJS) $(STATS_OBJS) ../util/*.o ../storage/http.o ../storage/storage-windows.o $(SCLIBS) $(NC_LIBS) $(STATS_LIBS) $(EFENCE) ../net/libeucanet.a -o $(SERVICE_SO)
-
 ../util/stats/%.o:
 	make -C ../util/stats
-
-clientlib: generated/stubs ../util/data.o $(SCLIBS) client-marshal-adb.o
-
-client: $(CLIENT) $(CLIENT)_local
-
-fake: $(CLIENT)_fake
-
-$(CLIENT): generated/stubs $(CLIENT).c $(STORAGE_OBJS) ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../util/data.o client-marshal-adb.o client-marshal-local.o $(CLIENT).c ../storage/vbr.o $(STATS_OBJS)
-	$(CC) -o $(CLIENT) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) $(CLIENT).c client-marshal-adb.c generated/adb_*.o generated/axis2_stub_*.o ../util/*.o ../storage/diskutil.o ../storage/http.o -lcurl ../storage/storage-windows.o $(STATS_OBJS) $(STATS_LIBS) -lm $(AXIOM_LIBS) $(OPENSSL_LIBS) $(NC_LIBS)
-
-$(CLIENT)_fake: generated/stubs $(STORAGE_OBJS) ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../util/data.o client-marshal-adb.o client-marshal-local.o client-marshal-fake.o $(CLIENT).c ../storage/vbr.o $(STATS_OBJS)
-
-$(CLIENT)_local: generated/stubs $(STORAGE_OBJS) ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../util/data.o client-marshal-adb.o client-marshal-local.o handlers.o $(NC_HANDLERS) $(CLIENT).c ../util/euca_auth.o ../storage/vbr.o $(STATS_OBJS)
-	$(CC) -o $(CLIENT)_local -DNO_COMP $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -shared client-marshal-local.o ../util/*.o $(STORAGE_OBJS) handlers.o $(NC_HANDLERS) $(CLIENT).c $(NC_LIBS) ../storage/http.o ../storage/storage-windows.o $(SCLIBS) $(STATS_OBJS) $(STATS_LIBS)
-
-test_misc: test.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../util/data.o $(STATS_OBJS)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -o test_misc test.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../storage/diskutil.o ../util/data.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o $(NC_LIBS) $(STATS_OBJS) $(STATS_LIBS) ../util/config.o
-
-test_nc: test_nc.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../storage/diskutil.o $(STATS_OBJS)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -o test_nc -lvirt test_nc.c -lvirt ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../storage/diskutil.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o $(NC_LIBS) $(STATS_OBJS) $(STATS_LIBS) ../util/config.o
-
-test_hooks: hooks.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../storage/diskutil.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -o test_hooks -D__STANDALONE hooks.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/sensor.o ../storage/diskutil.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o $(NC_LIBS) $(STATS_OBJS) $(STATS_LIBS) ../util/config.o
-
-test_xml: xml.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../storage/diskutil.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o ../util/data.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) `xslt-config --cflags` -o test_xml -D__STANDALONE xml.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../storage/diskutil.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o ../util/data.o $(NC_LIBS)
-
-test_xml2: xml.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../storage/diskutil.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o ../util/data.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) `xslt-config --cflags` -o test_xml2 -D__STANDALONE2 xml.c ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../storage/diskutil.o ../util/euca_auth.o $(OPENSSL_LIBS) ../util/ipc.o ../util/data.o $(NC_LIBS)
-
-libvirt_tortura: libvirt_tortura.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -o libvirt_tortura libvirt_tortura.c -lvirt
-
-libvirt_nag: libvirt_nag.c ../util/ipc.o ../util/misc.o ../util/log.o ../util/euca_string.o ../util/euca_file.o ../storage/diskutil.o 
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -o libvirt_nag libvirt_nag.c -lvirt ../util/ipc.o ../util/misc.o ../util/log.o ../util/euca_string.o ../util/euca_file.o ../storage/diskutil.o 
-
-deploy:
-	$(INSTALL) -d $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)/
-	$(INSTALL) $(SERVICE_SO) $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)/
-
-# no ws-sec
-	cat generated/services.xml | ../tools/add_wsdllocation.pl $(AXIS2C_SERVICES)/$(SERVICE_NAME)/$(NCWSDLNAME) > $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)/services_noWS.xml
-# ws-sec
-	cat generated/services.xml | ../tools/add_wsdllocation.pl $(AXIS2C_SERVICES)/$(SERVICE_NAME)/$(NCWSDLNAME) | ../tools/add_service_policy.pl ../tools/service-policy-template.xml | sed "s:CLIENT-CERT:cluster-cert.pem:g" | sed "s:CLIENT-KEY:cluster-pk.pem:g" | sed "s:SERVER-CERT:node-cert.pem:g" | sed "s:SERVER-KEY:node-pk.pem:g" | sed "s:CLIENT-USERNAME:eucalyptus:g" > $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)/services_WS.xml
-	cat ../tools/client-policy-template.xml | sed "s:EUCALYPTUS_HOME:$(EUCALYPTUS):g" | sed "s:AXIS2C_HOME:$(AXIS2C_HOME):g"  | sed "s:CLIENT-CERT:cluster-cert.pem:g" | sed "s:CLIENT-KEY:cluster-pk.pem:g" | sed "s:SERVER-CERT:node-cert.pem:g" | sed "s:SERVER-KEY:node-pk.pem:g" | sed "s:CLIENT-USERNAME:eucalyptus:g" > nc-client-policy.xml
-#	cp nc-client-policy.xml $(EUCALYPTUS)/var/lib/eucalyptus/keys/
-##	cp ../tools/*.pem $(EUCALYPTUS)/var/lib/eucalyptus/keys/
-#	chmod -R 0600 $(EUCALYPTUS)/var/lib/eucalyptus/keys/*
-# ws
-	$(INSTALL) $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)/services_WS.xml $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)/services.xml
-# no ws
-#	cp $(AXIS2C_SERVICES)/$(SERVICE_NAME)/services_noWS.xml $(AXIS2C_SERVICES)/$(SERVICE_NAME)/services.xml
 
 indent:
 	@for idfile in *.[ch]; do \
@@ -251,14 +181,11 @@ indent:
 		$(INDENTTOOLS) $$idfile $(INDENTFLAGS) -o $$idfile ; \
 	done
 
-test: test_nc test_misc test_hooks test_xml test_xml2
-	./test_xml ../tools/libvirt.xsl
-
 clean:
-	rm -rf $(SERVICE_SO) *.o $(CLIENT) $(CLIENT)_local $(NET_LIB) *~* *#* test_nc test_misc test_xml test_xml2
+	rm -rf *.o $(CLIENT) $(CLIENT)_local $(NET_LIB) *~* *#* test_nc test_misc test_xml test_xml2
 
 distclean:
-	rm -rf generated $(SERVICE_SO) *.o $(CLIENT) $(CLIENT)_local nc-client-policy.xml test test_nc test_hooks $(NET_LIB) *~* *#*
+	rm -rf *.o $(CLIENT) $(CLIENT)_local nc-client-policy.xml test test_nc test_hooks $(NET_LIB) *~* *#*
 
 install: deploy
 	$(INSTALL) -m 0700 -d $(DESTDIR)$(libvirthooksdir)
@@ -271,5 +198,5 @@ install: deploy
 uninstall:
 	$(RM) -f $(DESTDIR)$(policiesdir)/nc-client-policy.xml
 	$(RM) -f $(DESTDIR)$(sbindir)/euca_test_nc
-	$(RM) -rf $(DESTDIR)$(AXIS2C_SERVICES)/$(SERVICE_NAME)
 	$(RM) -f $(libvirthooksdir)/qemu
+

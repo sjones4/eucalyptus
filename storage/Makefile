@@ -71,16 +71,15 @@
 
 include ../Makedefs
 
-SUBDIRS=generated .
+SUBDIRS= .
 WSDLPATH=../wsdl
 SCWSDLNAME=eucalyptus_sc.wsdl
 SCWSDL=$(WSDLPATH)/$(SCWSDLNAME)
 GFLAGS=$(patsubst -Werror,,$(CFLAGS))
 GPPFLAGS=$(patsubst -Werror,,$(CPPFLAGS))
-SCCLIENT=SCclient
-WSSECLIBS=../util/euca_axis.o ../util/euca_auth.o
-SC_LIBS = ${LIBS} ${LDFLAGS} -lcurl -lssl -lcrypto -lrampart
-STORAGE_CONTROLLER_OBJS = generated/*.o sc-client-marshal-adb.o iscsi.o ../util/config.o ../util/data.o ../util/fault.o ../util/wc.o ../util/utf8.o diskutil.o ../util/log.o ../util/misc.o ../util/ipc.o ../util/euca_string.o ../util/euca_file.o
+WSSECLIBS=../util/euca_auth.o
+SC_LIBS = ${LIBS} ${LDFLAGS} -lcurl -lssl -lcrypto
+STORAGE_CONTROLLER_OBJS = iscsi.o ../util/config.o ../util/data.o ../util/fault.o ../util/wc.o ../util/utf8.o diskutil.o ../util/log.o ../util/misc.o ../util/ipc.o ../util/euca_string.o ../util/euca_file.o
 EUCA_BLOBS_OBJS =                                     diskutil.o map.o                ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
 OSGCLIENT_OBJS    =                     objectstorage.o http.o diskutil.o map.o                ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
 TEST_BLOB_OBJS  =                                     diskutil.o map.o                ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
@@ -93,47 +92,26 @@ CFLAGS         +=
 #EFENCE          = -lefence
 NODEADMIN_TOOL_NAME = nodeadmin-manage-volume-connections
 
-#all: vbr.o backing.o storage-windows.o objectstorage.o diskutil.o map.o Wclient euca-blobs generated/stubs $(SCCLIENT) $(TESTS)
-all: generated/stubs
+#all: vbr.o backing.o storage-windows.o objectstorage.o diskutil.o map.o Wclient euca-blobs $(TESTS)
+all:
 	@for subdir in $(SUBDIRS); do \
 		(cd $$subdir && $(MAKE) buildall) || exit $$? ; done
-
-generated/stubs: $(SCWSDL)
-	rm -rf generated
-	mkdir -p generated
-	@echo Generating SCclient stubs
-	sh $(WSDL2C) -uri $(SCWSDL) -g -d adb -u -uw -f -o generated | grep -v 'the classpath'
-	@cp ../tools/Makefile.gen generated/Makefile
-	$(MAKE) -C generated CFLAGS="$(GPFLAGS) $(GFLAGS) -Wno-unused-variable"
-	@echo "this is a cute little makefile marker" >generated/stubs
-	@echo Stubs generated.
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(INCLUDES) $<
 
 build: all
 
-buildall: generated/stubs ebs_utils.o storage-controller.o vbr.o vbr_no_ebs.o backing.o storage-windows.o objectstorage.o diskutil.o map.o OSGclient euca-blobs $(SCCLIENT) $(TESTS) $(NODEADMIN_TOOL_NAME)
+buildall: ebs_utils.o storage-controller.o vbr.o vbr_no_ebs.o backing.o storage-windows.o objectstorage.o diskutil.o map.o OSGclient euca-blobs $(TESTS) $(NODEADMIN_TOOL_NAME)
 
-client: $(SCCLIENT) OSGclient
-
-$(SCCLIENT): $(SCCLIENT).c generated/stubs $(WSSECLIBS) storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS)
-	$(CC) -o $(SCCLIENT) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) $(SCCLIENT).c -DMODE=1 storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS) $(WSSECLIBS) $(SC_LIBS)
-
-$(NODEADMIN_TOOL_NAME): euca_volume.c generated/stubs $(WSSECLIBS) storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS)
+$(NODEADMIN_TOOL_NAME): euca_volume.c $(WSSECLIBS) storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS)
 	$(CC) -o $(NODEADMIN_TOOL_NAME) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) euca_volume.c -DMODE=1 storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS) $(WSSECLIBS) $(SC_LIBS) `xslt-config --cflags` `xslt-config --libs`
 
 euca-blobs: Makefile blobstore.c blobstore.h $(EUCA_BLOBS_OBJS)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -D_EUCA_BLOBS blobstore.c -o euca-blobs $(EUCA_BLOBS_OBJS) $(STORAGE_LIBS) $(EFENCE)
 
-OSGclient: Makefile OSGclient.c $(OSGCLIENT_OBJS)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) OSGclient.c -o OSGclient $(OSGCLIENT_OBJS) $(STORAGE_LIBS) $(EFENCE)
-
 test_blobstore: blobstore.o $(TEST_BLOB_OBJS)
 	$(CC) -rdynamic $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -D_UNIT_TEST blobstore.c -o test_blobstore $(TEST_BLOB_OBJS) $(STORAGE_LIBS) $(EFENCE)
-
-test_vbr: vbr.o $(TEST_VBR_OBJS) generated/stubs $(STORAGE_CONTROLLER_OBJS) ../util/fault.o
-	$(CC) -rdynamic $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -D_NO_EBS -D_UNIT_TEST vbr.c -o test_vbr $(TEST_VBR_OBJS) $(STORAGE_LIBS) $(EFENCE) ../util/euca_axis.o sc-client-marshal-adb.o ../util/fault.o generated/*.o ../util/utf8.o ../util/wc.o $(SC_LIBS)
 
 test_url: http.c
 	$(CC) -D_UNIT_TEST -o test_url http.c
@@ -171,9 +149,6 @@ vbr_no_ebs.o: vbr.c vbr.h
 ../util/euca_auth.o: ../util/euca_auth.c ../util/data.h ../util/eucalyptus.h
 	make -C ../util
 
-../util/euca_axis.o:
-	make -C ../util
-
 indent:
 	@for idfile in *.[ch]; do \
 		echo $(INDENTTOOLS) $$idfile $(INDENTFLAGS) -o $$idfile ; \
@@ -181,19 +156,16 @@ indent:
 	done
 
 clean:
-	@rm -rf *~ *.o OSGclient euca-blobs $(SCCLIENT) $(TESTS)
+	@rm -rf *~ *.o OSGclient euca-blobs $(TESTS)
 
 distclean:
-	@rm -rf generated sc-client-policy.xml
+	@rm -rf sc-client-policy.xml
 
 install:
 	@echo installing sc-client-policy.xml
 	@$(INSTALL) -d $(DESTDIR)$(policiesdir)
 	@$(INSTALL) sc-client-policy.xml $(DESTDIR)$(policiesdir)
 	@$(INSTALL) -m 755 $(NODEADMIN_TOOL_NAME) $(DESTDIR)$(libexecdir)/eucalyptus/$(NODEADMIN_TOOL_NAME)
-
-deploy:
-	cat ../tools/client-policy-template.xml | sed "s:EUCALYPTUS_HOME:$(EUCALYPTUS):g" | sed "s:AXIS2C_HOME:$(AXIS2C_HOME):g" | sed "s:CLIENT-CERT:node-cert.pem:g" | sed "s:SERVER-CERT:cloud-cert.pem:g" | sed "s:SERVER-KEY:node-pk.pem:g" | sed "s:CLIENT-KEY:node-pk.pem:g" | sed "s:CLIENT-USERNAME:eucalyptus:g" > sc-client-policy.xml
 
 uninstall:
 	@$(RM) -f $(DESTDIR)$(policiesdir)/sc-client-policy.xml

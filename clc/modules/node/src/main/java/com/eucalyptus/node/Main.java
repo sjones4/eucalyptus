@@ -10,6 +10,8 @@ package com.eucalyptus.node;
  */
 public class Main {
   public static void main(String[] args) {
-    System.out.println("Node controller, libvirt query retries: " + NodeInterface.getLibvirtQueryRetries());
+    System.out.println("Node controller starting");
+    NodeInterface.doInitNC();
+    System.out.println("Node controller exiting");
   }
 }
