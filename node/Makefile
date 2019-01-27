@@ -102,7 +102,7 @@ LIBNODENAME   := libeucanode.a
 
 BUILD_ID=-DEUCA_COMPILE_TIMESTAMP=\""[built `date --rfc-3339='sec'`]"\"
 
-all: $(LIBNODENAME) test_hooks
+all: $(LIBNODENAME)
 	@for subdir in $(SUBDIRS); do \
 		(cd $$subdir && $(MAKE) buildall) || exit $$? ; done
 

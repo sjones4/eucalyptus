@@ -80,7 +80,7 @@ GPPFLAGS=$(patsubst -Werror,,$(CPPFLAGS))
 WSSECLIBS=../util/euca_auth.o
 SC_LIBS = ${LIBS} ${LDFLAGS} -lcurl -lssl -lcrypto
 STORAGE_CONTROLLER_OBJS = iscsi.o ../util/config.o ../util/data.o ../util/fault.o ../util/wc.o ../util/utf8.o diskutil.o ../util/log.o ../util/misc.o ../util/ipc.o ../util/euca_string.o ../util/euca_file.o
-EUCA_BLOBS_OBJS =                                     diskutil.o map.o                ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
+EUCA_BLOBS_OBJS =                                     diskutil.o map.o objectstorage.o http.o blobstore.o           ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
 OSGCLIENT_OBJS    =                     objectstorage.o http.o diskutil.o map.o                ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
 TEST_BLOB_OBJS  =                                     diskutil.o map.o                ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o
 TEST_VBR_OBJS   = iscsi.o blobstore.o objectstorage.o http.o diskutil.o       ../util/hash.o ../util/log.o ../util/misc.o ../util/euca_string.o ../util/euca_file.o ../util/ipc.o ../util/euca_auth.o ebs_utils.o storage-controller.o
@@ -102,7 +102,7 @@ all:
 
 build: all
 
-buildall: ebs_utils.o storage-controller.o vbr.o vbr_no_ebs.o backing.o storage-windows.o objectstorage.o diskutil.o map.o OSGclient euca-blobs $(TESTS) $(NODEADMIN_TOOL_NAME)
+buildall: ebs_utils.o storage-controller.o vbr.o vbr_no_ebs.o backing.o storage-windows.o objectstorage.o diskutil.o map.o euca-blobs $(NODEADMIN_TOOL_NAME)
 
 $(NODEADMIN_TOOL_NAME): euca_volume.c $(WSSECLIBS) storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS)
 	$(CC) -o $(NODEADMIN_TOOL_NAME) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) euca_volume.c -DMODE=1 storage-controller.o ebs_utils.o $(STORAGE_CONTROLLER_OBJS) $(WSSECLIBS) $(SC_LIBS) `xslt-config --cflags` `xslt-config --libs`

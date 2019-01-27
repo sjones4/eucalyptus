@@ -5,9 +5,13 @@
  */
 package com.eucalyptus.node;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.graalvm.nativeimage.StackValue;
+import org.graalvm.nativeimage.c.type.CIntPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 import org.graalvm.nativeimage.c.type.CTypeConversion.CCharPointerHolder;
+import org.graalvm.nativeimage.c.type.CTypeConversion.CCharPointerPointerHolder;
 import com.eucalyptus.cluster.common.msgs.InstanceType;
 import com.eucalyptus.cluster.common.msgs.NcAttachVolumeResponseType;
 import com.eucalyptus.cluster.common.msgs.NcAttachVolumeType;
@@ -43,6 +47,7 @@ import com.eucalyptus.cluster.common.msgs.NcStopInstanceResponseType;
 import com.eucalyptus.cluster.common.msgs.NcStopInstanceType;
 import com.eucalyptus.cluster.common.msgs.NcTerminateInstanceResponseType;
 import com.eucalyptus.cluster.common.msgs.NcTerminateInstanceType;
+import com.eucalyptus.node.NodeInterface.NcInstancePointerPointer;
 import com.eucalyptus.node.NodeInterface.NcMetadata;
 import com.google.common.collect.Lists;
 
@@ -52,12 +57,42 @@ import com.google.common.collect.Lists;
 public class NodeServiceImpl {
 
   public NcDescribeInstancesResponseType describeInstances(final NcDescribeInstancesType request) {
-    //TODO dummy
     final NcDescribeInstancesResponseType response = request.getReply();
-    final InstanceType instanceType = new InstanceType();
-    instanceType.setAccountId( "123000123000" );
-    instanceType.setInstanceId("i-00000000");
-    response.setInstances( Lists.newArrayList(instanceType));
+    final NcMetadata meta = StackValue.get(NcMetadata.class);
+    meta.setServicesLen(0);
+    meta.setDisabledServicesLen(0);
+    meta.setNotreadyServicesLen(0);
+    final NcInstancePointerPointer instancePointerPointer = StackValue.get(NcInstancePointerPointer.class);
+    final CIntPointer instanceCount = StackValue.get(CIntPointer.class);
+//    long long call_time = time_ms();
+//    pthread_mutex_lock(&ncHandlerLock);
+    final List<String> requestInstanceIds = request.getInstanceIds();
+    final String[] requestIdsArray = requestInstanceIds==null ?
+        new String[0] : requestInstanceIds.toArray(new String[0]);
+    try (final CCharPointerPointerHolder instanceIds = CTypeConversion.toCStrings(requestIdsArray);
+         final CCharPointerHolder userId = CTypeConversion.toCString("eucalyptus")){
+      // EUCA_MESSAGE_UNMARSHAL request -> meta
+      //threadCorrelationId *corr_id = set_corrid(meta.correlationId);
+      meta.setUserId(userId.get());
+      NodeInterface.doDescribeInstances(
+          meta,
+          instanceIds.get(),
+          requestIdsArray.length,
+          instancePointerPointer, //TODO:STEVE: need to free these?
+          instanceCount);
+      //unset_corrid(corr_id);
+
+      ArrayList<InstanceType> responseInstances = Lists.newArrayList();
+      for (int i=0; i<instanceCount.read(); i++) {
+        final InstanceType instanceType = new InstanceType();
+        instanceType.setInstanceId(CTypeConversion.toJavaString(instancePointerPointer.read(0).read(i).instanceId()));
+        instanceType.setImageId(CTypeConversion.toJavaString(instancePointerPointer.read(0).read(i).imageId()));
+        responseInstances.add(instanceType);
+      }
+      response.setInstances(responseInstances);
+    }
+//    pthread_mutex_unlock(&ncHandlerLock);
+//    nc_update_message_stats("BroadcastNetworkInfo", (long)(time_ms() - call_time), error);
     return response;
   }
 

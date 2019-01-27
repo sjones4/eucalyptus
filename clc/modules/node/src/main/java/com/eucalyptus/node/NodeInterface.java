@@ -39,7 +39,7 @@ public class NodeInterface {
     @Override
     public List<String> getHeaderFiles() {
       return Lists.newArrayList(
-          "\"handlers.h\""
+          "\"handlers.h\"", "\"eucalyptus-config.h\""
       );
     }
 
@@ -194,10 +194,10 @@ public class NodeInterface {
     @CField("numberOfCoresAvailable")
     void setNumberOfCoresAvailable(int numberOfCoresAvailable);
 
-    @CFieldAddress( "uuid" )
+    @CFieldAddress("publicSubnets")
     CCharPointer publicSubnets();
 
-    @CFieldAddress( "uuid" )
+    @CFieldAddress("hypervisor")
     CCharPointer hypervisor();
   }
 
@@ -549,8 +549,8 @@ public class NodeInterface {
     void write(int index, NcInstancePointerPointer value);
   }
 
-  @CConstant("LIBVIRT_QUERY_RETRIES")
-  public static native int getLibvirtQueryRetries();
+  @CConstant("EUCA_VERSION")
+  public static native String getEucaVersion();
 
   @CFunction("doInitNC")
   public static native void doInitNC();
@@ -578,7 +578,7 @@ public class NodeInterface {
       NcMetadata ncMetadata,
       CCharPointerPointer instIds,
       int instIdsLen,
-      NcInstancePointerPointerPointer outInsts,
+      NcInstancePointerPointer outInsts,
       CIntPointer outInstsLen);
 
   @CFunction("doBroadcastNetworkInfo")

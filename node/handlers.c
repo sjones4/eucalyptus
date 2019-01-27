@@ -85,7 +85,6 @@
 #include <backing.h>
 #include <diskutil.h>
 #include <euca_auth.h>
-#include <euca_axis.h>
 #include <euca_network.h>
 #include <euca_gni.h>
 
