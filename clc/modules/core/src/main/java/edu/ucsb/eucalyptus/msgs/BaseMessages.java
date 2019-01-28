@@ -106,6 +106,10 @@ public class BaseMessages {
     }
   }
 
+  public static <T> T fromString( final String text, final Class<T> type ) throws IOException {
+    return xmlMapper.readValue( text, type );
+  }
+
   public static <T> T fromOm( final OMElement object, final Class<T> type ) throws IOException {
     final XMLStreamReader reader = new NamespaceMappingXMLStreamReader(
         object.getXMLStreamReader( ),
