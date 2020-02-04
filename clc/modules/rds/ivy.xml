@@ -11,5 +11,6 @@
   <dependencies>
     <dependency name="eucalyptus-rds-common" rev="latest.integration"/>
     <dependency name="eucalyptus-core" rev="latest.integration"/>
+    <dependency name="eucalyptus-compute-common" rev="latest.integration"/>
   </dependencies>
 </ivy-module>

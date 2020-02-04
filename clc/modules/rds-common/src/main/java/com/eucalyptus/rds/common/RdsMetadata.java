@@ -7,6 +7,7 @@
  */
 package com.eucalyptus.rds.common;
 
+import com.eucalyptus.auth.policy.annotation.PolicyResourceType;
 import com.eucalyptus.auth.policy.annotation.PolicyVendor;
 import com.eucalyptus.auth.type.RestrictedType;
 import com.eucalyptus.rds.common.policy.RdsPolicySpec;
@@ -14,8 +15,6 @@ import com.eucalyptus.rds.common.policy.RdsPolicySpec;
 @PolicyVendor(RdsPolicySpec.VENDOR_RDS)
 public interface RdsMetadata extends RestrictedType {
 
-  //TODO add policy resource types
-  //@PolicyResourceType( "lower_case_name-here" )
-  //interface XXXMetadata extends RdsMetadata {}
-
+  @PolicyResourceType( "subgrp" )
+  interface DBSubnetGroupMetadata extends RdsMetadata {}
 }
