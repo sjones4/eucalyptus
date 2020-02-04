@@ -13,6 +13,7 @@ import com.eucalyptus.component.annotation.AwsServiceName;
 import com.eucalyptus.component.annotation.Description;
 import com.eucalyptus.component.annotation.Partition;
 import com.eucalyptus.component.annotation.PublicService;
+import com.eucalyptus.util.techpreview.TechPreview;
 
 /**
  *
@@ -22,6 +23,7 @@ import com.eucalyptus.component.annotation.PublicService;
 @PolicyVendor("rds")
 @Partition(value = Rds.class, manyToOne = true)
 @Description("Amazon RDS API service")
+@TechPreview(enableByDefaultProperty = "enable.rds.tech.preview")
 public class Rds extends ComponentId {
 
   private static final long serialVersionUID = 1L;
