@@ -15,6 +15,24 @@ import com.eucalyptus.rds.common.policy.RdsPolicySpec;
 @PolicyVendor(RdsPolicySpec.VENDOR_RDS)
 public interface RdsMetadata extends RestrictedType {
 
+  @PolicyResourceType( "db" )
+  interface DBInstanceMetadata extends RdsMetadata {}
+
+  @PolicyResourceType( "pg" )
+  interface DBParameterGroupMetadata extends RdsMetadata {}
+
+  @PolicyResourceType( "secgrp" )
+  interface DBSecurityGroupMetadata extends RdsMetadata {}
+
   @PolicyResourceType( "subgrp" )
   interface DBSubnetGroupMetadata extends RdsMetadata {}
+
+  @PolicyResourceType( "es" )
+  interface EventSubscriptionMetadata extends RdsMetadata {}
+
+  @PolicyResourceType( "og" )
+  interface OptionGroupMetadata extends RdsMetadata {}
+
+  @PolicyResourceType( "ri" )
+  interface ReservedDBInstanceMetadata extends RdsMetadata {}
 }

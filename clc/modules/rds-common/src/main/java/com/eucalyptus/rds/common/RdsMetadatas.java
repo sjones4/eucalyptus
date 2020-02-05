@@ -19,7 +19,7 @@ public class RdsMetadatas extends RestrictedTypes {
     return new RdsResourceName(
       "",
       metadata.getOwner().getAccountNumber(),
-        Ats.from(metadata).get(PolicyResourceType.class).value(),
+        Ats.inClassHierarchy(metadata).get(PolicyResourceType.class).value(),
       metadata.getDisplayName()
     ).toString();
   }
