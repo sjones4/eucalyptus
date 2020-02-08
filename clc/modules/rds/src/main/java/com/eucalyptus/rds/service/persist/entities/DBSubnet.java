@@ -7,6 +7,7 @@
  */
 package com.eucalyptus.rds.service.persist.entities;
 
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import com.eucalyptus.entities.AbstractPersistent;
+import com.eucalyptus.rds.service.persist.views.DBSubnetView;
+import com.eucalyptus.util.CompatPredicate;
 
 /**
  *
@@ -26,11 +29,17 @@ import com.eucalyptus.entities.AbstractPersistent;
 @Table( name = "rds_db_subnet", indexes = {
     @Index( name = "rds_db_subnet_id_idx", columnList = "rds_db_subnet_group_id" )
 } )
-public class DBSubnet extends AbstractPersistent {
+public class DBSubnet extends AbstractPersistent implements DBSubnetView {
   private static final long serialVersionUID = 1L;
 
-  public enum Status {
+  public enum Status implements CompatPredicate<DBSubnetView> {
     Active,
+    ;
+
+    @Override
+    public boolean apply(final DBSubnetView input) {
+      return input != null && this == input.getStatus();
+    }
   }
 
   @ManyToOne

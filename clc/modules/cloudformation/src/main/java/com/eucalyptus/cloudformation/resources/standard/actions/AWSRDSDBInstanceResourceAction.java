@@ -39,7 +39,7 @@ import com.google.common.primitives.Ints;
  */
 public class AWSRDSDBInstanceResourceAction extends StepBasedResourceAction {
 
-  public static volatile Integer INSTANCE_CREATE_MAX_CREATE_RETRY_SECS = 300;
+  public static volatile Integer INSTANCE_CREATE_MAX_CREATE_RETRY_SECS = 600;
   public static volatile Integer INSTANCE_DELETE_MAX_DELETE_RETRY_SECS = 300;
 
 
@@ -143,7 +143,14 @@ public class AWSRDSDBInstanceResourceAction extends StepBasedResourceAction {
         final DeleteDBInstanceType deleteDBInstance =
             MessageHelper.createMessage(DeleteDBInstanceType.class, action.info.getEffectiveUserId());
         deleteDBInstance.setDBInstanceIdentifier(action.info.getPhysicalResourceId());
-        rds.deleteDBInstance(deleteDBInstance);
+        try {
+          rds.deleteDBInstance(deleteDBInstance);
+        } catch ( final RuntimeException ex ) {
+          if (AsyncExceptions.isWebServiceErrorCode(ex, "DBInstanceNotFound")) {
+            return action;
+          }
+          throw ex;
+        }
         return action;
       }
     },

@@ -11,12 +11,14 @@ import java.util.List;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import com.eucalyptus.auth.principal.FullName;
 import com.eucalyptus.auth.principal.OwnerFullName;
@@ -25,6 +27,7 @@ import com.eucalyptus.entities.UserMetadata;
 import com.eucalyptus.rds.common.Rds;
 import com.eucalyptus.rds.common.RdsMetadata.DBInstanceMetadata;
 import com.eucalyptus.rds.service.persist.entities.DBInstance.Status;
+import com.eucalyptus.rds.service.persist.views.DBInstanceView;
 import com.google.common.collect.Lists;
 
 /**
@@ -33,7 +36,7 @@ import com.google.common.collect.Lists;
 @Entity
 @PersistenceContext( name = "eucalyptus_rds" )
 @Table( name = "rds_db_instance" )
-public class DBInstance extends UserMetadata<Status> implements DBInstanceMetadata {
+public class DBInstance extends UserMetadata<Status> implements DBInstanceMetadata, DBInstanceView {
   private static final long serialVersionUID = 1L;
 
   public enum Status {
@@ -114,11 +117,13 @@ public class DBInstance extends UserMetadata<Status> implements DBInstanceMetada
   private Boolean publiclyAccessible;
 
   @ElementCollection
-  @CollectionTable( name = "rds_db_instance_vpc_sgs" )
+  @CollectionTable( name = "rds_db_instance_vpc_sgs", joinColumns = @JoinColumn( name = "rds_db_instance_id" ))
   @Column( name = "rds_db_security_group_id" )
-  @JoinColumn( name = "rds_db_instance_id" )
-  @OrderBy( "rds_db_security_group_id")
+  @OrderColumn( name = "rds_db_security_group_index")
   private List<String> vpcSecurityGroups = Lists.newArrayList();
+
+  @Embedded
+  private DBInstanceRuntime dbInstanceRuntime;
 
   protected DBInstance( ) {
   }
@@ -140,6 +145,7 @@ public class DBInstance extends UserMetadata<Status> implements DBInstanceMetada
       final Boolean publiclyAccessible
       ) {
     final DBInstance instance = new DBInstance( owner, name );
+    instance.setDbInstanceRuntime(new DBInstanceRuntime(instance));
     instance.setState(Status.creating);
     instance.setAllocatedStorage(allocatedStorage);
     instance.setCopyTagsToSnapshot(copyTagsToSnapshot);
@@ -278,6 +284,14 @@ public class DBInstance extends UserMetadata<Status> implements DBInstanceMetada
     this.vpcSecurityGroups = vpcSecurityGroups;
   }
 
+  public DBInstanceRuntime getDbInstanceRuntime() {
+    return dbInstanceRuntime;
+  }
+
+  public void setDbInstanceRuntime(final DBInstanceRuntime dbInstanceRuntime) {
+    this.dbInstanceRuntime = dbInstanceRuntime;
+  }
+
   @Override
   public String getPartition() {
     return "eucalyptus";
@@ -289,5 +303,12 @@ public class DBInstance extends UserMetadata<Status> implements DBInstanceMetada
         .region(ComponentIds.lookup(Rds.class).name())
         .namespace(this.getOwnerAccountNumber())
         .relativeId("db", getDisplayName());
+  }
+
+  @PostLoad
+  protected void onLoad() {
+    if ( dbInstanceRuntime == null ) {
+      dbInstanceRuntime = new DBInstanceRuntime(this);
+    }
   }
 }

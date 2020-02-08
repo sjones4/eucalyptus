@@ -22,6 +22,7 @@ import com.eucalyptus.component.ComponentIds;
 import com.eucalyptus.entities.UserMetadata;
 import com.eucalyptus.rds.common.Rds;
 import com.eucalyptus.rds.common.RdsMetadata.DBSubnetGroupMetadata;
+import com.eucalyptus.rds.service.persist.views.DBSubnetGroupView;
 
 /**
  *
@@ -29,7 +30,7 @@ import com.eucalyptus.rds.common.RdsMetadata.DBSubnetGroupMetadata;
 @Entity
 @PersistenceContext( name = "eucalyptus_rds" )
 @Table( name = "rds_db_subnet_group" )
-public class DBSubnetGroup extends UserMetadata<DBSubnetGroup.Status> implements DBSubnetGroupMetadata {
+public class DBSubnetGroup extends UserMetadata<DBSubnetGroup.Status> implements DBSubnetGroupMetadata, DBSubnetGroupView {
   private static final long serialVersionUID = 1L;
 
   public enum Status {

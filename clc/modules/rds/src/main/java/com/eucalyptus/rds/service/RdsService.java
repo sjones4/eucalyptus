@@ -24,7 +24,7 @@ import com.eucalyptus.context.Context;
 import com.eucalyptus.context.Contexts;
 import com.eucalyptus.rds.common.RdsMetadatas;
 import com.eucalyptus.rds.common.msgs.*;
-import com.eucalyptus.rds.engine.RdsEngine;
+import com.eucalyptus.rds.service.engine.RdsEngine;
 import com.eucalyptus.rds.service.persist.RdsMetadataNotFoundException;
 import com.eucalyptus.rds.service.persist.entities.DBInstance.Status;
 import com.eucalyptus.rds.service.persist.entities.DBSubnet;

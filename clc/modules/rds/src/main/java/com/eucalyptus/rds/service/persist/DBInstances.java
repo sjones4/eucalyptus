@@ -8,16 +8,33 @@
 package com.eucalyptus.rds.service.persist;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.hibernate.criterion.Criterion;
+import org.xbill.DNS.Name;
+import org.xbill.DNS.NameTooLongException;
+import com.eucalyptus.auth.principal.AccountFullName;
 import com.eucalyptus.auth.principal.OwnerFullName;
 import com.eucalyptus.entities.AbstractPersistentSupport;
 import com.eucalyptus.entities.Entities;
+import com.eucalyptus.rds.common.Rds;
 import com.eucalyptus.rds.common.RdsMetadata.DBInstanceMetadata;
 import com.eucalyptus.rds.common.RdsMetadatas;
+import com.eucalyptus.rds.common.msgs.Endpoint;
 import com.eucalyptus.rds.common.msgs.VpcSecurityGroupMembership;
 import com.eucalyptus.rds.common.msgs.VpcSecurityGroupMembershipList;
+import com.eucalyptus.rds.service.dns.RdsDnsHelper;
 import com.eucalyptus.rds.service.persist.entities.DBInstance;
+import com.eucalyptus.rds.service.persist.entities.DBInstanceRuntime;
+import com.eucalyptus.rds.service.persist.views.DBInstanceComposite;
+import com.eucalyptus.rds.service.persist.views.DBInstanceRuntimeComposite;
+import com.eucalyptus.rds.service.persist.views.DBInstanceView;
+import com.eucalyptus.rds.service.persist.views.ImmutableDBInstanceComposite;
+import com.eucalyptus.rds.service.persist.views.ImmutableDBInstanceRuntimeComposite;
+import com.eucalyptus.rds.service.persist.views.ImmutableDBInstanceView;
 import com.eucalyptus.util.TypeMapper;
 import com.eucalyptus.util.TypeMappers;
+import com.eucalyptus.util.dns.DomainNames;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
@@ -26,11 +43,33 @@ import com.google.common.base.Predicate;
  */
 public interface DBInstances {
 
+  long EXPIRY_AGE = TimeUnit.HOURS.toMillis( 1 );
+
+  Function<DBInstance, DBInstanceRuntimeComposite> COMPOSITE_RUNTIME =
+      instance -> ImmutableDBInstanceRuntimeComposite.builder()
+          .instance(ImmutableDBInstanceView.copyOf(instance))
+          .runtime(instance.getDbInstanceRuntime())
+          .build();
+
+  Function<DBInstance, DBInstanceComposite> COMPOSITE_FULL =
+      instance -> ImmutableDBInstanceComposite.builder()
+          .instance(ImmutableDBInstanceView.copyOf(instance))
+          .runtime(instance.getDbInstanceRuntime())
+          .subnetGroup(instance.getDbSubnetGroup())
+          .subnets(instance.getDbSubnetGroup().getSubnets())
+          .build();
+
   List<DBInstance> deleteByExample(DBInstance example) throws RdsMetadataException;
 
   <T> List<T> list(OwnerFullName ownerFullName,
                    Predicate<? super DBInstance> filter,
                    Function<? super DBInstance, T> transform) throws RdsMetadataException;
+
+  <T> List<T> list( OwnerFullName ownerFullName,
+                    Criterion criterion,
+                    Map<String,String> aliases,
+                    Predicate<? super  DBInstance> filter,
+                    Function<? super  DBInstance,T> transform ) throws RdsMetadataException;
 
   <T> List<T> listByExample(DBInstance example,
                             Predicate<? super DBInstance> filter,
@@ -53,6 +92,19 @@ public interface DBInstances {
                         OwnerFullName ownerFullName,
                         String desc,
                         Function<? super DBInstance, T> updateTransform) throws RdsMetadataException;
+
+  default <T> T updateByView(
+      final DBInstanceView view,
+      final Function<? super DBInstance, T> updateTransform
+  ) throws RdsMetadataException {
+    final AccountFullName accountFullName = AccountFullName.getInstance(view.getOwnerAccountNumber());
+    return updateByExample(
+        DBInstance.exampleWithName( accountFullName, view.getDisplayName() ),
+        accountFullName,
+        view.getDisplayName(),
+        updateTransform
+    );
+  }
 
   AbstractPersistentSupport<DBInstanceMetadata, DBInstance, RdsMetadataException> withRetries();
 
@@ -92,6 +144,24 @@ public interface DBInstances {
           list.getMember().add(item);
         }
         result.setVpcSecurityGroups(list);
+      }
+
+      if ( Entities.isReadable( instance.getDbInstanceRuntime( ) ) ) {
+        final DBInstanceRuntime runtime = instance.getDbInstanceRuntime();
+        if ( runtime.getPrivateIp( ) != null ) try {
+          final String endpointAddress = DomainNames.relativize(
+              Name.concatenate(
+                  RdsDnsHelper.getRelativeName(instance.getDisplayName(),instance.getOwnerAccountNumber()),
+                  DomainNames.externalSubdomain(Rds.class)),
+              DomainNames.root()).toString();
+
+          final Endpoint endpoint = new Endpoint();
+          endpoint.setAddress(endpointAddress);
+          endpoint.setPort(instance.getDbPort());
+          result.setEndpoint(endpoint);
+        } catch (final NameTooLongException e) {
+          // omit endpoint
+        }
       }
 
       // hard-code some items we do not support
