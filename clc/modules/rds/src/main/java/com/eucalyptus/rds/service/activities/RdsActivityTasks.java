@@ -46,6 +46,7 @@ import com.eucalyptus.auth.euare.common.msgs.ServerCertificateType;
 import com.eucalyptus.auth.principal.AccountFullName;
 import com.eucalyptus.auth.principal.AccountIdentifiers;
 import com.eucalyptus.cloudformation.common.CloudFormation;
+import com.eucalyptus.cloudformation.common.msgs.Capabilities;
 import com.eucalyptus.cloudformation.common.msgs.CloudFormationMessage;
 import com.eucalyptus.cloudformation.common.msgs.CreateStackResponseType;
 import com.eucalyptus.cloudformation.common.msgs.CreateStackResult;
@@ -57,7 +58,6 @@ import com.eucalyptus.cloudformation.common.msgs.DescribeStacksResult;
 import com.eucalyptus.cloudformation.common.msgs.DescribeStacksType;
 import com.eucalyptus.cloudformation.common.msgs.Parameter;
 import com.eucalyptus.cloudformation.common.msgs.Parameters;
-import com.eucalyptus.cloudformation.common.msgs.ResourceList;
 import com.eucalyptus.cloudformation.common.msgs.Stack;
 import com.eucalyptus.cloudformation.common.msgs.Stacks;
 import com.eucalyptus.cloudformation.common.msgs.Tag;
@@ -1823,7 +1823,7 @@ public class RdsActivityTasks {
       req.setStackName(stack);
       req.setTemplateBody(template);
 
-      final ResourceList capabilitiesList = new ResourceList();
+      final Capabilities capabilitiesList = new Capabilities();
       capabilitiesList.getMember().add("CAPABILITY_IAM");
       req.setCapabilities(capabilitiesList);
 
