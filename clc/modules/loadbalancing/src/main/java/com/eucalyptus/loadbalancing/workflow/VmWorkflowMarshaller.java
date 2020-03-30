@@ -72,17 +72,25 @@ public class VmWorkflowMarshaller {
     return marshalLoadBalancer(descriptions);
   }
 
+  public static String marshalLoadBalancer(final LoadBalancerServoDescription desc) {
+    final LoadBalancerServoDescriptions lbDescriptions = new LoadBalancerServoDescriptions();
+    lbDescriptions.setMember(new ArrayList<>());
+    lbDescriptions.getMember().add(desc);
+    final String encoded = marshalLoadBalancer(lbDescriptions);
+    return encoded;
+  }
+
   public static String marshalLoadBalancer(final LoadBalancerServoDescriptions desc) {
     final Binding binding =
         BindingManager.getBinding(LOADBALANCING_BINDING_NAME);
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stream = new ByteArrayOutputStream(512);
     try{
       binding.toStream(stream, desc);
     }catch(final BindingException ex) {
       LOG.error("Marshalling failed", ex);
       throw Exceptions.toUndeclared(ex);
     }
-    final String outString = new String(stream.toByteArray());
+    final String outString = stream.toString();
     return outString;
   }
 
@@ -110,7 +118,7 @@ public class VmWorkflowMarshaller {
     return data;
   }
 
-  public static Map<String,String> decodeJsonStringMap(final String encodedMap) {
+  private static Map<String,String> decodeJsonStringMap(final String encodedMap) {
     final ObjectMapper mapper = new ObjectMapper();
     final TypeReference<Map<String,String>> typeRef = new TypeReference<Map<String,String>>() {};
     try{

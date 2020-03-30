@@ -39,6 +39,7 @@ import com.eucalyptus.auth.AuthException;
 import com.eucalyptus.auth.principal.Role;
 import com.eucalyptus.auth.tokens.SecurityTokenAWSCredentialsProvider;
 import com.eucalyptus.compute.common.*;
+import com.eucalyptus.crypto.Digest;
 import com.eucalyptus.loadbalancing.*;
 import com.eucalyptus.loadbalancing.activities.LoadBalancerServoInstance.STATE;
 import com.eucalyptus.loadbalancing.common.LoadBalancing;
@@ -76,6 +77,7 @@ import com.eucalyptus.autoscaling.common.msgs.Instance;
 import com.eucalyptus.autoscaling.common.msgs.Instances;
 import com.eucalyptus.autoscaling.common.msgs.LaunchConfigurationType;
 import com.eucalyptus.cloudwatch.common.msgs.MetricData;
+import com.eucalyptus.cloudwatch.common.msgs.MetricDatum;
 import com.eucalyptus.component.annotation.ComponentPart;
 import com.eucalyptus.crypto.util.B64;
 import com.eucalyptus.empyrean.ServiceStatusType;
@@ -117,6 +119,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -129,6 +132,16 @@ import com.google.common.collect.Sets;
 @ComponentPart(LoadBalancing.class)
 public class LoadBalancingActivitiesImpl implements LoadBalancingActivities {
   private static Logger LOG  = Logger.getLogger( LoadBalancingActivitiesImpl.class );
+
+  private static final ImmutableList<String> zeroMetrics = ImmutableList.of(
+      "RequestCount",
+      "HTTPCode_ELB_4XX",
+      "HTTPCode_ELB_5XX",
+      "HTTPCode_Backend_2XX",
+      "HTTPCode_Backend_3XX",
+      "HTTPCode_Backend_4XX",
+      "HTTPCode_Backend_5XX"
+  );
 
   private static int findAvailableResources(final List<ClusterInfoType> clusters, final String zoneName, final String instanceType){
     // parse euca-describe-availability-zones verbose response
@@ -1499,6 +1512,17 @@ public class LoadBalancingActivitiesImpl implements LoadBalancingActivities {
         if(data.getMember()== null || data.getMember().size()<=0)
           continue;
 
+        // metrics with a zero value are omitted from the message
+        Set<String> names = data.getMember().stream().map(MetricDatum::getMetricName).collect(Collectors.toSet());
+        for ( final String zeroMetric : zeroMetrics) {
+          if (!names.contains(zeroMetric)) {
+            MetricDatum datum = new MetricDatum();
+            datum.setMetricName(zeroMetric);
+            datum.setValue(0D);
+            data.getMember().add(datum);
+          }
+        }
+
         LoadBalancerZone zone = null;
         /// TODO: SCALE
         try ( final TransactionResource db = Entities.transactionFor( LoadBalancerServoInstance.class ) ) {
@@ -1522,7 +1546,11 @@ public class LoadBalancingActivitiesImpl implements LoadBalancingActivities {
   }
 
   @Override
-  public List<String> listLoadBalancerPolicies(final String accountNumber, final String lbName) throws LoadBalancingActivityException {
+  public List<String> listLoadBalancerPolicies(
+      final String accountNumber,
+      final String lbName,
+      final String policiesSha1
+  ) throws LoadBalancingActivityException {
     try {
       final LoadBalancer lb = LoadBalancers.getLoadbalancer(accountNumber, lbName);
       final List<LoadBalancerListener> listeners = lb.getListeners().stream()
@@ -1553,29 +1581,45 @@ public class LoadBalancingActivitiesImpl implements LoadBalancingActivities {
       final List<String> policies = Lists.newArrayList(listenerPolicies);
       policies.addAll(backendPolicies);
       policies.addAll(publicKeyPolicies);
-      return policies.stream().distinct().collect(Collectors.toList());
+      final List<String> result = policies.stream().distinct().collect(Collectors.toList());
+      return policiesSha1==null || !policiesSha1.equals(sha1(Sets.newTreeSet(result).toString())) ?
+          result :
+          Lists.newArrayList(policiesSha1);
     }catch(final Exception ex) {
       throw new LoadBalancingActivityException("Failed to lookup loadbalancer policies", ex);
     }
   }
 
   @Override
-  public PolicyDescription getLoadBalancerPolicy(final String accountNumber, final String lbName, final String policyName)
-          throws LoadBalancingActivityException {
+  public PolicyDescription getLoadBalancerPolicy(
+      final String accountNumber,
+      final String lbName,
+      final String policyName,
+      final String policySha1
+  ) throws LoadBalancingActivityException {
     try {
       final LoadBalancer lb = LoadBalancers.getLoadbalancer(accountNumber, lbName);
       final LoadBalancerPolicyDescription policy =
               LoadBalancerPolicies.getLoadBalancerPolicyDescription(lb, policyName);
-      return LoadBalancerPolicies.AsPolicyDescription.INSTANCE.apply(policy);
+      final PolicyDescription description = LoadBalancerPolicies.AsPolicyDescription.INSTANCE.apply(policy);
+      return policySha1==null || !policySha1.equals(sha1(VmWorkflowMarshaller.marshalPolicy(description))) ?
+          description :
+          null;
     } catch(final Exception ex) {
       throw new LoadBalancingActivityException("Failed to lookup loadbalancer policies", ex);
     }
   }
 
-  // TODO: SCALE
+  private static String sha1(final String text) {
+    return Digest.SHA1.digestHex(text.getBytes(StandardCharsets.UTF_8));
+  }
+
   @Override
-  public Map<String, LoadBalancerServoDescription> lookupLoadBalancerDescription(final String accountNumber, final String lbName)
-      throws LoadBalancingActivityException {
+  public Map<String, LoadBalancerServoDescription> lookupLoadBalancerDescription(
+      final String accountNumber,
+      final String lbName,
+      final String lbSha1
+  ) throws LoadBalancingActivityException {
     final Map<String, LoadBalancerServoDescription> result = Maps.newHashMap();
     try{
       final LoadBalancer lb = LoadBalancers.getLoadbalancer(accountNumber, lbName);
@@ -1585,9 +1629,14 @@ public class LoadBalancingActivitiesImpl implements LoadBalancingActivities {
 
         final LoadBalancerServoDescription desc =
             LoadBalancers.getServoDescription(accountNumber, lbName, zoneView.getName());
+        final String descSha1 = lbSha1==null ? null : sha1(VmWorkflowMarshaller.marshalLoadBalancer(desc));
         final LoadBalancerZone zone = LoadBalancerZoneEntityTransform.INSTANCE.apply(zoneView);
         for(final LoadBalancerServoInstanceCoreView servoView : zone.getServoInstances()) {
-          result.put(servoView.getInstanceId(), desc);
+          if (lbSha1==null || !lbSha1.equals(descSha1)) {
+            result.put( servoView.getInstanceId( ), desc );
+          } else {
+            result.put( servoView.getInstanceId( ), null );
+          }
         }
       }
     } catch(final Exception ex) {
@@ -3365,7 +3414,9 @@ public class LoadBalancingActivitiesImpl implements LoadBalancingActivities {
           db.commit();
         }
       }
-    }catch(final Exception ex) {
+    } catch(final NoSuchElementException ex) {
+      LOG.warn(String.format("Failed to mark the VM (%s) as failed (not found)", instanceId));
+    } catch(final Exception ex) {
        LOG.warn(String.format("Failed to mark the VM (%s) as failed", instanceId), ex);
     }
   }
