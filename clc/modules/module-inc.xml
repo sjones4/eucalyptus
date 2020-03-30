@@ -354,7 +354,7 @@
 	</target>
 	<target name="generate-java" depends="classpaths">
 		<antcall target="build-mkdirs" />
-		<echo level="info" messsage="Generating Java source"/>
+		<echo level="info" message="Generating Java source"/>
 		<javac source="${javac.source}" target="${javac.target}" classpathref="generate-classpath" deprecation="false" failonerror="true" debug="${javac.debug}" encoding="utf-8" listfiles="true" includeantruntime="${javac.includeantruntime}">
 			<compilerarg value="-proc:only"/>
 			<compilerarg value="-s"/>
