@@ -1251,92 +1251,92 @@ public interface LoadBalancingActivitiesClient extends ActivitiesClient
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#listLoadBalancerPolicies}
      */
-    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(String accountNumber, String lbName);
+    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(String accountNumber, String lbName, String policiesSha1);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#listLoadBalancerPolicies}
      */
-    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(String accountNumber, String lbName, Promise<?>... waitFor);
+    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(String accountNumber, String lbName, String policiesSha1, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#listLoadBalancerPolicies}
      */
-    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(String accountNumber, String lbName, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
+    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(String accountNumber, String lbName, String policiesSha1, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#listLoadBalancerPolicies}
      */
-    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(Promise<String> accountNumber, Promise<String> lbName);
+    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policiesSha1);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#listLoadBalancerPolicies}
      */
-    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(Promise<String> accountNumber, Promise<String> lbName, Promise<?>... waitFor);
+    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policiesSha1, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#listLoadBalancerPolicies}
      */
-    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(Promise<String> accountNumber, Promise<String> lbName, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
+    Promise<java.util.List<java.lang.String>> listLoadBalancerPolicies(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policiesSha1, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#getLoadBalancerPolicy}
      */
-    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(String accountNumber, String lbName, String policyName);
+    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(String accountNumber, String lbName, String policyName, String policySha1);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#getLoadBalancerPolicy}
      */
-    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(String accountNumber, String lbName, String policyName, Promise<?>... waitFor);
+    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(String accountNumber, String lbName, String policyName, String policySha1, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#getLoadBalancerPolicy}
      */
-    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(String accountNumber, String lbName, String policyName, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
+    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(String accountNumber, String lbName, String policyName, String policySha1, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#getLoadBalancerPolicy}
      */
-    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policyName);
+    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policyName, Promise<String> policySha1);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#getLoadBalancerPolicy}
      */
-    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policyName, Promise<?>... waitFor);
+    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policyName, Promise<String> policySha1, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#getLoadBalancerPolicy}
      */
-    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policyName, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
+    Promise<com.eucalyptus.loadbalancing.common.msgs.PolicyDescription> getLoadBalancerPolicy(Promise<String> accountNumber, Promise<String> lbName, Promise<String> policyName, Promise<String> policySha1, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerDescription}
      */
-    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(String accountNumber, String lbName);
+    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(String accountNumber, String lbName, String lbSha1);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerDescription}
      */
-    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(String accountNumber, String lbName, Promise<?>... waitFor);
+    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(String accountNumber, String lbName, String lbSha1, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerDescription}
      */
-    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(String accountNumber, String lbName, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
+    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(String accountNumber, String lbName, String lbSha1, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerDescription}
      */
-    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(Promise<String> accountNumber, Promise<String> lbName);
+    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(Promise<String> accountNumber, Promise<String> lbName, Promise<String> lbSha1);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerDescription}
      */
-    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(Promise<String> accountNumber, Promise<String> lbName, Promise<?>... waitFor);
+    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(Promise<String> accountNumber, Promise<String> lbName, Promise<String> lbSha1, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerDescription}
      */
-    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(Promise<String> accountNumber, Promise<String> lbName, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
+    Promise<java.util.Map<java.lang.String,com.eucalyptus.loadbalancing.common.msgs.LoadBalancerServoDescription>> lookupLoadBalancerDescription(Promise<String> accountNumber, Promise<String> lbName, Promise<String> lbSha1, ActivitySchedulingOptions optionsOverride, Promise<?>... waitFor);
 
     /**
      * Generated from {@link com.eucalyptus.loadbalancing.workflow.LoadBalancingActivities#lookupLoadBalancerHealthCheck}
