@@ -13,6 +13,7 @@ import com.eucalyptus.component.annotation.Description;
 import com.eucalyptus.component.annotation.Partition;
 import com.eucalyptus.auth.policy.annotation.PolicyVendor;
 import com.eucalyptus.component.annotation.PublicService;
+import com.eucalyptus.util.techpreview.TechPreview;
 
 /**
  *
@@ -22,6 +23,7 @@ import com.eucalyptus.component.annotation.PublicService;
 @PolicyVendor( "logs" )
 @Partition( value = Cloudwatchlogs.class, manyToOne = true )
 @Description( "CloudWatch Logs API service" )
+@TechPreview(enableByDefaultProperty = "enable.cloudwatchlogs.tech.preview")
 public class Cloudwatchlogs extends ComponentId {
   private static final long serialVersionUID = 1L;
 }
