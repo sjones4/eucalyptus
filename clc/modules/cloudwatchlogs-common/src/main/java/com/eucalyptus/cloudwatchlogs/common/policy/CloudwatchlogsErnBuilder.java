@@ -43,8 +43,8 @@ public class CloudwatchlogsErnBuilder extends ServiceErnBuilder {
     } else {
       final Matcher groupMatcher = RESOURCE_PATTERN_GROUP.matcher(resource);
       if (groupMatcher.matches()) {
-        String type = matcher.group(ARN_PATTERNGROUP_LOGS_TYPE).toLowerCase();
-        String id = matcher.group(ARN_PATTERNGROUP_LOGS_ID);
+        String type = groupMatcher.group(ARN_PATTERNGROUP_LOGS_TYPE).toLowerCase();
+        String id = groupMatcher.group(ARN_PATTERNGROUP_LOGS_ID);
         return new CloudwatchlogsResourceName(region, account, type, id);
       }
     }
