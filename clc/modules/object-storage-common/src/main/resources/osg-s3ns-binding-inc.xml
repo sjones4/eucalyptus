@@ -411,6 +411,15 @@
     </structure>
   </mapping>
 
+  <!-- TODO:STEVE: jibx binding for request and response? -->
+  <mapping name="SelectObjectContent"
+           class="com.eucalyptus.objectstorage.msgs.SelectObjectContentType">
+  </mapping>
+
+  <mapping name="SelectObjectContentResponse"
+           class="com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType">
+  </mapping>
+
   <mapping name="HeadObject"
            class="com.eucalyptus.objectstorage.msgs.HeadObjectType">
     <structure

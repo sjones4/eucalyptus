@@ -55,6 +55,7 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpHeaders.Values;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
@@ -136,7 +137,7 @@ public class ObjectStorageGETOutboundHandler extends ObjectStorageBasicOutboundH
     return false;
   }
 
-  protected void writeObjectStorageDataGetResponse(final ObjectStorageDataGetResponseType response, final ChannelHandlerContext ctx) throws S3Exception {
+  static void writeObjectStorageDataGetResponse(final ObjectStorageDataGetResponseType response, final ChannelHandlerContext ctx) throws S3Exception {
     DefaultHttpResponse httpResponse = createHttpResponse(response);
     if (!Strings.isNullOrEmpty(response.getCorrelationId())) {
       httpResponse.setHeader(ObjectStorageProperties.AMZ_REQUEST_ID, response.getCorrelationId());
@@ -177,7 +178,7 @@ public class ObjectStorageGETOutboundHandler extends ObjectStorageBasicOutboundH
   }
 
   // TODO: zhill - this should all be done in bindings, just need 2-way bindings
-  protected DefaultHttpResponse createHttpResponse(ObjectStorageDataGetResponseType reply) throws S3Exception {
+  protected static DefaultHttpResponse createHttpResponse(ObjectStorageDataGetResponseType reply) throws S3Exception {
     DefaultHttpResponse httpResponse = null;
 
     if (reply.getStatus() == HttpResponseStatus.OK) {
@@ -192,7 +193,11 @@ public class ObjectStorageGETOutboundHandler extends ObjectStorageBasicOutboundH
       }
 
       long contentLength = reply.getSize();
-      httpResponse.addHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(contentLength));
+      if ( reply.getHasStreamingData() && contentLength == 0 ) {
+        httpResponse.addHeader(HttpHeaders.Names.TRANSFER_ENCODING, Values.CHUNKED);
+      } else {
+        httpResponse.addHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(contentLength));
+      }
 
       // write extra headers
       if (reply.getByteRangeEnd() != null) {
@@ -234,7 +239,7 @@ public class ObjectStorageGETOutboundHandler extends ObjectStorageBasicOutboundH
     return httpResponse;
   }
 
-  private void overrideHeaders(ObjectStorageDataResponseType response, DefaultHttpResponse httpResponse) {
+  private static void overrideHeaders(ObjectStorageDataResponseType response, DefaultHttpResponse httpResponse) {
     Map<String, String> overrides = response.getResponseHeaderOverrides();
     if (overrides == null || overrides.size() == 0) {
       return;

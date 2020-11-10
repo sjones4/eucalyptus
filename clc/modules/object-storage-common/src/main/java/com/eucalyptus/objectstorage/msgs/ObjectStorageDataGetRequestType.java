@@ -29,11 +29,9 @@
 package com.eucalyptus.objectstorage.msgs;
 
 import java.util.Map;
-import org.jboss.netty.channel.Channel;
 
 public class ObjectStorageDataGetRequestType extends ObjectStorageDataRequestType {
 
-  protected Channel channel;
   private Map<String, String> responseHeaderOverrides;
 
   public ObjectStorageDataGetRequestType( ) {
@@ -41,14 +39,6 @@ public class ObjectStorageDataGetRequestType extends ObjectStorageDataRequestTyp
 
   public ObjectStorageDataGetRequestType( String bucket, String key ) {
     super( bucket, key );
-  }
-
-  public Channel getChannel( ) {
-    return channel;
-  }
-
-  public void setChannel( Channel channel ) {
-    this.channel = channel;
   }
 
   public Map<String, String> getResponseHeaderOverrides( ) {

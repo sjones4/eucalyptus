@@ -190,6 +190,8 @@ import com.eucalyptus.objectstorage.msgs.PutObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PutObjectType;
 import com.eucalyptus.objectstorage.msgs.PreflightCheckCorsResponseType;
 import com.eucalyptus.objectstorage.msgs.PreflightCheckCorsType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyType;
 import com.eucalyptus.objectstorage.msgs.SetBucketCorsResponseType;
@@ -1493,6 +1495,39 @@ public class ObjectStorageGateway implements ObjectStorageService {
     if (storedHeaders.containsKey(HttpHeaders.EXPIRES)) {
       reply.setExpires(storedHeaders.get(HttpHeaders.EXPIRES));
     }
+  }
+
+  @Override
+  public SelectObjectContentResponseType selectObjectContent(final SelectObjectContentType request) throws S3Exception {
+    final ObjectEntity objectEntity = getObjectEntityAndCheckPermissions(request, request.getVersionId());
+
+    final UserPrincipal user = getRequestUser(request);
+    if (Principals.isSameUser(user, Principals.nobodyUser())) {
+      throw new AccessDeniedException(request.getKey());
+    }
+
+    if (objectEntity.getIsDeleteMarker()) {
+      throw new NoSuchKeyException(request.getKey());
+    }
+
+    request.setKey(objectEntity.getObjectUuid());
+    request.setBucket(objectEntity.getBucket().getBucketUuid());
+    request.setVersionId(null);
+
+    final SelectObjectContentResponseType reply = request.getReply();
+    try {
+      final SelectObjectContentResponseType backendReply = ospClient.selectObjectContent(request);
+      reply.setStatus(HttpResponseStatus.OK);
+      reply.setHasStreamingData(true);
+      reply.setMetaData(backendReply.getMetaData());
+      reply.setContentType(backendReply.getContentType());
+      reply.setDataInputStream(backendReply.getDataInputStream());
+    } catch (S3Exception e) {
+      LOG.warn("CorrelationId: " + Contexts.lookup().getCorrelationId() + " Responding to client with 500 InternalError because of:", e);
+      // We don't dispatch unless it exists and should be available. An error from the backend would be confusing. This is an internal issue.
+      throw new InternalErrorException(e);
+    }
+    return reply;
   }
 
   /*

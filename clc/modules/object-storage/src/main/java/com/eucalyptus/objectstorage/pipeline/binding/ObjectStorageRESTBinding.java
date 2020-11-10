@@ -95,7 +95,6 @@ import com.eucalyptus.objectstorage.exceptions.s3.MalformedXMLException;
 import com.eucalyptus.objectstorage.exceptions.s3.MethodNotAllowedException;
 import com.eucalyptus.objectstorage.exceptions.s3.NotImplementedException;
 import com.eucalyptus.objectstorage.exceptions.s3.S3Exception;
-import com.eucalyptus.objectstorage.msgs.ObjectStorageDataGetRequestType;
 import com.eucalyptus.objectstorage.msgs.ObjectStorageDataPutRequestType;
 import com.eucalyptus.objectstorage.msgs.ObjectStorageRequestType;
 import com.eucalyptus.objectstorage.pipeline.ObjectStorageRESTPipeline;
@@ -191,10 +190,6 @@ public abstract class ObjectStorageRESTBinding extends RestfulMarshallingHandler
       BaseMessage msg = (BaseMessage) this.bind(httpRequest);
       httpRequest.setMessage(msg);
 
-      if (msg instanceof ObjectStorageDataGetRequestType) {
-        ObjectStorageDataGetRequestType getObject = (ObjectStorageDataGetRequestType) msg;
-        getObject.setChannel(ctx.getChannel());
-      }
       if (msg instanceof ObjectStorageDataPutRequestType ) {
         ObjectStorageDataPutRequestType request = (ObjectStorageDataPutRequestType) msg;
         String expect = httpRequest.getHeader(HttpHeaders.Names.EXPECT);
@@ -579,6 +574,10 @@ public abstract class ObjectStorageRESTBinding extends RestfulMarshallingHandler
             String contentType = httpRequest.getHeader(HttpHeaders.Names.CONTENT_TYPE);
             if (contentType != null)
               operationParams.put("ContentType", contentType);
+          } else if (params.containsKey("select")) {
+            //TODO:STEVE: parse other data from select requests here
+            operationParams.put("Expression", getExpression(httpRequest));
+            operationParams.put("ExpressionType", "SQL");
           }
         }
       }
@@ -975,6 +974,22 @@ public abstract class ObjectStorageRESTBinding extends RestfulMarshallingHandler
       throw new BindingException("Unable to parse part list " + ex.getMessage());
     }
     return partList;
+  }
+
+  private String getExpression(MappingHttpRequest httpRequest) throws S3Exception {
+    String expression = null;
+    try {
+      final String selectionString = getMessageString(httpRequest);
+      if (selectionString.length() > 0) {
+        XMLParser xmlParser = new XMLParser(selectionString);
+        expression = xmlParser.getValue("/SelectObjectContentRequest/Expression");
+      }
+    } catch (Exception ex) {
+      MalformedXMLException malEx = new MalformedXMLException("/SelectObjectContentRequest/Expression");
+      malEx.initCause(ex);
+      throw malEx;
+    }
+    return expression;
   }
 
   protected String getLocationConstraint(MappingHttpRequest httpRequest) throws S3Exception {

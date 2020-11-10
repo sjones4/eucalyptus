@@ -66,6 +66,10 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.GroupGrantee;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
+import com.amazonaws.services.s3.model.InputSerialization;
+import com.amazonaws.services.s3.model.JSONInput;
+import com.amazonaws.services.s3.model.JSONOutput;
+import com.amazonaws.services.s3.model.JSONType;
 import com.amazonaws.services.s3.model.ListBucketsRequest;
 import com.amazonaws.services.s3.model.ListMultipartUploadsRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
@@ -75,6 +79,7 @@ import com.amazonaws.services.s3.model.MultipartUpload;
 import com.amazonaws.services.s3.model.MultipartUploadListing;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.OutputSerialization;
 import com.amazonaws.services.s3.model.PartETag;
 import com.amazonaws.services.s3.model.PartListing;
 import com.amazonaws.services.s3.model.PartSummary;
@@ -83,6 +88,8 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.model.S3VersionSummary;
+import com.amazonaws.services.s3.model.SelectObjectContentRequest;
+import com.amazonaws.services.s3.model.SelectObjectContentResult;
 import com.amazonaws.services.s3.model.SetBucketLoggingConfigurationRequest;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.model.UploadPartRequest;
@@ -148,6 +155,8 @@ import com.eucalyptus.objectstorage.msgs.PostObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PostObjectType;
 import com.eucalyptus.objectstorage.msgs.PutObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PutObjectType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyType;
 import com.eucalyptus.objectstorage.msgs.SetBucketLoggingStatusResponseType;
@@ -829,6 +838,37 @@ public class S3ProviderClient implements ObjectStorageProviderClient {
       return reply;
     } catch (AmazonServiceException e) {
       LOG.debug("Error from backend", e);
+      throw S3ExceptionMapper.fromAWSJavaSDK(e);
+    }
+  }
+
+  @Override
+  public SelectObjectContentResponseType selectObjectContent(final SelectObjectContentType request) throws S3Exception {
+    final User requestUser = getRequestUser(request);
+    OsgInternalS3Client internalS3Client = null;
+
+    final SelectObjectContentRequest selectRequest = new SelectObjectContentRequest();
+    selectRequest.setBucketName(request.getBucket());
+    selectRequest.setKey(request.getKey());
+    selectRequest.setExpressionType(request.getExpressionType());
+    selectRequest.setExpression(request.getExpression());
+    // TODO:STEVE: select object request propagation
+    //selectRequest.setInputSerialization();
+    //selectRequest.setOutputSerialization();
+    selectRequest.setInputSerialization(new InputSerialization().withJson(new JSONInput().withType(JSONType.LINES)));
+    selectRequest.setOutputSerialization(new OutputSerialization().withJson(new JSONOutput()));
+
+    try {
+      internalS3Client = getS3Client(requestUser);
+      final AmazonS3Client s3Client = internalS3Client.getS3Client();
+      SelectObjectContentResult result = s3Client.selectObjectContent(selectRequest);
+      InputStream payloadInput = result.getPayload().getRecordsInputStream();
+
+      SelectObjectContentResponseType reply = request.getReply();
+      reply.setDataInputStream(payloadInput);
+      return reply;
+    } catch (AmazonServiceException e) {
+      LOG.debug("Error from backend on select", e);
       throw S3ExceptionMapper.fromAWSJavaSDK(e);
     }
   }

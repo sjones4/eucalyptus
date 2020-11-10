@@ -80,6 +80,8 @@ import com.eucalyptus.objectstorage.msgs.PostObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PostObjectType;
 import com.eucalyptus.objectstorage.msgs.PutObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PutObjectType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyType;
 import com.eucalyptus.objectstorage.msgs.SetBucketLoggingStatusResponseType;
@@ -182,6 +184,8 @@ public interface ObjectStorageProviderClient {
   public GetObjectResponseType getObject(GetObjectType request) throws S3Exception;
 
   public GetObjectExtendedResponseType getObjectExtended(GetObjectExtendedType request) throws S3Exception;
+
+  public SelectObjectContentResponseType selectObjectContent(SelectObjectContentType request) throws S3Exception;
 
   public HeadObjectResponseType headObject(HeadObjectType request) throws S3Exception;
 

@@ -100,6 +100,8 @@ import com.eucalyptus.objectstorage.msgs.PreflightCheckCorsResponseType;
 import com.eucalyptus.objectstorage.msgs.PreflightCheckCorsType;
 import com.eucalyptus.objectstorage.msgs.PutObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PutObjectType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyType;
 import com.eucalyptus.objectstorage.msgs.SetBucketCorsResponseType;
@@ -161,6 +163,8 @@ public interface ObjectStorageService {
   GetObjectResponseType getObject(GetObjectType request) throws S3Exception;
 
   GetObjectExtendedResponseType getObjectExtended(GetObjectExtendedType request) throws S3Exception;
+
+  SelectObjectContentResponseType selectObjectContent(SelectObjectContentType request) throws S3Exception;
 
   HeadObjectResponseType headObject(HeadObjectType request) throws S3Exception;
 

@@ -103,6 +103,8 @@ import com.eucalyptus.objectstorage.msgs.PostObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PostObjectType;
 import com.eucalyptus.objectstorage.msgs.PutObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PutObjectType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyType;
 import com.eucalyptus.objectstorage.msgs.SetBucketLoggingStatusResponseType;
@@ -624,6 +626,11 @@ public class InMemoryProvider implements ObjectStorageProviderClient {
   public GetObjectExtendedResponseType getObjectExtended(GetObjectExtendedType request) throws S3Exception {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public SelectObjectContentResponseType selectObjectContent(final SelectObjectContentType request) throws S3Exception {
+    throw new NotImplementedException();
   }
 
   @Override

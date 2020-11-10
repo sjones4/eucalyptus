@@ -68,6 +68,8 @@ public class ObjectStoragePUTBinding extends ObjectStorageRESTBinding {
     .put(OBJECT + HttpMethod.PUT + ObjectParameter.acl.toString(), "SetObjectAccessControlPolicy")
     .put(OBJECT + HttpMethod.PUT + ObjectStorageProperties.COPY_SOURCE, "CopyObject")
 
+    .put(OBJECT + HttpMethod.POST + ObjectParameter.select.toString(), "SelectObjectContent")
+
     // Multipart Uploads
     .put(OBJECT + HttpMethod.PUT + ObjectParameter.partNumber.toString().toLowerCase()
         + ObjectParameter.uploadId.toString().toLowerCase(), "UploadPart")

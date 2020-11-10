@@ -58,6 +58,7 @@ import com.eucalyptus.objectstorage.msgs.ObjectStorageDataResponseType;
 import com.eucalyptus.objectstorage.msgs.ObjectStorageResponseType;
 import com.eucalyptus.objectstorage.msgs.PostObjectResponseType;
 import com.eucalyptus.objectstorage.msgs.PutObjectResponseType;
+import com.eucalyptus.objectstorage.msgs.SelectObjectContentResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketAccessControlPolicyResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketCorsResponseType;
 import com.eucalyptus.objectstorage.msgs.SetBucketLifecycleResponseType;
@@ -95,13 +96,14 @@ public class ObjectStorageOutboundHandler extends MessageStackHandler {
   public void handleDownstream(ChannelHandlerContext ctx, ChannelEvent channelEvent) throws Exception {
     if (channelEvent instanceof MessageEvent) {
       final MessageEvent msgEvent = (MessageEvent) channelEvent;
-      this.outgoingMessage(ctx, msgEvent);
+      if (this.handleOutgoingMessage(ctx, msgEvent)) {
+        return;
+      }
     }
     ctx.sendDownstream(channelEvent);
   }
 
-  @Override
-  public void outgoingMessage(ChannelHandlerContext ctx, MessageEvent event) throws Exception {
+  public boolean handleOutgoingMessage(ChannelHandlerContext ctx, MessageEvent event) throws Exception {
     if (event.getMessage() instanceof MappingHttpResponse) {
       MappingHttpResponse httpResponse = (MappingHttpResponse) event.getMessage();
       BaseMessage msg = (BaseMessage) httpResponse.getMessage();
@@ -160,6 +162,10 @@ public class ObjectStorageOutboundHandler extends MessageStackHandler {
         if (msg instanceof PutObjectResponseType || msg instanceof UploadPartResponseType) {
           removeResponseBody(msg, httpResponse);
         }
+        if (msg instanceof SelectObjectContentResponseType) {
+          ObjectStorageGETOutboundHandler.writeObjectStorageDataGetResponse((SelectObjectContentResponseType) msg, ctx);
+          return true;
+        }
       } else if (msg instanceof ObjectStorageResponseType) { // Filter for GETs and PUTs *NOT* related to data
         // Remove the content in response for certain operations
         if (msg instanceof SetBucketAccessControlPolicyResponseType || msg instanceof SetBucketLifecycleResponseType
@@ -176,6 +182,7 @@ public class ObjectStorageOutboundHandler extends MessageStackHandler {
         }
       }
     }
+    return false;
   }
 
   private void removeResponseBody(BaseMessage msg, MappingHttpResponse httpResponse) {
