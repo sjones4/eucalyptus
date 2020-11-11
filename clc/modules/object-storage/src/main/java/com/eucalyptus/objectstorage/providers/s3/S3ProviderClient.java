@@ -29,8 +29,8 @@
 
 package com.eucalyptus.objectstorage.providers.s3;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -88,6 +88,7 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.model.S3VersionSummary;
+import com.amazonaws.services.s3.model.SelectObjectContentEventStream;
 import com.amazonaws.services.s3.model.SelectObjectContentRequest;
 import com.amazonaws.services.s3.model.SelectObjectContentResult;
 import com.amazonaws.services.s3.model.SetBucketLoggingConfigurationRequest;
@@ -190,6 +191,7 @@ import com.eucalyptus.storage.msgs.s3.MetaDataEntry;
 import com.eucalyptus.storage.msgs.s3.Part;
 import com.eucalyptus.storage.msgs.s3.VersionEntry;
 import com.eucalyptus.util.EucalyptusCloudException;
+import com.eucalyptus.util.Exceptions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -861,12 +863,16 @@ public class S3ProviderClient implements ObjectStorageProviderClient {
     try {
       internalS3Client = getS3Client(requestUser);
       final AmazonS3Client s3Client = internalS3Client.getS3Client();
-      SelectObjectContentResult result = s3Client.selectObjectContent(selectRequest);
-      InputStream payloadInput = result.getPayload().getRecordsInputStream();
+      final SelectObjectContentResult result = s3Client.selectObjectContent(selectRequest);
+      final Field field = SelectObjectContentEventStream.class.getDeclaredField("inputStream");
+      field.setAccessible(true);
+      final InputStream payloadInput = (InputStream) field.get(result.getPayload());
 
-      SelectObjectContentResponseType reply = request.getReply();
+      final SelectObjectContentResponseType reply = request.getReply();
       reply.setDataInputStream(payloadInput);
       return reply;
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw Exceptions.toUndeclared(e);
     } catch (AmazonServiceException e) {
       LOG.debug("Error from backend on select", e);
       throw S3ExceptionMapper.fromAWSJavaSDK(e);

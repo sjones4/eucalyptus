@@ -192,10 +192,8 @@ public class ObjectStorageGETOutboundHandler extends ObjectStorageBasicOutboundH
         httpResponse.addHeader("Content-Disposition", contentDisposition);
       }
 
-      long contentLength = reply.getSize();
-      if ( reply.getHasStreamingData() && contentLength == 0 ) {
-        httpResponse.addHeader(HttpHeaders.Names.TRANSFER_ENCODING, Values.CHUNKED);
-      } else {
+      Long contentLength = reply.getSize();
+      if (contentLength != null) {
         httpResponse.addHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(contentLength));
       }
 
@@ -215,7 +213,10 @@ public class ObjectStorageGETOutboundHandler extends ObjectStorageBasicOutboundH
     if (etag != null) {
       httpResponse.addHeader(HttpHeaders.Names.ETAG, "\"" + etag + "\""); // etag in quotes, per s3-spec.
     }
-    httpResponse.addHeader(HttpHeaders.Names.LAST_MODIFIED, DateFormatter.dateToHeaderFormattedString(reply.getLastModified()));
+    Date lastModified = reply.getLastModified();
+    if (lastModified != null) {
+      httpResponse.addHeader(HttpHeaders.Names.LAST_MODIFIED, DateFormatter.dateToHeaderFormattedString(lastModified));
+    }
 
     String versionId = reply.getVersionId();
     if (versionId != null && !ObjectStorageProperties.NULL_VERSION_ID.equals(versionId)) {
