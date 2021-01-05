@@ -76,7 +76,7 @@ EFENCE=-lefence
 #DEBUGS = -DDEBUG # -DDEBUG1
 CFLAGS += 
 
-all: euca_system.o euca_string.o euca_network.o euca_file.o utf8.o log.o config.o fault.o misc.o wc.o hash.o data.o sensor.o euca_auth.o euca_axis.o ipc.o sequence_executor.o atomic_file.o euca_rootwrap euca-generate-fault
+all: euca_system.o euca_string.o euca_network.o euca_file.o utf8.o log.o config.o fault.o misc.o wc.o hash.o data.o sensor.o euca_auth.o ipc.o sequence_executor.o atomic_file.o euca_rootwrap euca-generate-fault
 	@for subdir in $(SUBDIRS); do \
         	(cd $$subdir && $(MAKE) buildall) || exit $$? ; done
 

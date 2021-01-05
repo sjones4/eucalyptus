@@ -56,9 +56,7 @@
 
 #include <eucalyptus.h>
 #include <misc.h>
-//#include <data.h>
 #include <euca_string.h>
-#include <euca_axis.h>
 
 #include "storage-controller.h"
 

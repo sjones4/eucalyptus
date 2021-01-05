@@ -45,9 +45,6 @@ URL:           https://eucalyptus.cloud/
 BuildRequires: ant >= 1.7
 BuildRequires: ant-apache-regexp
 BuildRequires: apache-ivy
-BuildRequires: axis2-adb-codegen
-BuildRequires: axis2-codegen
-BuildRequires: axis2c-devel >= 1.6.0
 BuildRequires: curl-devel
 BuildRequires: eucalyptus-java-deps >= %{version_java_deps}
 BuildRequires: gengetopt
@@ -84,25 +81,6 @@ computing service that is interface-compatible with Amazon AWS.
 This package contains bits that are shared by all Eucalyptus components
 and is not particularly useful on its own -- to get a usable cloud you
 will need to install Eucalyptus services as well.
-
-
-%package axis2c-common
-Summary:      Eucalyptus cloud platform - Axis2/C shared components
-
-Requires:     %{name} = %{version}-%{release}
-Requires:     eucalyptus-selinux >= %{version_selinux}
-Requires:     httpd
-Requires:     perl(Digest::MD5)
-Requires:     perl(MIME::Base64)
-
-%description axis2c-common
-Eucalyptus is a service overlay that implements elastic computing
-using existing resources. The goal of Eucalyptus is to allow sites
-with existing clusters and server infrastructure to co-host an elastic
-computing service that is interface-compatible with Amazon AWS.
-
-This package contains shared components used by all eucalyptus services
-that are based on Axis2/C.
 
 
 %package blockdev-utils
@@ -261,42 +239,10 @@ This package contains the cluster controller part of eucalyptus. It
 handles a group of node controllers.
 
 
-%package cc-native
-Summary:      Eucalyptus cloud platform - native cluster controller
-
-Requires:     %{name} = %{version}-%{release}
-Requires:     %{name}-axis2c-common = %{version}-%{release}
-Requires:     %{name}-cc = %{version}-%{release}
-Requires:     bridge-utils
-Requires:     dhcp >= 4.1.1-33.P1
-Requires:     eucalyptus-selinux >= %{version_selinux}
-Requires:     httpd
-Requires:     iproute
-Requires:     iptables
-Requires:     iputils
-Requires:     libselinux-python
-Requires:     rsync
-Requires:     /usr/bin/which
-%{?systemd_requires}
-
-Provides:     eucalyptus-cluster = %{version}-%{release}
-
-%description cc-native
-Eucalyptus is a service overlay that implements elastic computing
-using existing resources. The goal of Eucalyptus is to allow sites
-with existing clusters and server infrastructure to co-host an elastic
-computing service that is interface-compatible with Amazon AWS.
-
-This package contains the native cluster controller service. It
-handles a group of node controllers as an alternative to the Java
-cluster controller.
-
-
 %package nc
 Summary:      Eucalyptus cloud platform - node controller
 
 Requires:     %{name} = %{version}-%{release}
-Requires:     %{name}-axis2c-common = %{version}-%{release}
 Requires:     %{name}-blockdev-utils = %{version}-%{release}
 Requires:     %{name}-imaging-toolkit = %{version}-%{release}
 Requires:     bridge-utils
@@ -456,9 +402,6 @@ export JAVA_HOME='/usr/lib/jvm/java-1.8.0' && export JAVA='$JAVA_HOME/jre/bin/ja
     --prefix=/ \
     --disable-bundled-jars \
     --enable-debug \
-    --with-apache2-module-dir=%{_libdir}/httpd/modules \
-    --with-axis2=%{_datadir}/axis2-* \
-    --with-axis2c=%{axis2c_home} \
     --with-db-home=%{_prefix} \
     --with-extra-version=%{release}
 
@@ -503,16 +446,6 @@ cp -Rp admin-tools/conf/* $RPM_BUILD_ROOT/%{_sysconfdir}/eucalyptus-admin
 %attr(-,eucalyptus,eucalyptus) %dir /var/log/eucalyptus
 %attr(-,eucalyptus,eucalyptus) %dir /var/run/eucalyptus
 %attr(-,eucalyptus,eucalyptus-status) %dir /var/run/eucalyptus/status
-
-
-%files axis2c-common
-# CC and NC
-/etc/eucalyptus/httpd.conf
-/usr/share/eucalyptus/policies
-/usr/share/eucalyptus/euca_ipt
-/usr/share/eucalyptus/floppy
-/usr/share/eucalyptus/populate_arp.pl
-%{axis2c_home}/services/EucalyptusGL/
 
 
 %files blockdev-utils
@@ -570,21 +503,11 @@ cp -Rp admin-tools/conf/* $RPM_BUILD_ROOT/%{_sysconfdir}/eucalyptus-admin
 %{_unitdir}/eucalyptus-cluster.service
 
 
-%files cc-native
-%{axis2c_home}/services/EucalyptusCC/
-%attr(-,eucalyptus,eucalyptus) %dir /var/lib/eucalyptus/CC
-/usr/lib/eucalyptus/shutdownCC
-/usr/sbin/eucalyptus-cluster
-/usr/share/eucalyptus/dynserv.pl
-%{_unitdir}/eucalyptus-cluster-native.service
-%{_unitdir}/eucalyptus-cloud.service.d/eucalyptus-cloud-cluster-native.conf
-
 %files nc
 %doc tools/nc-hooks
 %config(noreplace) /etc/eucalyptus/libvirt.xsl
 %dir /etc/eucalyptus/nc-hooks
 /etc/eucalyptus/nc-hooks/example.sh
-%{axis2c_home}/services/EucalyptusNC/
 %attr(-,eucalyptus,eucalyptus) %dir /var/lib/eucalyptus/instances
 %{_libexecdir}/eucalyptus/nodeadmin-manage-volume-connections
 %dir /etc/libvirt/hooks
@@ -607,6 +530,10 @@ cp -Rp admin-tools/conf/* $RPM_BUILD_ROOT/%{_sysconfdir}/eucalyptus-admin
 %{_unitdir}/eucalyptus-node.service
 %{_unitdir}/eucalyptus-node-keygen.service
 
+/usr/share/eucalyptus/policies
+/usr/share/eucalyptus/euca_ipt
+/usr/share/eucalyptus/floppy
+/usr/share/eucalyptus/populate_arp.pl
 
 %files admin-tools
 %{python_sitelib}/eucalyptus_admin*

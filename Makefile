@@ -71,7 +71,7 @@
 
 include Makedefs
 
-# notes: storage has to preceed node and node has to preceed cluster
+# notes: storage has to preceed node
 SUBDIRS			=	tools \
 				systemd \
 				util \
@@ -80,11 +80,9 @@ SUBDIRS			=	tools \
 				storage	 \
 				gatherlog \
 				node  \
-				cluster \
 				clc
 
-INDENTDIRS =	cluster \
-				util \
+INDENTDIRS =	util \
 				net \
 				storage	 \
 				gatherlog \
@@ -106,8 +104,8 @@ help:
 
 tags:
 	@echo making tags for emacs and vi
-	find cluster net node storage tools util -name "*.[chCH]" -print | xargs ctags 
-	find cluster net node storage tools util -name "*.[chCH]" -print | xargs etags
+	find net node storage tools util -name "*.[chCH]" -print | xargs ctags
+	find net node storage tools util -name "*.[chCH]" -print | xargs etags
 
 build: Makedefs 
 	@for subdir in $(SUBDIRS); do \
