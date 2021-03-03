@@ -66,6 +66,8 @@ import com.eucalyptus.compute.common.backend.EnableVolumeIOResponseType;
 import com.eucalyptus.compute.common.backend.EnableVolumeIOType;
 import com.eucalyptus.compute.common.backend.ModifyVolumeAttributeResponseType;
 import com.eucalyptus.compute.common.backend.ModifyVolumeAttributeType;
+import com.eucalyptus.compute.common.backend.ModifyVolumeResponseType;
+import com.eucalyptus.compute.common.backend.ModifyVolumeType;
 import com.eucalyptus.compute.common.internal.blockstorage.Snapshot;
 import com.eucalyptus.compute.common.internal.blockstorage.Snapshots;
 import com.eucalyptus.compute.common.internal.blockstorage.State;
@@ -90,6 +92,7 @@ import com.eucalyptus.blockstorage.msgs.DeleteStorageVolumeType;
 import com.eucalyptus.blockstorage.msgs.DetachStorageVolumeType;
 import com.eucalyptus.blockstorage.msgs.GetVolumeTokenResponseType;
 import com.eucalyptus.blockstorage.msgs.GetVolumeTokenType;
+import com.eucalyptus.blockstorage.msgs.ModifyStorageVolumeType;
 import com.eucalyptus.blockstorage.util.StorageProperties;
 import com.eucalyptus.cluster.callback.VolumeAttachCallback;
 import com.eucalyptus.cluster.callback.VolumeDetachCallback;
@@ -121,6 +124,7 @@ import com.eucalyptus.vm.VmInstances;
 import com.eucalyptus.compute.common.internal.vm.VmVolumeAttachment;
 import com.eucalyptus.compute.common.internal.vm.VmVolumeAttachment.AttachmentState;
 import com.google.common.base.Function;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -232,7 +236,86 @@ public class VolumeManager {
     }
     throw new EucalyptusCloudException( "Failed to create volume after " + VOL_CREATE_RETRIES + " because of: " + lastEx, lastEx );
   }
-  
+
+
+  public ModifyVolumeResponseType modifyVolume(final ModifyVolumeType request) throws EucalyptusCloudException {
+    final ModifyVolumeResponseType reply = request.getReply( );
+    final Context ctx = Contexts.lookup( );
+    final AccountFullName accountFullName = ctx.getAccount();
+    final String volumeId = normalizeVolumeIdentifier( request.getVolumeId() );
+    final int requestedSize = MoreObjects.firstNonNull(request.getSize(), 0);
+
+    Volume volume;
+    try{
+      volume = Volumes.lookup(accountFullName, volumeId);
+    }catch(final NoSuchElementException ex){
+      try {
+        volume = Volumes.lookup( null, volumeId );
+      } catch ( NoSuchElementException e ) {
+        throw new ClientComputeException( "InvalidVolume.NotFound", "The volume '"+request.getVolumeId()+"' does not exist" );
+      }
+    }
+    final AccountFullName volumeAccount = AccountFullName.getInstance(volume.getOwnerAccountNumber());
+    final int volumeSize = volume.getSize();
+
+    if (!RestrictedTypes.filterPrivileged().apply(volume)) {
+      throw new ClientUnauthorizedComputeException( "Not authorized to modify volume " + volumeId + " by " + ctx.getUser( ).getName( ) );
+    }
+
+    //TODO:STEVE: check volume size quota
+    //TODO:STEVE: do not request resize if backend does not support it
+    //TODO:STEVE: check type of volume attachment before allowing resize (root volume)
+    Integer modifySize = requestedSize;
+    if (State.BUSY == volume.getState()) {
+      try {
+        final ServiceConfiguration ccConfig =
+            Topology.lookup( ClusterController.class, Partitions.lookupByName( volume.getPartition( ) ) );
+        final VmVolumeAttachment volumeAttachment = VmInstances.lookupVolumeAttachment( volume.getDisplayName() );
+        final ClusterAttachVolumeType attachVolume = new ClusterAttachVolumeType();
+        attachVolume.setInstanceId(volumeAttachment.getVmInstance().getInstanceId());
+        attachVolume.setVolumeId(volumeAttachment.getVolumeId());
+        attachVolume.setDevice(volumeAttachment.getDevice());
+        attachVolume.setRemoteDevice(volumeAttachment.getRemoteDevice());
+        attachVolume.setSize(requestedSize);
+        final VolumeAttachCallback cb = new VolumeAttachCallback(attachVolume);
+        AsyncRequests.newRequest(cb).sendSync(ccConfig);
+        modifySize = null; // updated by node, refresh size from backend
+      } catch (NoSuchElementException ex ) {
+        /** no attachment, or no partition **/
+      } catch (Exception ex) {
+        throw Exceptions.toUndeclared( "Modifying volume failed.", ex );
+      }
+    }
+    try {
+      ServiceConfiguration sc = Topology.lookup(Storage.class, Partitions.lookupByName(volume.getPartition()));
+      AsyncRequests.sendSync(sc, new ModifyStorageVolumeType(volume.getDisplayName(), modifySize));
+    } catch (Exception ex) {
+      throw Exceptions.toUndeclared( "Modifying volume failed.", ex );
+    }
+
+    @SuppressWarnings("Guava")
+    final Function<String, Volume> modifyVolume = input -> {
+      try {
+        final Volume vol = Entities.uniqueResult(Volume.named(volumeAccount, input));
+        vol.setSize(requestedSize);
+        return vol;
+      } catch ( Exception ex ) {
+        throw Exceptions.toUndeclared( "Updating volume failed.", ex );
+      }
+    };
+
+    try {
+      Entities.asTransaction( Volume.class, modifyVolume ).apply( volumeId );
+      reply.set_return( true );
+      return reply;
+    } catch ( NoSuchElementException ex ) {
+      return reply;
+    } catch ( RuntimeException ex ) {
+      Exceptions.rethrow( ex, ComputeException.class );
+      throw ex;
+    }
+  }
+
   public DeleteVolumeResponseType DeleteVolume( final DeleteVolumeType request ) throws EucalyptusCloudException {
     DeleteVolumeResponseType reply = ( DeleteVolumeResponseType ) request.getReply( );
     final Context ctx = Contexts.lookup( );

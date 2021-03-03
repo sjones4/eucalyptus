@@ -258,6 +258,7 @@ public class ClusterServiceImpl implements ClusterFullService {
       attachVolume.setVolumeId( request.getVolumeId( ) );
       attachVolume.setLocalDev( request.getDevice( ) );
       attachVolume.setRemoteDev( request.getRemoteDevice( ) );
+      attachVolume.setSize( request.getSize( ) );
       nodeService.attachVolume( attachVolume );
     } );
     return response;

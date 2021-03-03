@@ -91,6 +91,7 @@
     <value name="volumeId" field="volumeId" usage="optional"/>
     <value name="remoteDev" field="remoteDev" usage="optional"/>
     <value name="localDev" field="localDev" usage="optional"/>
+    <value name="size" field="size" usage="optional"/>
   </mapping>
   <mapping name="ncAttachVolumeResponse" class="com.eucalyptus.cluster.common.msgs.NcAttachVolumeResponseType" extends="com.eucalyptus.cluster.common.msgs.CloudNodeMessage">
     <structure map-as="com.eucalyptus.cluster.common.msgs.CloudNodeMessage"/>

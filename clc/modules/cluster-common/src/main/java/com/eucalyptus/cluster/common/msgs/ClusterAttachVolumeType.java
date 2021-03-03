@@ -34,6 +34,7 @@ public class ClusterAttachVolumeType extends CloudClusterMessage {
   private String instanceId;
   private String device;
   private String remoteDevice;
+  private Integer size;
 
   public ClusterAttachVolumeType( ) {
     super( );
@@ -77,5 +78,13 @@ public class ClusterAttachVolumeType extends CloudClusterMessage {
 
   public void setRemoteDevice( String remoteDevice ) {
     this.remoteDevice = remoteDevice;
+  }
+
+  public Integer getSize( ) {
+    return size;
+  }
+
+  public void setSize( Integer size ) {
+    this.size = size;
   }
 }

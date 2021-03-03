@@ -34,6 +34,7 @@ public class NcAttachVolumeType extends CloudNodeMessage {
   private String volumeId;
   private String remoteDev;
   private String localDev;
+  private Integer size;
 
   public String getInstanceId( ) {
     return instanceId;
@@ -65,5 +66,13 @@ public class NcAttachVolumeType extends CloudNodeMessage {
 
   public void setLocalDev( String localDev ) {
     this.localDev = localDev;
+  }
+
+  public Integer getSize( ) {
+    return size;
+  }
+
+  public void setSize( Integer size ) {
+    this.size = size;
   }
 }

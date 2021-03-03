@@ -63,7 +63,6 @@ import com.eucalyptus.blockstorage.async.ThreadPoolSizeUpdater;
 import com.eucalyptus.blockstorage.async.VolumeCreator;
 import com.eucalyptus.blockstorage.async.VolumeDeleter;
 import com.eucalyptus.blockstorage.async.VolumeStateChecker;
-import com.eucalyptus.blockstorage.async.VolumesConvertor;
 import com.eucalyptus.blockstorage.entities.BlockStorageGlobalConfiguration;
 import com.eucalyptus.blockstorage.entities.SnapshotInfo;
 import com.eucalyptus.blockstorage.entities.StorageInfo;
@@ -99,6 +98,8 @@ import com.eucalyptus.blockstorage.msgs.GetStorageVolumeResponseType;
 import com.eucalyptus.blockstorage.msgs.GetStorageVolumeType;
 import com.eucalyptus.blockstorage.msgs.GetVolumeTokenResponseType;
 import com.eucalyptus.blockstorage.msgs.GetVolumeTokenType;
+import com.eucalyptus.blockstorage.msgs.ModifyStorageVolumeResponseType;
+import com.eucalyptus.blockstorage.msgs.ModifyStorageVolumeType;
 import com.eucalyptus.blockstorage.msgs.StorageSnapshot;
 import com.eucalyptus.blockstorage.msgs.StorageVolume;
 import com.eucalyptus.blockstorage.msgs.UnexportVolumeResponseType;
@@ -124,6 +125,7 @@ import com.eucalyptus.util.EucalyptusCloudException;
 import com.eucalyptus.util.metrics.MonitoredAction;
 import com.eucalyptus.util.metrics.ThruputMetrics;
 import com.google.common.base.Function;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -1123,6 +1125,55 @@ public class BlockStorageController implements BlockStorageService {
       throw new EucalyptusCloudException("Failed to add creation task for " + volumeId + " to asynchronous thread pool", e);
     }
 
+    return reply;
+  }
+
+  @Override
+  public ModifyStorageVolumeResponseType ModifyStorageVolume(ModifyStorageVolumeType request) throws EucalyptusCloudException {
+    final long startTime = System.currentTimeMillis();
+    final ModifyStorageVolumeResponseType reply = request.getReply();
+    reply.set_return(false);
+    if (!StorageProperties.enableStorage) {
+      LOG.error("BlockStorage has been disabled. Please check your setup");
+      return reply;
+    }
+    final String volumeId = MoreObjects.firstNonNull(request.getVolumeId(), "none");
+    final int size = MoreObjects.firstNonNull(request.getSize(), -1);
+    LOG.info("Processing ModifyStorageVolume request for volume " + volumeId);
+
+    final VolumeInfo volumeInfo = new VolumeInfo();
+    volumeInfo.setVolumeId(volumeId);
+    try (TransactionResource tran = Entities.transactionFor(VolumeInfo.class)) {
+      VolumeInfo foundVolume = Entities.uniqueResult(volumeInfo);
+      // check its status
+      String status = foundVolume.getStatus();
+      if (status == null) {
+        throw new EucalyptusCloudException("Invalid volume status: null");
+      } else if (status.equals(StorageProperties.Status.available.toString())) {
+        if (size == -1 || size > foundVolume.getSize()) {
+          int newSize = blockManager.resizeVolume(foundVolume.getVolumeId(), size);
+          if (newSize > 0) {
+            foundVolume.setSize(newSize);
+          }
+        }
+      } else if (status.equals(StorageProperties.Status.deleting.toString())
+          || status.equals(StorageProperties.Status.deleted.toString())
+          || status.equals(StorageProperties.Status.failed.toString())) {
+        throw new EucalyptusCloudException("Invalid volume status: " + status);
+      } else {
+        throw new EucalyptusCloudException("Cannot modify volume in state: " + status + ". Please retry later");
+      }
+      reply.set_return(true);
+      tran.commit();
+    } catch (NoSuchElementException e) {
+      LOG.warn("Got modify request, but unable to find volume in SC database: " + volumeId);
+    } catch (EucalyptusCloudException e) {
+      LOG.error("Error modifying volume " + volumeId + ": " + e.getMessage());
+      throw e;
+    } catch (final Throwable e) {
+      LOG.error("Exception looking up volume for modification: " + volumeId, e);
+      throw new EucalyptusCloudException(e);
+    }
     return reply;
   }
 
