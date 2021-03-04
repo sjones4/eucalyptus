@@ -3501,10 +3501,11 @@ int doStartNetwork(ncMetadata * pMeta, char *uuid, char **remoteHosts, int remot
 //! @param[in] volumeId the volume identifier string (vol-XXXXXXXX)
 //! @param[in] remoteDev the target device name
 //! @param[in] localDev the local device name
+//! @param[in] size the size if this is a modification of an existing attachment
 //!
 //! @return EUCA_ERROR on failure or the result of the proper doAttachVolume() handler call.
 //!
-int doAttachVolume(ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev)
+int doAttachVolume(ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev, int size)
 {
     int ret = EUCA_OK;
 
@@ -3513,12 +3514,12 @@ int doAttachVolume(ncMetadata * pMeta, char *instanceId, char *volumeId, char *r
     DISABLED_CHECK;
 
     LOGINFO("[%s][%s] attaching volume\n", instanceId, volumeId);
-    LOGDEBUG("[%s][%s] volume attaching (remoteDev=%s localDev=%s)\n", instanceId, volumeId, remoteDev, localDev);
+    LOGDEBUG("[%s][%s] volume attaching (remoteDev=%s localDev=%s size=%d)\n", instanceId, volumeId, remoteDev, localDev, size);
 
     if (nc_state.H->doAttachVolume)
-        ret = nc_state.H->doAttachVolume(&nc_state, pMeta, instanceId, volumeId, remoteDev, localDev);
+        ret = nc_state.H->doAttachVolume(&nc_state, pMeta, instanceId, volumeId, remoteDev, localDev, size);
     else
-        ret = nc_state.D->doAttachVolume(&nc_state, pMeta, instanceId, volumeId, remoteDev, localDev);
+        ret = nc_state.D->doAttachVolume(&nc_state, pMeta, instanceId, volumeId, remoteDev, localDev, size);
 
     return ret;
 }

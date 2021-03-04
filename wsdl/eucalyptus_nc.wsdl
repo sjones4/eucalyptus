@@ -188,6 +188,7 @@
 	        <xs:element minOccurs="0" maxOccurs="1" name="volumeId" type="xs:string"/>
 	        <xs:element minOccurs="0" maxOccurs="1" name="remoteDev" type="xs:string"/>
 	        <xs:element minOccurs="0" maxOccurs="1" name="localDev" type="xs:string"/>
+	        <xs:element minOccurs="0" maxOccurs="1" name="size" type="xs:int"/>
 	      </xs:sequence>
 	    </xs:extension>
 	  </xs:complexContent>

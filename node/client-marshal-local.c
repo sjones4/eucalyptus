@@ -354,14 +354,15 @@ int ncDescribeResourceStub(ncStub * pStub, ncMetadata * pMeta, char *resourceTyp
 //! @param[in] volumeId the volume identifier string (vol-XXXXXXXX)
 //! @param[in] remoteDev the target device name
 //! @param[in] localDev the local device name
+//! @param[in] size the volume size if resizing
 //!
 //! @return the result of doAttachVolume()
 //!
 //! @see doAttachVolume()
 //!
-int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev)
+int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev, int size)
 {
-    return doAttachVolume(pMeta, instanceId, volumeId, remoteDev, localDev);
+    return doAttachVolume(pMeta, instanceId, volumeId, remoteDev, localDev, size);
 }
 
 //!

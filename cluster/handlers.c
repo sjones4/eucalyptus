@@ -741,7 +741,7 @@ int ncClientCall(ncMetadata * pMeta, int timeout, int ncLock, char *ncURL, char 
             char *remoteDev = va_arg(al, char *);
             char *localDev = va_arg(al, char *);
 
-            rc = ncAttachVolumeStub(ncs, localmeta, instanceId, volumeId, remoteDev, localDev);
+            rc = ncAttachVolumeStub(ncs, localmeta, instanceId, volumeId, remoteDev, localDev, 0);
         } else if (!strcmp(ncOp, "ncDetachVolume")) {
             char *instanceId = va_arg(al, char *);
             char *volumeId = va_arg(al, char *);

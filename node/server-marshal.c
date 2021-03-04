@@ -891,6 +891,7 @@ adb_ncAttachVolumeResponse_t *ncAttachVolumeMarshal(adb_ncAttachVolume_t * ncAtt
     axis2_char_t *volumeId = NULL;
     axis2_char_t *remoteDev = NULL;
     axis2_char_t *localDev = NULL;
+    int size = 0;
     adb_ncAttachVolumeType_t *input = NULL;
     adb_ncAttachVolumeResponse_t *response = NULL;
     adb_ncAttachVolumeResponseType_t *output = NULL;
@@ -906,13 +907,14 @@ adb_ncAttachVolumeResponse_t *ncAttachVolumeMarshal(adb_ncAttachVolume_t * ncAtt
         volumeId = adb_ncAttachVolumeType_get_volumeId(input, env);
         remoteDev = adb_ncAttachVolumeType_get_remoteDev(input, env);
         localDev = adb_ncAttachVolumeType_get_localDev(input, env);
+        size = adb_ncAttachVolumeType_get_size(input, env);
 
         {
             // do it
             EUCA_MESSAGE_UNMARSHAL(ncAttachVolumeType, input, (&meta));
 
             threadCorrelationId *corr_id = set_corrid(meta.correlationId);
-            if ((error = doAttachVolume(&meta, instanceId, volumeId, remoteDev, localDev)) != EUCA_OK) {
+            if ((error = doAttachVolume(&meta, instanceId, volumeId, remoteDev, localDev, size)) != EUCA_OK) {
                 LOGERROR("[%s][%s] failed error=%d\n", instanceId, volumeId, error);
                 adb_ncAttachVolumeResponseType_set_return(output, env, AXIS2_FALSE);
                 adb_ncAttachVolumeResponseType_set_correlationId(output, env, meta.correlationId);

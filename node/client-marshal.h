@@ -119,7 +119,7 @@ int ncStartNetworkStub(ncStub * pStub, ncMetadata * pMeta, char *uuid, char **pe
 int ncBroadcastNetworkInfoStub(ncStub * pStub, ncMetadata * pMeta, char *networkInfo);
 int ncAssignAddressStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *publicIp);
 int ncPowerDownStub(ncStub * pStub, ncMetadata * pMeta);
-int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev);
+int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev, int size);
 int ncDetachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev, int force);
 int ncAttachNetworkInterfaceStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, netConfig * netCfg);
 int ncDetachNetworkInterfaceStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *attachmentId, int force);

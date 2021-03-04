@@ -187,7 +187,7 @@ static int doBroadcastNetworkInfo(struct nc_state_t *nc, ncMetadata * pMeta, cha
 static int doAssignAddress(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *publicIp);
 static int doPowerDown(struct nc_state_t *nc, ncMetadata * pMeta);
 static int doStartNetwork(struct nc_state_t *nc, ncMetadata * pMeta, char *uuid, char **remoteHosts, int remoteHostsLen, int port, int vlan);
-static int doAttachVolume(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev);
+static int doAttachVolume(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int size);
 static int doDetachVolume(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int force);
 static int doAttachNetworkInterface(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, netConfig * netCfg);
 static int doDetachNetworkInterface(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *interfaceId, int force);
@@ -1354,6 +1354,40 @@ int delete_vol_xml(const char *instanceId, const char *volumeId)
     return (unlink(lpath)) ? (EUCA_ERROR) : (EUCA_OK);
 }
 
+int resize_vol_instance(struct nc_state_t *nc, const char *devName, const char *instanceId, const char *volumeId, int size)
+{
+    int ret = EUCA_OK;
+    unsigned long long size_kb = size;
+    size_kb = size_kb * (1024 * 1024);
+
+    virConnectPtr conn = lock_hypervisor_conn();
+    if (conn == NULL) {
+        LOGERROR("[%s][%s] cannot get connection to hypervisor\n", instanceId, volumeId);
+        return EUCA_HYPERVISOR_ERROR;
+    }
+    
+    // find domain on hypervisor
+    virDomainPtr dom = virDomainLookupByName(conn, instanceId);
+    if (dom == NULL) {
+        unlock_hypervisor_conn();
+        return EUCA_HYPERVISOR_ERROR;
+    }
+
+    int err = 0;
+    err = virDomainBlockResize(dom, devName, size_kb, 0);
+    if (err) {
+        LOGERROR("[%s][%s] failed to resize EBS guest device\n", instanceId, volumeId);
+        LOGDEBUG("[%s][%s] virDomainBlockResize() failed (err=%d devName=%s size=%d)\n", instanceId, volumeId, err, devName, size);
+        ret = EUCA_ERROR;
+    }
+
+    virDomainFree(dom);                // release libvirt resource
+    unlock_hypervisor_conn();
+
+    return ret;
+}
+
+
 int attach_vol_instance(struct nc_state_t *nc, const char *devName, const char *instanceId, const char *volumeId, const char *libvirt_xml)
 {
     int ret = EUCA_OK;
@@ -1446,11 +1480,12 @@ void set_serial_and_bus(const char *vol, const char *dev, char *serial, int seri
 //! @param[in] volumeId the volume identifier string (vol-XXXXXXXX)
 //! @param[in] attachmentToken the token string for the attachment target
 //! @param[in] localDev the local device name
+//! @param[in] size the updated size for the volume
 //!
 //! @return EUCA_OK on success or proper error code. Known error code returned include: EUCA_ERROR,
 //!         EUCA_NOT_FOUND_ERROR and EUCA_HYPERVISOR_ERROR.
 //!
-static int doAttachVolume(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev)
+static int doAttachVolume(struct nc_state_t *nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int size)
 {
     int ret = EUCA_OK;
     boolean have_remote_device = FALSE;
@@ -1463,30 +1498,38 @@ static int doAttachVolume(struct nc_state_t *nc, ncMetadata * pMeta, char *insta
     if (ret)
         return ret;
 
-    if (update_volume(instanceId, volumeId, attachmentToken, NULL, canonicalDev, VOL_STATE_ATTACHING, NULL, FALSE)) {
-        return EUCA_ERROR;
-    }
+    if (size > 0) {
+      ret = resize_vol_instance(nc, canonicalDev, instanceId, volumeId, size);
+      if (ret == EUCA_OK) {
+          LOGINFO("[%s][%s] EBS volume size modified for guest device '%s' now %dG\n", instanceId, volumeId, canonicalDev, size);
+      }
+      goto free;
+    } else {
+      if (update_volume(instanceId, volumeId, attachmentToken, NULL, canonicalDev, VOL_STATE_ATTACHING, NULL, FALSE)) {
+          return EUCA_ERROR;
+      }
 
-    char serial[128];
-    char bus[16];
-    set_serial_and_bus(volumeId, canonicalDev, serial, sizeof(serial), bus, sizeof(bus));
-    if (connect_ebs(canonicalDev, serial, bus, nc, instanceId, volumeId, attachmentToken, &libvirt_xml, &vol_data)) {
-        ret = EUCA_ERROR;
-        goto release;
-    }
-    have_remote_device = TRUE;
+      char serial[128];
+      char bus[16];
+      set_serial_and_bus(volumeId, canonicalDev, serial, sizeof(serial), bus, sizeof(bus));
+      if (connect_ebs(canonicalDev, serial, bus, nc, instanceId, volumeId, attachmentToken, &libvirt_xml, &vol_data)) {
+          ret = EUCA_ERROR;
+          goto release;
+      }
+      have_remote_device = TRUE;
 
-    if (update_volume(instanceId, volumeId, attachmentToken, vol_data->connect_string, NULL, VOL_STATE_ATTACHING, libvirt_xml, FALSE)) {
-        ret = EUCA_ERROR;
-        goto release;
-    }
+      if (update_volume(instanceId, volumeId, attachmentToken, vol_data->connect_string, NULL, VOL_STATE_ATTACHING, libvirt_xml, FALSE)) {
+          ret = EUCA_ERROR;
+          goto release;
+      }
 
-    if (create_vol_xml(instanceId, volumeId, libvirt_xml, &libvirt_xml_modified) != EUCA_OK) {
-        ret = EUCA_ERROR;
-        goto release;
-    }
+      if (create_vol_xml(instanceId, volumeId, libvirt_xml, &libvirt_xml_modified) != EUCA_OK) {
+          ret = EUCA_ERROR;
+          goto release;
+      }
 
-    ret = attach_vol_instance(nc, canonicalDev, instanceId, volumeId, libvirt_xml_modified);
+      ret = attach_vol_instance(nc, canonicalDev, instanceId, volumeId, libvirt_xml_modified);
+    }
 
 release:
 
@@ -1509,6 +1552,8 @@ release:
     if (ret == EUCA_OK) {
         LOGINFO("[%s][%s] EBS volume attached as guest device '%s'\n", instanceId, volumeId, canonicalDev);
     }
+
+free:
 
     EUCA_FREE(vol_data);
     EUCA_FREE(libvirt_xml);

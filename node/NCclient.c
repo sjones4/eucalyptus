@@ -722,7 +722,7 @@ static int ncClientAttachVolume(ncStub * pStub, ncMetadata * pMeta, char *psInst
 {
     int rc = EUCA_OK;
 
-    if ((rc = ncAttachVolumeStub(pStub, pMeta, psInstanceId, psVolumeId, psRemoteDevice, psLocalDevice)) != EUCA_OK) {
+    if ((rc = ncAttachVolumeStub(pStub, pMeta, psInstanceId, psVolumeId, psRemoteDevice, psLocalDevice, 0)) != EUCA_OK) {
         printf("ncAttachVolumeStub = %d\n", rc);
         exit(1);
     }

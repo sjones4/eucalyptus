@@ -956,7 +956,7 @@ int ncStartNetworkStub(ncStub * pStub, ncMetadata * pMeta, char *uuid, char **pe
 //!
 //! @return EUCA_OK on success or EUCA_ERROR on failure.
 //!
-int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev)
+int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, char *volumeId, char *remoteDev, char *localDev, int size)
 {
     int status = 0;
     axutil_env_t *env = NULL;
@@ -987,6 +987,7 @@ int ncAttachVolumeStub(ncStub * pStub, ncMetadata * pMeta, char *instanceId, cha
     adb_ncAttachVolumeType_set_volumeId(request, env, volumeId);
     adb_ncAttachVolumeType_set_remoteDev(request, env, remoteDev);
     adb_ncAttachVolumeType_set_localDev(request, env, localDev);
+    adb_ncAttachVolumeType_set_size(request, env, size);
     adb_ncAttachVolume_set_ncAttachVolume(input, env, request);
 
     // do it

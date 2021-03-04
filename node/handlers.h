@@ -215,7 +215,7 @@ struct handlers {
     int (*doGetConsoleOutput) (struct nc_state_t * nc, ncMetadata * pMeta, char *instanceId, char **consoleOutput);
     int (*doDescribeResource) (struct nc_state_t * nc, ncMetadata * pMeta, char *resourceType, ncResource ** outRes);
     int (*doStartNetwork) (struct nc_state_t * nc, ncMetadata * pMeta, char *uuid, char **remoteHosts, int remoteHostsLen, int port, int vlan);
-    int (*doAttachVolume) (struct nc_state_t * nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev);
+    int (*doAttachVolume) (struct nc_state_t * nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int size);
     int (*doDetachVolume) (struct nc_state_t * nc, ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int force);
     int (*doAttachNetworkInterface) (struct nc_state_t * nc, ncMetadata * pMeta, char *instanceId, netConfig * netConfig);
     int (*doDetachNetworkInterface) (struct nc_state_t * nc, ncMetadata * pMeta, char *instanceId, char *interfaceId, int force);
@@ -302,7 +302,7 @@ int doRebootInstance(ncMetadata * pMeta, char *instanceId);
 int doGetConsoleOutput(ncMetadata * pMeta, char *instanceId, char **consoleOutput);
 int doDescribeResource(ncMetadata * pMeta, char *resourceType, ncResource ** outRes);
 int doStartNetwork(ncMetadata * pMeta, char *uuid, char **remoteHosts, int remoteHostsLen, int port, int vlan);
-int doAttachVolume(ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev);
+int doAttachVolume(ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int size);
 int doDetachVolume(ncMetadata * pMeta, char *instanceId, char *volumeId, char *attachmentToken, char *localDev, int force);
 int doAttachNetworkInterface(ncMetadata * pMeta, char *instanceId, netConfig * netCfg);
 int doDetachNetworkInterface(ncMetadata * pMeta, char *instanceId, char *attachmentId, int force);
