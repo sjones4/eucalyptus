@@ -1642,11 +1642,14 @@
     <value name="state" field="state" usage="optional"/>
     <value name="vpcId" field="vpcId" usage="optional"/>
     <value name="cidrBlock" field="cidrBlock" usage="optional"/>
+    <structure name="ipv6CidrBlockAssociationSet" usage="required"/>
     <value name="availableIpAddressCount" field="availableIpAddressCount" usage="optional"/>
     <value name="availabilityZone" field="availabilityZone" usage="optional"/>
     <value name="defaultForAz" field="defaultForAz" usage="optional"/>
     <value name="mapPublicIpOnLaunch" field="mapPublicIpOnLaunch" usage="optional"/>
     <structure name="tagSet" field="tagSet" usage="optional" type="com.eucalyptus.compute.common.ResourceTagSetType"/>
+    <value name="assignIpv6AddressOnCreation" field="assignIpv6AddressOnCreation" usage="optional"/>
+    <value name="mapCustomerOwnedIpOnLaunch" field="mapCustomerOwnedIpOnLaunch" usage="optional"/>
   </mapping>
   <mapping class="com.eucalyptus.compute.common.CustomerGatewaySetType" abstract="true">
     <collection field="item">
