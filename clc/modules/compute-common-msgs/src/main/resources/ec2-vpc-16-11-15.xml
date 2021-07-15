@@ -1932,6 +1932,8 @@
   <mapping name="ModifySubnetAttribute" class="com.eucalyptus.compute.common.ModifySubnetAttributeType" extends="com.eucalyptus.compute.common.ComputeMessage">
     <structure map-as="com.eucalyptus.compute.common.ComputeMessage"/>
     <value name="subnetId" field="subnetId" usage="required"/>
+    <structure name="assignIpv6AddressOnCreation" field="assignIpv6AddressOnCreation" usage="optional" type="com.eucalyptus.compute.common.AttributeBooleanValueType"/>
+    <structure name="mapCustomerOwnedIpOnLaunch" field="mapCustomerOwnedIpOnLaunch" usage="optional" type="com.eucalyptus.compute.common.AttributeBooleanValueType"/>
     <structure name="mapPublicIpOnLaunch" field="mapPublicIpOnLaunch" usage="optional" type="com.eucalyptus.compute.common.AttributeBooleanValueType"/>
   </mapping>
   <mapping name="ModifySubnetAttributeResponse" class="com.eucalyptus.compute.common.ModifySubnetAttributeResponseType" extends="com.eucalyptus.compute.common.ComputeMessage">
